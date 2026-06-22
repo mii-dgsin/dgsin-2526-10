@@ -126,7 +126,7 @@ isYearOutOfRange(value: string): boolean {
     this.offset = 0;
     this.loadRecords();
   }
-  
+
   clearFilters(): void {
     this.location = '';
     this.period = '';
@@ -174,5 +174,30 @@ isYearOutOfRange(value: string): boolean {
       this.offset = 0;
       this.loadRecords();
     }, 400);
+  }
+
+  deleteRecord(id: string): void {
+    const confirmed = confirm('Are you sure you want to delete this record?');
+
+    if (!confirmed) {
+      return;
+    }
+
+    this.loading = true;
+    this.errorMessage = '';
+
+    this.carbonEmissionService.deleteRecord(id).subscribe({
+      next: () => {
+        if (this.records.length === 1 && this.offset > 0) {
+          this.offset = Math.max(this.offset - this.limit, 0);
+        }
+
+        this.loadRecords();
+      },
+      error: () => {
+        this.errorMessage = 'Error deleting carbon emission record';
+        this.loading = false;
+      }
+    });
   }
 }

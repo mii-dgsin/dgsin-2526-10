@@ -142,6 +142,28 @@ button:disabled {
   opacity: 0.5;
 }
 
+.icon-button {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-button.danger {
+  background: #b00020;
+  color: white;
+}
+
+.icon-button.danger:hover {
+  opacity: 0.85;
+}
 .field select {
   padding: 8px;
   border: 1px solid #bbb;

@@ -43,4 +43,7 @@ export class CarbonEmissionRecordService {
 
     return this.http.get<CarbonEmissionRecordResponse>(this.apiUrl, { params });
   }
+  deleteRecord(id: string) {
+    return this.http.delete(`${this.apiUrl}/${id}`);
+  }
 }
