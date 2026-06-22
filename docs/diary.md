@@ -323,6 +323,18 @@ Aunque durante el desarrollo se está utilizando Insomnia, se mantiene la carpet
 
 ---
 
+## Avance 10 - Validación y control de errores
+
+Se ha añadido una capa de validación para el recurso `carbon-emission-records`.
+
+La validación comprueba que los datos recibidos en las operaciones de creación y actualización contienen los campos obligatorios y que los tipos de datos son correctos.
+
+También se ha añadido un middleware para gestionar rutas no encontradas, devolviendo una respuesta JSON con código HTTP 404 cuando se solicita un endpoint inexistente.
+
+Con estos cambios, la API mejora su robustez y ofrece respuestas más claras ante peticiones incorrectas.
+
+---
+
 # Decisiones técnicas tomadas
 
 ## Uso de Node.js y Express

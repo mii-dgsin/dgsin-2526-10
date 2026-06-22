@@ -8,12 +8,14 @@ const {
   deleteCarbonEmissionRecord
 } = require("../controllers/carbonEmissionRecord.controller");
 
+const validateCarbonEmissionRecord = require("../validators/carbonEmissionRecord.validator");
+
 const router = express.Router();
 
 router.get("/", getCarbonEmissionRecords);
 router.get("/:id", getCarbonEmissionRecordById);
-router.post("/", createCarbonEmissionRecord);
-router.put("/:id", updateCarbonEmissionRecord);
+router.post("/", validateCarbonEmissionRecord, createCarbonEmissionRecord);
+router.put("/:id", validateCarbonEmissionRecord, updateCarbonEmissionRecord);
 router.delete("/:id", deleteCarbonEmissionRecord);
 
 module.exports = router;
