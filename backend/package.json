@@ -8,6 +8,9 @@
     "dev": "nodemon src/app.js",
     "load:carbon": "node src/scripts/loadCarbonEmissionRecords.js"
   },
+    "engines": {
+    "node": "24.x.x"
+  },
   "keywords": [
     "nodejs",
     "express",

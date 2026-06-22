@@ -1,0 +1,5 @@
+runtime: nodejs24
+
+env_variables:
+  NODE_ENV: "production"
+  MONGODB_URI: "mongodb+srv://USER:PASSWORD@CLUSTER.mongodb.net/dgsin-2526-10?retryWrites=true&w=majority"

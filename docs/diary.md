@@ -334,6 +334,18 @@ También se ha añadido un middleware para gestionar rutas no encontradas, devol
 Con estos cambios, la API mejora su robustez y ofrece respuestas más claras ante peticiones incorrectas.
 
 ---
+## Avance 11 - Preparación para Google App Engine
+
+Se ha comenzado a preparar el backend para su futuro despliegue en Google App Engine.
+
+Para ello se ha creado una plantilla de configuración `app.example.yaml`, donde se define el runtime de Node.js y las variables de entorno necesarias para ejecutar la aplicación en la nube.
+
+También se ha revisado el script `start` del archivo `package.json`, ya que App Engine ejecutará la aplicación mediante `npm start`.
+
+Además, se ha añadido la versión de Node.js en la sección `engines` para mantener coherencia entre la configuración del proyecto y el runtime definido para App Engine.
+
+Por motivos de seguridad, el archivo real `app.yaml`, que puede contener credenciales de conexión a MongoDB Atlas, no se subirá al repositorio. En su lugar, se mantiene una plantilla sin credenciales reales.
+---
 
 # Decisiones técnicas tomadas
 
