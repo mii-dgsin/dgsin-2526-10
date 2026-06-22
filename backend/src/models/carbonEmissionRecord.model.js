@@ -7,6 +7,11 @@ const carbonEmissionRecordSchema = new mongoose.Schema(
       required: true,
       trim: true
     },
+    normalizedLocation: {
+      type: String,
+      required: true,
+      trim: true
+    },
     period: {
       type: Number,
       required: true,
@@ -38,7 +43,7 @@ const carbonEmissionRecordSchema = new mongoose.Schema(
 );
 
 carbonEmissionRecordSchema.index(
-  { location: 1, period: 1 },
+  { normalizedLocation: 1, period: 1 },
   { unique: true }
 );
 

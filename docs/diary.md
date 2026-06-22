@@ -20,11 +20,11 @@ El objetivo principal será estudiar la evolución de las emisiones de CO₂ en 
 
 ## URL
 
-Pendiente.
+https://dgsin-2526-10-mjcadenas.ew.r.appspot.com
 
 ## APIs
 
-Pendiente.
+Pendiente de documentación final.
 
 ---
 
@@ -55,15 +55,16 @@ La fuente cumple los requisitos indicados para el proyecto porque:
 
 ## Ejemplo de dato
 
-| location | period | total-emissions-mt | emissions-intensity | emissions-per-capita | annual-variation |
-|---|---:|---:|---:|---:|---:|
-| Spain | 2022 | 235.471 | 0.11 | 5.07 | -0.84 |
+| location | normalized-location | period | total-emissions-mt | emissions-intensity | emissions-per-capita | annual-variation |
+|---|---|---:|---:|---:|---:|---:|
+| Spain and Andorra | Spain | 2022 | 235.471 | 0.11 | 5.07 | -0.84 |
 
 ## Campos de la fuente
 
 | Campo | Descripción |
 |---|---|
-| `location` | País al que pertenecen los datos |
+| `location` | Localización original tal y como aparece en la fuente de información |
+| `normalized-location` | Nombre normalizado del país para facilitar búsquedas e integración futura con APIs externas |
 | `period` | Año del registro |
 | `total-emissions-mt` | Emisiones totales de CO₂ en megatoneladas |
 | `emissions-intensity` | Intensidad de emisiones |
@@ -76,10 +77,10 @@ Para facilitar la integración posterior con una API externa de datos energétic
 
 | Dimensión | Campo usado |
 |---|---|
-| Información geográfica | `location` |
+| Información geográfica | `normalized-location` |
 | Información temporal | `period` |
 
-La información geográfica se representará a nivel de país y la información temporal se representará a nivel de año. Esto permitirá comparar posteriormente los datos de emisiones de CO₂ con otros datos energéticos externos.
+La información geográfica se representará a nivel de país mediante `normalized-location` y la información temporal se representará a nivel de año mediante `period`.
 
 ---
 
@@ -110,21 +111,25 @@ DGSIN-2526-10/
 ├── backend/
 │   ├── data/
 │   │   └── carbonEmissionRecords.json
-│   ├── node_modules/
 │   ├── src/
 │   │   ├── config/
 │   │   │   └── db.js
 │   │   ├── controllers/
 │   │   │   └── carbonEmissionRecord.controller.js
+│   │   ├── middlewares/
+│   │   │   └── notFound.middleware.js
 │   │   ├── models/
 │   │   │   └── carbonEmissionRecord.model.js
 │   │   ├── routes/
 │   │   │   └── carbonEmissionRecord.routes.js
 │   │   ├── scripts/
 │   │   │   └── loadCarbonEmissionRecords.js
+│   │   ├── validators/
+│   │   │   └── carbonEmissionRecord.validator.js
 │   │   └── app.js
 │   ├── .env
 │   ├── .gitignore
+│   ├── app.example.yaml
 │   ├── package-lock.json
 │   └── package.json
 ├── docs/
@@ -134,8 +139,6 @@ DGSIN-2526-10/
 ```
 
 La estructura anterior evita mantener una carpeta duplicada de `backend/backend` y deja el proyecto más claro para el desarrollo, la documentación y el futuro despliegue.
-
-Como mejora pendiente, se valorará mover o duplicar el archivo `.gitignore` a la raíz del repositorio para aplicar reglas generales a todo el proyecto cuando se incorpore el frontend.
 
 ---
 
@@ -210,13 +213,14 @@ El modelo representa los registros de emisiones de CO₂ y contiene los siguient
 | Campo en MongoDB | Campo del diario | Tipo |
 |---|---|---|
 | `location` | `location` | String |
+| `normalizedLocation` | `normalized-location` | String |
 | `period` | `period` | Number |
 | `totalEmissionsMt` | `total-emissions-mt` | Number |
 | `emissionsIntensity` | `emissions-intensity` | Number |
 | `emissionsPerCapita` | `emissions-per-capita` | Number |
 | `annualVariation` | `annual-variation` | Number |
 
-Se ha añadido una restricción para evitar registros duplicados con la misma combinación de país y año.
+Se ha añadido una restricción para evitar registros duplicados con la misma combinación de país normalizado y año.
 
 ---
 
@@ -238,9 +242,9 @@ El recurso permite realizar operaciones CRUD sobre los registros de emisiones de
 |---|---|---|
 | GET | `/api/v1/health` | Comprueba que la API está funcionando |
 | GET | `/api/v1/carbon-emission-records` | Obtiene todos los registros de emisiones de CO₂ |
-| GET | `/api/v1/carbon-emission-records?location=Spain` | Filtra los registros por país |
+| GET | `/api/v1/carbon-emission-records?location=Spain` | Filtra los registros por país normalizado |
 | GET | `/api/v1/carbon-emission-records?period=2022` | Filtra los registros por año |
-| GET | `/api/v1/carbon-emission-records?location=Spain&period=2022` | Filtra los registros por país y año |
+| GET | `/api/v1/carbon-emission-records?location=Spain&period=2022` | Filtra los registros por país normalizado y año |
 | GET | `/api/v1/carbon-emission-records/:id` | Obtiene un registro concreto por identificador |
 | POST | `/api/v1/carbon-emission-records` | Crea un nuevo registro de emisiones |
 | PUT | `/api/v1/carbon-emission-records/:id` | Actualiza un registro existente |
@@ -256,11 +260,12 @@ Se ha creado un archivo JSON con datos iniciales de emisiones de CO₂:
 backend/data/carbonEmissionRecords.json
 ```
 
-El primer dato cargado corresponde a España en el año 2022:
+El primer dato cargado corresponde a la localización original `Spain and Andorra`, con `Spain` como localización normalizada para facilitar búsquedas e integración posterior:
 
 ```json
 {
-  "location": "Spain",
+  "location": "Spain and Andorra",
+  "normalizedLocation": "Spain",
   "period": 2022,
   "totalEmissionsMt": 235.471,
   "emissionsIntensity": 0.11,
@@ -282,6 +287,8 @@ npm run load:carbon
 ```
 
 La carga de datos se ha probado correctamente y el registro inicial se ha insertado en la base de datos.
+
+Durante esta fase se detectaron avisos de Mongoose relacionados con el uso de `new: true` en operaciones de actualización. Se sustituyó por `returnDocument: "after"` para evitar el uso de una opción obsoleta.
 
 ---
 
@@ -334,6 +341,7 @@ También se ha añadido un middleware para gestionar rutas no encontradas, devol
 Con estos cambios, la API mejora su robustez y ofrece respuestas más claras ante peticiones incorrectas.
 
 ---
+
 ## Avance 11 - Preparación para Google App Engine
 
 Se ha comenzado a preparar el backend para su futuro despliegue en Google App Engine.
@@ -345,6 +353,36 @@ También se ha revisado el script `start` del archivo `package.json`, ya que App
 Además, se ha añadido la versión de Node.js en la sección `engines` para mantener coherencia entre la configuración del proyecto y el runtime definido para App Engine.
 
 Por motivos de seguridad, el archivo real `app.yaml`, que puede contener credenciales de conexión a MongoDB Atlas, no se subirá al repositorio. En su lugar, se mantiene una plantilla sin credenciales reales.
+
+---
+
+## Avance 12 - Despliegue del backend en Google App Engine
+
+Se ha desplegado el backend del proyecto en Google App Engine.
+
+La aplicación se encuentra disponible públicamente en la siguiente URL:
+
+https://dgsin-2526-10-mjcadenas.ew.r.appspot.com
+
+Para el despliegue se ha utilizado Google Cloud CLI desde la carpeta `backend/`, donde se encuentra el archivo `app.yaml`.
+
+Durante el proceso se detectó inicialmente un problema de facturación del proyecto, ya que Google Cloud requería una cuenta de facturación asociada para poder crear la aplicación de App Engine. Una vez vinculada la facturación correspondiente, se pudo crear la aplicación.
+
+Posteriormente se detectó un problema de permisos con el bucket de staging de App Engine. Para resolverlo, se concedieron permisos de administración de Cloud Storage a la cuenta de servicio predeterminada de App Engine.
+
+También se detectó un problema de conexión entre App Engine y MongoDB Atlas. La API respondía correctamente en la ruta raíz, pero las rutas que consultaban MongoDB devolvían un error de timeout. El problema se resolvió ajustando la configuración de acceso de red en MongoDB Atlas.
+
+Tras corregir estas incidencias, la API desplegada responde correctamente y puede acceder a los datos almacenados en MongoDB Atlas.
+
+Endpoints verificados:
+
+| Método | Endpoint | Estado |
+|---|---|---|
+| GET | `/` | Probado |
+| GET | `/api/v1/health` | Probado |
+| GET | `/api/v1/carbon-emission-records` | Probado |
+| GET | `/api/v1/carbon-emission-records?location=Spain` | Probado |
+
 ---
 
 # Decisiones técnicas tomadas
@@ -365,15 +403,11 @@ Esta decisión facilita el despliegue posterior de la aplicación, ya que el bac
 
 El proyecto se ha estructurado separando el backend en una carpeta propia. Más adelante se añadirá una carpeta `frontend/` para implementar la aplicación Angular.
 
-La estructura prevista será:
+## Uso de localización normalizada
 
-```txt
-DGSIN-2526-10/
-├── backend/
-├── frontend/
-├── docs/
-└── README.md
-```
+Se ha decidido conservar el valor original de localización proporcionado por la fuente en el campo `location` y añadir un campo `normalizedLocation` para facilitar búsquedas e integración futura con APIs externas.
+
+Esta decisión permite mantener trazabilidad con la fuente original y, al mismo tiempo, utilizar nombres de país más fáciles de comparar con otros sistemas.
 
 ## Uso de Insomnia para pruebas
 
@@ -389,14 +423,11 @@ Los próximos pasos del proyecto serán:
 
 1. Completar las pruebas de todos los endpoints CRUD.
 2. Añadir más datos reales de emisiones de CO₂.
-3. Mejorar la validación de datos de entrada.
-4. Gestionar mejor los errores de la API.
-5. Preparar documentación de la API.
-6. Añadir configuración para despliegue en Google App Engine.
-7. Crear el frontend con Angular.
-8. Integrar una API externa de datos energéticos.
-9. Añadir visualizaciones y comparativas.
-10. Actualizar el diario con cada avance realizado.
+3. Preparar documentación de la API.
+4. Crear el frontend con Angular.
+5. Integrar una API externa de datos energéticos.
+6. Añadir visualizaciones de datos.
+7. Actualizar el diario con cada avance realizado.
 
 ---
 
@@ -413,3 +444,4 @@ Los tiempos de trabajo se irán registrando en Toggl.
 | Pendiente | Implementación del recurso `carbon-emission-records` | Pendiente |
 | Pendiente | Creación del script de carga de datos | Pendiente |
 | Pendiente | Pruebas iniciales con Insomnia | Pendiente |
+| Pendiente | Preparación y despliegue en App Engine | Pendiente |

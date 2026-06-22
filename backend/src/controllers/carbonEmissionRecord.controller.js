@@ -7,9 +7,9 @@ const getCarbonEmissionRecords = async (req, res) => {
     const filter = {};
 
     if (location) {
-      filter.location = new RegExp(`^${location}$`, "i");
+      filter.normalizedLocation = new RegExp(`^${location}$`, "i");
     }
-
+    
     if (period) {
       filter.period = Number(period);
     }

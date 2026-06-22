@@ -16,6 +16,21 @@ La fuente seleccionada contiene información organizada en tablas HTML, por lo q
 
 En fases posteriores, el sistema se integrará con una API externa de datos energéticos para poder realizar comparaciones relacionadas con la transición energética.
 
+## URL desplegada
+
+La API está desplegada en Google App Engine:
+
+https://dgsin-2526-10-mjcadenas.ew.r.appspot.com
+
+Endpoints principales desplegados:
+
+```txt
+GET https://dgsin-2526-10-mjcadenas.ew.r.appspot.com/
+GET https://dgsin-2526-10-mjcadenas.ew.r.appspot.com/api/v1/health
+GET https://dgsin-2526-10-mjcadenas.ew.r.appspot.com/api/v1/carbon-emission-records
+GET https://dgsin-2526-10-mjcadenas.ew.r.appspot.com/api/v1/carbon-emission-records?location=Spain
+```
+
 ## Tecnologías utilizadas
 
 - Node.js
@@ -25,6 +40,8 @@ En fases posteriores, el sistema se integrará con una API externa de datos ener
 - dotenv
 - cors
 - nodemon
+- Google App Engine
+- Google Cloud CLI
 - Insomnia para pruebas de API
 
 ## Estructura del proyecto
@@ -39,14 +56,20 @@ DGSIN-2526-10/
 │   │   │   └── db.js
 │   │   ├── controllers/
 │   │   │   └── carbonEmissionRecord.controller.js
+│   │   ├── middlewares/
+│   │   │   └── notFound.middleware.js
 │   │   ├── models/
 │   │   │   └── carbonEmissionRecord.model.js
 │   │   ├── routes/
 │   │   │   └── carbonEmissionRecord.routes.js
 │   │   ├── scripts/
 │   │   │   └── loadCarbonEmissionRecords.js
+│   │   ├── validators/
+│   │   │   └── carbonEmissionRecord.validator.js
 │   │   └── app.js
 │   ├── .env
+│   ├── .gitignore
+│   ├── app.example.yaml
 │   ├── package-lock.json
 │   └── package.json
 ├── docs/
@@ -80,6 +103,29 @@ MONGODB_URI=mongodb+srv://USER:PASSWORD@CLUSTER.mongodb.net/dgsin-2526-10?retryW
 ```
 
 El archivo `.env` no debe subirse al repositorio porque contiene credenciales privadas.
+
+## Configuración de App Engine
+
+El archivo real `app.yaml` no se sube al repositorio porque puede contener credenciales reales de MongoDB Atlas.
+
+Se incluye una plantilla de ejemplo:
+
+```txt
+backend/app.example.yaml
+```
+
+Ejemplo de configuración:
+
+```yaml
+runtime: nodejs24
+
+automatic_scaling:
+  max_instances: 1
+
+env_variables:
+  NODE_ENV: "production"
+  MONGODB_URI: "mongodb+srv://USER:PASSWORD@CLUSTER.mongodb.net/dgsin-2526-10?retryWrites=true&w=majority"
+```
 
 ## Scripts disponibles
 
@@ -127,7 +173,7 @@ Obtiene todos los registros de emisiones de CO₂.
 GET /api/v1/carbon-emission-records?location=Spain
 ```
 
-Obtiene los registros correspondientes a una localización concreta.
+Obtiene los registros correspondientes a una localización normalizada concreta.
 
 ### Filtrar por año
 
@@ -143,7 +189,7 @@ Obtiene los registros correspondientes a un año concreto.
 GET /api/v1/carbon-emission-records?location=Spain&period=2022
 ```
 
-Obtiene los registros correspondientes a una localización y un año concretos.
+Obtiene los registros correspondientes a una localización normalizada y un año concretos.
 
 ### Obtener un registro por ID
 
@@ -163,7 +209,8 @@ Ejemplo de body:
 
 ```json
 {
-  "location": "Spain",
+  "location": "Spain and Andorra",
+  "normalizedLocation": "Spain",
   "period": 2022,
   "totalEmissionsMt": 235.471,
   "emissionsIntensity": 0.11,
@@ -194,14 +241,15 @@ El recurso principal de la API es `carbon-emission-records`.
 
 | Campo | Tipo | Descripción |
 |---|---|---|
-| `location` | String | País al que pertenece el registro |
+| `location` | String | Localización original tal y como aparece en la fuente |
+| `normalizedLocation` | String | Nombre normalizado del país para búsquedas e integración futura |
 | `period` | Number | Año del registro |
 | `totalEmissionsMt` | Number | Emisiones totales de CO₂ en megatoneladas |
 | `emissionsIntensity` | Number | Intensidad de emisiones |
 | `emissionsPerCapita` | Number | Emisiones de CO₂ por habitante |
 | `annualVariation` | Number | Variación anual de emisiones |
 
-El modelo incluye una restricción para evitar duplicados con la misma combinación de `location` y `period`.
+El modelo incluye una restricción para evitar duplicados con la misma combinación de `normalizedLocation` y `period`.
 
 ## Pruebas
 
@@ -217,18 +265,29 @@ Endpoints probados inicialmente:
 
 Queda pendiente completar y documentar las pruebas de `PUT` y `DELETE`.
 
+## Despliegue
+
+El backend se ha desplegado en Google App Engine.
+
+Durante el despliegue se resolvieron incidencias relacionadas con:
+
+- Facturación del proyecto de Google Cloud.
+- Permisos sobre el bucket de staging de App Engine.
+- Acceso de red desde App Engine hacia MongoDB Atlas.
+
+La aplicación desplegada responde correctamente desde la URL pública y accede a los datos almacenados en MongoDB Atlas.
+
 ## Estado actual
 
-Actualmente el backend arranca correctamente en local y conecta con MongoDB Atlas.
+Actualmente el backend arranca correctamente en local y también está desplegado en Google App Engine.
 
-La API dispone del recurso `carbon-emission-records` con operaciones CRUD básicas y filtros por localización y periodo.
+La API dispone del recurso `carbon-emission-records` con operaciones CRUD básicas, validación de datos, control de rutas no encontradas y filtros por localización normalizada y periodo.
 
 ## Próximos pasos
 
 - Completar pruebas CRUD con Insomnia.
 - Añadir más registros reales de emisiones de CO₂.
-- Mejorar validaciones y gestión de errores.
-- Preparar configuración para Google App Engine.
+- Preparar documentación final de la API.
 - Crear frontend con Angular.
 - Integrar una API externa de datos energéticos.
 - Añadir visualizaciones de datos.
