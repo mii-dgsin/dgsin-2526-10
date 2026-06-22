@@ -1,7 +1,6 @@
 const validateCarbonEmissionRecord = (req, res, next) => {
   const {
     location,
-    normalizedLocation,
     period,
     totalEmissionsMt,
     emissionsIntensity,
@@ -36,10 +35,6 @@ const validateCarbonEmissionRecord = (req, res, next) => {
 
   if (typeof annualVariation !== "number") {
     errors.push("annualVariation is required and must be a number");
-  }
-
-  if (!normalizedLocation || typeof normalizedLocation !== "string" || normalizedLocation.trim().length === 0) {
-    errors.push("normalizedLocation is required and must be a non-empty string");
   }
 
   if (errors.length > 0) {

@@ -1,6 +1,6 @@
 # DGSIN-2526-10
 
-Sistema de información en la nube para gestionar y analizar registros de emisiones de CO₂ por país y año.
+Sistema de información en la nube para gestionar y analizar registros de emisiones de CO₂ por localización y año.
 
 El proyecto se desarrolla para la asignatura **Desarrollo y Gestión de Sistemas de Información en la Nube**.
 
@@ -20,7 +20,9 @@ En fases posteriores, el sistema se integrará con una API externa de datos ener
 
 La API está desplegada en Google App Engine:
 
+```txt
 https://dgsin-2526-10-mjcadenas.ew.r.appspot.com
+```
 
 Endpoints principales desplegados:
 
@@ -42,60 +44,32 @@ GET https://dgsin-2526-10-mjcadenas.ew.r.appspot.com/api/v1/carbon-emission-reco
 - nodemon
 - Google App Engine
 - Google Cloud CLI
+- Angular
+- TypeScript
 - Insomnia para pruebas de API
 
 ## Estructura del proyecto
 
 ```txt
 DGSIN-2526-10/
+├── .gitignore
+├── README.md
 ├── backend/
-│   ├── data/
-│   │   └── carbonEmissionRecords.json
-│   ├── src/
-│   │   ├── config/
-│   │   │   └── db.js
-│   │   ├── controllers/
-│   │   │   └── carbonEmissionRecord.controller.js
-│   │   ├── middlewares/
-│   │   │   └── notFound.middleware.js
-│   │   ├── models/
-│   │   │   └── carbonEmissionRecord.model.js
-│   │   ├── routes/
-│   │   │   └── carbonEmissionRecord.routes.js
-│   │   ├── scripts/
-│   │   │   └── loadCarbonEmissionRecords.js
-│   │   ├── validators/
-│   │   │   └── carbonEmissionRecord.validator.js
-│   │   └── app.js
-│   ├── .env
-│   ├── .gitignore
-│   ├── app.example.yaml
-│   ├── package-lock.json
-│   └── package.json
 ├── docs/
-│   ├── diary.md
-│   └── postman/
-└── README.md
+└── frontend/
 ```
 
-## Instalación
-
-Clonar el repositorio:
+## Instalación del backend
 
 ```bash
 git clone https://github.com/mii-dgsin/DGSIN-2526-10.git
 cd DGSIN-2526-10/backend
-```
-
-Instalar dependencias:
-
-```bash
 npm install
 ```
 
-## Variables de entorno
+## Variables de entorno del backend
 
-Crear un archivo `.env` dentro de la carpeta `backend/` con el siguiente contenido:
+Crear un archivo `.env` dentro de `backend/`:
 
 ```env
 PORT=8080
@@ -108,13 +82,13 @@ El archivo `.env` no debe subirse al repositorio porque contiene credenciales pr
 
 El archivo real `app.yaml` no se sube al repositorio porque puede contener credenciales reales de MongoDB Atlas.
 
-Se incluye una plantilla de ejemplo:
+Se incluye una plantilla:
 
 ```txt
 backend/app.example.yaml
 ```
 
-Ejemplo de configuración:
+Ejemplo:
 
 ```yaml
 runtime: nodejs24
@@ -127,15 +101,15 @@ env_variables:
   MONGODB_URI: "mongodb+srv://USER:PASSWORD@CLUSTER.mongodb.net/dgsin-2526-10?retryWrites=true&w=majority"
 ```
 
-## Scripts disponibles
+## Scripts del backend
 
-Dentro de la carpeta `backend/` se pueden ejecutar los siguientes comandos:
+Desde `backend/`:
 
 ```bash
 npm run dev
 ```
 
-Arranca el servidor en modo desarrollo usando nodemon.
+Arranca el servidor en modo desarrollo.
 
 ```bash
 npm start
@@ -147,7 +121,23 @@ Arranca el servidor en modo normal.
 npm run load:carbon
 ```
 
-Carga los datos iniciales de emisiones de CO₂ desde `backend/data/carbonEmissionRecords.json` en MongoDB Atlas.
+Carga los datos iniciales desde `backend/data/carbonEmissionRecords.json` en MongoDB Atlas.
+
+## Instalación del frontend
+
+Desde la raíz del proyecto:
+
+```bash
+cd frontend
+npm install
+ng serve
+```
+
+La aplicación estará disponible en:
+
+```txt
+http://localhost:4200
+```
 
 ## Endpoints principales
 
@@ -165,15 +155,33 @@ Comprueba que la API está funcionando.
 GET /api/v1/carbon-emission-records
 ```
 
-Obtiene todos los registros de emisiones de CO₂.
+Obtiene registros de emisiones de CO₂.
 
-### Filtrar por país
+### Filtrar por localización
 
 ```http
 GET /api/v1/carbon-emission-records?location=Spain
 ```
 
-Obtiene los registros correspondientes a una localización normalizada concreta.
+El filtro de localización usa búsqueda flexible. Por ejemplo, si se busca:
+
+```txt
+Spain
+```
+
+la API puede devolver registros cuya localización original sea:
+
+```txt
+Spain and Andorra
+```
+
+Esto permite conservar el valor original de la fuente en el campo `location` y, al mismo tiempo, facilitar búsquedas desde la API y el frontend.
+
+También puede buscarse por el valor completo:
+
+```http
+GET /api/v1/carbon-emission-records?location=Spain%20and%20Andorra
+```
 
 ### Filtrar por año
 
@@ -183,13 +191,21 @@ GET /api/v1/carbon-emission-records?period=2022
 
 Obtiene los registros correspondientes a un año concreto.
 
-### Filtrar por país y año
+### Filtrar por rango de años
+
+```http
+GET /api/v1/carbon-emission-records?fromPeriod=2020&toPeriod=2023
+```
+
+Obtiene los registros incluidos dentro de un rango de años.
+
+### Filtrar por localización y año
 
 ```http
 GET /api/v1/carbon-emission-records?location=Spain&period=2022
 ```
 
-Obtiene los registros correspondientes a una localización normalizada y un año concretos.
+Obtiene los registros correspondientes a una localización y un año concretos.
 
 ### Obtener un registro por ID
 
@@ -210,7 +226,6 @@ Ejemplo de body:
 ```json
 {
   "location": "Spain and Andorra",
-  "normalizedLocation": "Spain",
   "period": 2022,
   "totalEmissionsMt": 235.471,
   "emissionsIntensity": 0.11,
@@ -237,30 +252,28 @@ Elimina un registro existente.
 
 ## Modelo de datos
 
-El recurso principal de la API es `carbon-emission-records`.
-
 | Campo | Tipo | Descripción |
 |---|---|---|
 | `location` | String | Localización original tal y como aparece en la fuente |
-| `normalizedLocation` | String | Nombre normalizado del país para búsquedas e integración futura |
 | `period` | Number | Año del registro |
 | `totalEmissionsMt` | Number | Emisiones totales de CO₂ en megatoneladas |
-| `emissionsIntensity` | Number | Intensidad de emisiones |
+| `emissionsIntensity` | Number o null | Intensidad de emisiones |
 | `emissionsPerCapita` | Number | Emisiones de CO₂ por habitante |
-| `annualVariation` | Number | Variación anual de emisiones |
+| `annualVariation` | Number o null | Variación anual de emisiones |
 
-El modelo incluye una restricción para evitar duplicados con la misma combinación de `normalizedLocation` y `period`.
+El modelo incluye una restricción para evitar duplicados con la misma combinación de `location` y `period`.
 
 ## Pruebas
 
 Las pruebas iniciales de la API se están realizando con Insomnia.
 
-Endpoints probados inicialmente:
+Endpoints probados:
 
 - `GET /api/v1/health`
 - `GET /api/v1/carbon-emission-records`
 - `GET /api/v1/carbon-emission-records?location=Spain`
 - `GET /api/v1/carbon-emission-records?period=2022`
+- `GET /api/v1/carbon-emission-records?fromPeriod=2020&toPeriod=2023`
 - `POST /api/v1/carbon-emission-records`
 
 Queda pendiente completar y documentar las pruebas de `PUT` y `DELETE`.
@@ -275,19 +288,39 @@ Durante el despliegue se resolvieron incidencias relacionadas con:
 - Permisos sobre el bucket de staging de App Engine.
 - Acceso de red desde App Engine hacia MongoDB Atlas.
 
-La aplicación desplegada responde correctamente desde la URL pública y accede a los datos almacenados en MongoDB Atlas.
+## Frontend
+
+El frontend se ha creado con Angular.
+
+La primera versión del frontend permite:
+
+- Consultar registros desde la API desplegada.
+- Mostrar datos en una tabla.
+- Filtrar por localización.
+- Filtrar por año concreto.
+- Filtrar por rango de años.
+
+Durante la configuración inicial se detectó el error:
+
+```txt
+NG0908: In this configuration Angular requires Zone.js
+```
+
+El problema se resolvió instalando `zone.js` y cargándolo en `main.ts`.
 
 ## Estado actual
 
-Actualmente el backend arranca correctamente en local y también está desplegado en Google App Engine.
+Actualmente el backend arranca correctamente en local y está desplegado en Google App Engine.
 
-La API dispone del recurso `carbon-emission-records` con operaciones CRUD básicas, validación de datos, control de rutas no encontradas y filtros por localización normalizada y periodo.
+La API dispone del recurso `carbon-emission-records` con operaciones CRUD básicas, validación de datos, control de rutas no encontradas y filtros por localización y periodo.
+
+El frontend Angular ya consume datos reales desde la API desplegada y muestra los registros en una tabla.
 
 ## Próximos pasos
 
 - Completar pruebas CRUD con Insomnia.
-- Añadir más registros reales de emisiones de CO₂.
-- Preparar documentación final de la API.
-- Crear frontend con Angular.
+- Revisar y completar la documentación final de la API.
+- Mejorar el diseño visual del frontend Angular.
+- Añadir operaciones de creación, edición y eliminación desde Angular.
 - Integrar una API externa de datos energéticos.
 - Añadir visualizaciones de datos.
