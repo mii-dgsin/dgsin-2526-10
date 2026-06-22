@@ -413,6 +413,51 @@ El problema se resolvió instalando `zone.js` y cargándolo desde `main.ts`.
 Con esto, el frontend ya muestra datos reales obtenidos desde el backend desplegado en App Engine.
 
 ---
+## Avance 17 - Mejoras en el frontend Angular
+
+Se han realizado varias mejoras en el frontend Angular para facilitar la consulta de los registros de emisiones de CO₂.
+
+En primer lugar, se ha añadido paginación a la tabla de resultados. La API ya soportaba los parámetros `limit` y `offset`, por lo que el frontend se ha actualizado para permitir navegar entre páginas de resultados sin cargar todos los registros de una sola vez.
+
+También se ha añadido un selector de tamaño de página, permitiendo mostrar 25, 50 o 100 registros por página.
+
+Además, se ha mejorado el comportamiento de los filtros. Ahora, al escribir en los campos de búsqueda, la tabla se actualiza automáticamente tras un breve retardo, sin necesidad de pulsar siempre el botón de búsqueda. Aun así, se mantiene el botón `Search` para poder forzar manualmente la consulta.
+
+Se han añadido restricciones a los campos de año para evitar búsquedas fuera del rango disponible en el conjunto de datos. Actualmente, los años permitidos están comprendidos entre 1970 y 2023. También se valida que el campo `From year` no sea mayor que el campo `To year`.
+
+Se ha añadido un botón de recarga y se han mejorado los mensajes visuales de estado, mostrando el número total de registros, la página actual y el rango de registros visible.
+
+Por último, se ha comenzado a preparar la tabla para acciones CRUD desde el frontend. Se ha añadido una columna de acciones y se ha incorporado Font Awesome para mostrar iconos en lugar de texto plano, por ejemplo usando un icono de papelera para la acción de borrado.
+
+Durante esta fase también se corrigió un aviso de TypeScript 6 en `tsconfig.app.json`, añadiendo explícitamente la propiedad `rootDir` para indicar que el directorio fuente común de la aplicación es `./src`.
+---
+## Avance 18 - Creación de registros desde Angular
+
+Se ha añadido al frontend Angular un formulario para crear nuevos registros de emisiones de CO₂.
+
+El formulario permite introducir los campos principales del recurso `carbon-emission-records`:
+
+| Campo                | Descripción                               |
+| -------------------- | ----------------------------------------- |
+| `location`           | Localización del registro                 |
+| `period`             | Año del registro                          |
+| `totalEmissionsMt`   | Emisiones totales de CO₂ en megatoneladas |
+| `emissionsIntensity` | Intensidad de emisiones                   |
+| `emissionsPerCapita` | Emisiones por habitante                   |
+| `annualVariation`    | Variación anual de emisiones              |
+
+Desde Angular se envía una petición `POST` al endpoint desplegado en Google App Engine:
+
+```txt
+POST /api/v1/carbon-emission-records
+```
+
+Durante esta fase se detectó inicialmente un error `400 Bad Request` al crear registros desde el frontend. El error estaba relacionado con la validación de los datos enviados al backend. Tras revisar el cuerpo de la petición y la validación del recurso, se corrigió el problema y la creación de registros desde Angular quedó funcionando correctamente.
+
+Una vez creado un registro, el formulario se limpia, se oculta y la tabla se recarga automáticamente para mostrar los datos actualizados.
+
+Con este avance, el frontend ya permite consultar, filtrar, paginar y crear registros de emisiones desde la interfaz web.
+---
 
 # Decisiones técnicas tomadas
 

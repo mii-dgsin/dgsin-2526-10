@@ -108,7 +108,108 @@
       Also, "From year" cannot be greater than "To year".
     </p>
   </section>
+  <section class="create-panel">
+    <div class="create-header">
+      <h2>Create new record</h2>
 
+      <button
+        type="button"
+        class="secondary"
+        (click)="toggleCreateForm()"
+      >
+        {{ showCreateForm ? 'Hide form' : 'New record' }}
+      </button>
+    </div>
+
+    <form
+      *ngIf="showCreateForm"
+      class="create-form"
+      (ngSubmit)="createRecord()"
+    >
+      <div class="field">
+        <label for="newLocation">Location</label>
+        <input
+          id="newLocation"
+          name="newLocation"
+          type="text"
+          [(ngModel)]="newRecord.location"
+          placeholder="Spain and Andorra"
+          required
+        />
+      </div>
+
+      <div class="field">
+        <label for="newPeriod">Year</label>
+        <input
+          id="newPeriod"
+          name="newPeriod"
+          type="number"
+          [(ngModel)]="newRecord.period"
+          [min]="minPeriod"
+          [max]="maxPeriod"
+          required
+        />
+      </div>
+
+      <div class="field">
+        <label for="newTotalEmissionsMt">Total emissions Mt</label>
+        <input
+          id="newTotalEmissionsMt"
+          name="newTotalEmissionsMt"
+          type="number"
+          step="0.001"
+          [(ngModel)]="newRecord.totalEmissionsMt"
+          required
+        />
+      </div>
+
+      <div class="field">
+        <label for="newEmissionsIntensity">Intensity</label>
+        <input
+          id="newEmissionsIntensity"
+          name="newEmissionsIntensity"
+          type="number"
+          step="0.01"
+          [(ngModel)]="newRecord.emissionsIntensity"
+        />
+      </div>
+
+      <div class="field">
+        <label for="newEmissionsPerCapita">Per capita</label>
+        <input
+          id="newEmissionsPerCapita"
+          name="newEmissionsPerCapita"
+          type="number"
+          step="0.01"
+          [(ngModel)]="newRecord.emissionsPerCapita"
+          required
+        />
+      </div>
+
+      <div class="field">
+        <label for="newAnnualVariation">Annual variation</label>
+        <input
+          id="newAnnualVariation"
+          name="newAnnualVariation"
+          type="number"
+          step="0.01"
+          [(ngModel)]="newRecord.annualVariation"
+        />
+      </div>
+
+      <div class="actions">
+        <button type="submit">Create</button>
+
+        <button
+          type="button"
+          class="secondary"
+          (click)="resetCreateForm()"
+        >
+          Reset
+        </button>
+      </div>
+    </form>
+  </section>
   <section class="status">
     <p *ngIf="loading">Loading records...</p>
 

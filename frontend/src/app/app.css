@@ -169,3 +169,34 @@ button:disabled {
   border: 1px solid #bbb;
   border-radius: 4px;
 }
+.create-panel {
+  margin-bottom: 24px;
+  padding: 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.create-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.create-header h2 {
+  margin: 0;
+}
+
+.create-form {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(180px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+  align-items: end;
+}
+
+@media (max-width: 900px) {
+  .create-form {
+    grid-template-columns: 1fr;
+  }
+}

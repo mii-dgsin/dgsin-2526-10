@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { CarbonEmissionRecord } from './models/carbon-emission-record.model';
+import { CarbonEmissionRecord, CarbonEmissionRecordRequest} from './models/carbon-emission-record.model';
 import { CarbonEmissionRecordService } from './services/carbon-emission-record.service';
 
 @Component({
@@ -196,6 +196,89 @@ isYearOutOfRange(value: string): boolean {
       },
       error: () => {
         this.errorMessage = 'Error deleting carbon emission record';
+        this.loading = false;
+      }
+    });
+  }
+
+  showCreateForm = false;
+
+  newRecord: CarbonEmissionRecordRequest = {
+    location: '',
+    period: this.maxPeriod,
+    totalEmissionsMt: 0,
+    emissionsIntensity: null,
+    emissionsPerCapita: 0,
+    annualVariation: null
+  };
+
+  toggleCreateForm(): void {
+    this.showCreateForm = !this.showCreateForm;
+  }
+
+  resetCreateForm(): void {
+    this.newRecord = {
+      location: '',
+      period: this.maxPeriod,
+      totalEmissionsMt: 0,
+      emissionsIntensity: null,
+      emissionsPerCapita: 0,
+      annualVariation: null
+    };
+  }
+
+  createRecord(): void {
+    if (!this.newRecord.location || this.newRecord.location.trim().length === 0) {
+      this.errorMessage = 'Location is required';
+      return;
+    }
+
+    if (
+      this.newRecord.period < this.minPeriod ||
+      this.newRecord.period > this.maxPeriod
+    ) {
+      this.errorMessage = `Year must be between ${this.minPeriod} and ${this.maxPeriod}`;
+      return;
+    }
+
+    this.loading = true;
+    this.errorMessage = '';
+
+    const recordToCreate: CarbonEmissionRecordRequest = {
+      location: this.newRecord.location.trim(),
+      period: Number(this.newRecord.period),
+      totalEmissionsMt: Number(this.newRecord.totalEmissionsMt),
+      emissionsIntensity:
+        this.newRecord.emissionsIntensity === null ||
+        this.newRecord.emissionsIntensity === undefined
+          ? null
+          : Number(this.newRecord.emissionsIntensity),
+      emissionsPerCapita: Number(this.newRecord.emissionsPerCapita),
+      annualVariation:
+        this.newRecord.annualVariation === null ||
+        this.newRecord.annualVariation === undefined
+          ? null
+          : Number(this.newRecord.annualVariation)
+    };
+
+    this.carbonEmissionService.createRecord(recordToCreate).subscribe({
+      next: () => {
+        this.resetCreateForm();
+        this.showCreateForm = false;
+        this.offset = 0;
+        this.loadRecords();
+      },
+      error: (error) => {
+        console.error('Create record error:', error);
+
+        if (error.error?.errors && Array.isArray(error.error.errors)) {
+          this.errorMessage = error.error.errors.join(', ');
+        } else if (error.error?.message) {
+          this.errorMessage = error.error.message;
+        } else {
+          this.errorMessage = 'Error creating carbon emission record';
+        }
+
         this.loading = false;
       }
     });

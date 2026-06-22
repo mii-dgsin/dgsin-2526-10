@@ -1,8 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { CarbonEmissionRecordResponse } from '../models/carbon-emission-record.model';
-
+import {CarbonEmissionRecordRequest, CarbonEmissionRecordResponse } from '../models/carbon-emission-record.model';
 @Injectable({
   providedIn: 'root'
 })
@@ -46,4 +45,8 @@ export class CarbonEmissionRecordService {
   deleteRecord(id: string) {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
+  createRecord(record: CarbonEmissionRecordRequest) {
+    return this.http.post(this.apiUrl, record);
+  }
+  
 }
