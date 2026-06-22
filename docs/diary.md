@@ -384,6 +384,21 @@ Endpoints verificados:
 | GET | `/api/v1/carbon-emission-records?location=Spain` | Probado |
 
 ---
+## Avance 13 - Corrección del filtrado por localización
+
+Se ha corregido el filtrado de registros por localización en el recurso `carbon-emission-records`.
+
+Durante las pruebas se detectó que la fuente original utiliza valores de localización como `Spain and Andorra`, mientras que para futuras integraciones con APIs externas será más útil trabajar con una localización normalizada como `Spain`.
+
+Para resolverlo, se ha añadido el campo `normalizedLocation` y se ha modificado el controlador para que el parámetro `location` pueda buscar tanto en el valor original de la fuente como en el valor normalizado.
+
+De esta forma, las siguientes consultas devuelven correctamente el registro correspondiente:
+
+```txt
+GET /api/v1/carbon-emission-records?location=Spain
+GET /api/v1/carbon-emission-records?location=Spain%20and%20Andorra
+
+---
 
 # Decisiones técnicas tomadas
 

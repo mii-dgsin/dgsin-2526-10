@@ -7,15 +7,20 @@ const getCarbonEmissionRecords = async (req, res) => {
     const filter = {};
 
     if (location) {
-      filter.normalizedLocation = new RegExp(`^${location}$`, "i");
+      const locationRegex = new RegExp(location, "i");
+
+      filter.$or = [
+        { normalizedLocation: locationRegex },
+        { location: locationRegex }
+      ];
     }
-    
+
     if (period) {
       filter.period = Number(period);
     }
 
     const records = await CarbonEmissionRecord.find(filter)
-      .sort({ location: 1, period: 1 })
+      .sort({ normalizedLocation: 1, location: 1, period: 1 })
       .skip(Number(offset))
       .limit(Number(limit));
 
