@@ -2,25 +2,44 @@ const CarbonEmissionRecord = require("../models/carbonEmissionRecord.model");
 
 const getCarbonEmissionRecords = async (req, res) => {
   try {
-    const { location, period, limit = 50, offset = 0 } = req.query;
+    const {
+      location,
+      period,
+      fromPeriod,
+      toPeriod,
+      limit = 50,
+      offset = 0
+    } = req.query;
 
-    const filter = {};
+  const filter = {};
 
-    if (location) {
-      const locationRegex = new RegExp(location, "i");
+  if (location) {
+    const locationRegex = new RegExp(location, "i");
 
-      filter.$or = [
-        { normalizedLocation: locationRegex },
-        { location: locationRegex }
-      ];
+    filter.$or = [
+      { normalizedLocation: locationRegex },
+      { location: locationRegex }
+    ];
+  }
+
+  if (period) {
+    filter.period = Number(period);
+  }
+
+  if (fromPeriod || toPeriod) {
+    filter.period = {};
+
+    if (fromPeriod) {
+      filter.period.$gte = Number(fromPeriod);
     }
 
-    if (period) {
-      filter.period = Number(period);
+    if (toPeriod) {
+      filter.period.$lte = Number(toPeriod);
     }
+  }
 
     const records = await CarbonEmissionRecord.find(filter)
-      .sort({ normalizedLocation: 1, location: 1, period: 1 })
+      .sort({ normalizedLocation: 1, period: 1 })
       .skip(Number(offset))
       .limit(Number(limit));
 

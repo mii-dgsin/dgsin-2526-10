@@ -397,8 +397,34 @@ De esta forma, las siguientes consultas devuelven correctamente el registro corr
 ```txt
 GET /api/v1/carbon-emission-records?location=Spain
 GET /api/v1/carbon-emission-records?location=Spain%20and%20Andorra
+```
+
+La corrección se ha probado correctamente tanto en local como en la API desplegada en Google App Engine.
 
 ---
+
+## Avance 14 - Ampliación de datos y filtros por periodo
+
+Se ha ampliado el conjunto inicial de datos de emisiones de CO₂ con más registros por país y año.
+
+También se ha mejorado el endpoint `GET /api/v1/carbon-emission-records` para permitir búsquedas más flexibles mediante filtros por localización, año concreto y rango de años.
+
+Nuevos parámetros soportados:
+
+| Parámetro | Descripción |
+|---|---|
+| `location` | Filtra por localización original o normalizada |
+| `period` | Filtra por un año concreto |
+| `fromPeriod` | Filtra desde un año inicial |
+| `toPeriod` | Filtra hasta un año final |
+| `limit` | Limita el número de registros devueltos |
+| `offset` | Permite paginar los resultados |
+
+Estos cambios preparan la API para ser consumida posteriormente desde el frontend Angular.
+
+---
+
+
 
 # Decisiones técnicas tomadas
 
