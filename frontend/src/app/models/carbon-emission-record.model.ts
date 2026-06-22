@@ -3,9 +3,9 @@ export interface CarbonEmissionRecord {
   location: string;
   period: number;
   totalEmissionsMt: number;
-  emissionsIntensity: number;
+  emissionsIntensity: number | null;
   emissionsPerCapita: number;
-  annualVariation: number;
+  annualVariation: number | null;
   createdAt?: string;
   updatedAt?: string;
 }

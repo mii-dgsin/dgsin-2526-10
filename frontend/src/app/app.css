@@ -15,10 +15,10 @@
 
 .filters {
   display: grid;
-  grid-template-columns: repeat(4, minmax(160px, 1fr));
+  grid-template-columns: repeat(5, minmax(140px, 1fr));
   gap: 16px;
   align-items: end;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
   padding: 16px;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -88,4 +88,62 @@ th {
   padding: 16px;
   border: 1px solid #ddd;
   border-radius: 8px;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.pagination span {
+  font-weight: bold;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.field select {
+  padding: 8px;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+}
+.filter-help {
+  margin-bottom: 16px;
+}
+
+.hint {
+  margin: 0 0 8px 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.error {
+  color: #b00020;
+  font-weight: bold;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.pagination span {
+  font-weight: bold;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.field select {
+  padding: 8px;
+  border: 1px solid #bbb;
+  border-radius: 4px;
 }

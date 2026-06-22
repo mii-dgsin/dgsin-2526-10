@@ -18,6 +18,7 @@ export class CarbonEmissionRecordService {
     fromPeriod?: string;
     toPeriod?: string;
     limit?: string;
+    offset?: string;
   }): Observable<CarbonEmissionRecordResponse> {
     let params = new HttpParams();
 
@@ -37,7 +38,8 @@ export class CarbonEmissionRecordService {
       params = params.set('toPeriod', filters.toPeriod);
     }
 
-    params = params.set('limit', filters?.limit || '100');
+    params = params.set('limit', filters?.limit || '50');
+    params = params.set('offset', filters?.offset || '0');
 
     return this.http.get<CarbonEmissionRecordResponse>(this.apiUrl, { params });
   }
