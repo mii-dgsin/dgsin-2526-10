@@ -4,6 +4,7 @@ require("dotenv").config();
 
 const connectDB = require("./config/db");
 const carbonEmissionRecordRoutes = require("./routes/carbonEmissionRecord.routes");
+const integrationRoutes = require("./routes/integration.routes");
 const notFound = require("./middlewares/notFound.middleware");
 
 const app = express();
@@ -29,6 +30,7 @@ app.get("/api/v1/health", (req, res) => {
 });
 
 app.use("/api/v1/carbon-emission-records", carbonEmissionRecordRoutes);
+app.use("/api/v1/integrations", integrationRoutes);
 
 app.use(notFound);
 

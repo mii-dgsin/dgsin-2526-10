@@ -10,11 +10,11 @@ El proyecto consiste en desarrollar un sistema de información en la nube para a
 
 La aplicación permite consultar, filtrar, crear, editar y eliminar registros de emisiones contaminantes procedentes de una fuente de información que no se consume directamente mediante una API pública propia. Los datos incluyen emisiones totales, emisiones por habitante, intensidad de emisiones y variación anual.
 
-En una fase posterior, el sistema podrá integrarse con una API externa de datos energéticos para complementar la información disponible y permitir comparaciones relacionadas con la transición energética.
+Además, el proyecto se integra con una API externa de Ember Energy para complementar la información de emisiones con datos de generación eléctrica anual, utilizando un proxy propio en el backend para no exponer la API key en el frontend.
 
 ## Repositorio
 
-[mii-dgsin/DGSIN-2526-10](https://github.com/mii-dgsin/dgsin-2526-10)
+[mii-dgsin/dgsin-2526-10](https://github.com/mii-dgsin/dgsin-2526-10)
 
 ## URL
 
@@ -74,7 +74,7 @@ Los campos `emissionsIntensity` y `annualVariation` pueden ser `null`. En la tab
 
 ## Compatibilidad con otras fuentes
 
-Para una futura integración con una API externa de datos energéticos, se utilizarán dos dimensiones principales:
+Para la integración con Ember Energy se utilizan principalmente dos dimensiones:
 
 | Dimensión | Campo usado |
 |---|---|
@@ -101,12 +101,12 @@ También se ha decidido que la fuente principal de datos será `carbon-emission-
 
 Se ha creado el repositorio del proyecto dentro de la organización de la asignatura:
 
-[mii-dgsin/DGSIN-2526-10](https://github.com/mii-dgsin/DGSIN-2526-10)
+[mii-dgsin/dgsin-2526-10](https://github.com/mii-dgsin/dgsin-2526-10)
 
 Se ha organizado el proyecto separando backend, frontend y documentación:
 
 ```txt
-DGSIN-2526-10/
+dgsin-2526-10/
 ├── .gitignore
 ├── README.md
 ├── backend/
@@ -145,16 +145,7 @@ Durante la configuración se detectó un error de resolución DNS en la cadena d
 
 Se ha creado el modelo `CarbonEmissionRecord` en `backend/src/models/carbonEmissionRecord.model.js`.
 
-El modelo contiene los campos:
-
-| Campo en MongoDB | Tipo |
-|---|---|
-| `location` | String |
-| `period` | Number |
-| `totalEmissionsMt` | Number |
-| `emissionsIntensity` | Number o null |
-| `emissionsPerCapita` | Number |
-| `annualVariation` | Number o null |
+El modelo contiene los campos `location`, `period`, `totalEmissionsMt`, `emissionsIntensity`, `emissionsPerCapita` y `annualVariation`.
 
 Se ha añadido una restricción para evitar registros duplicados con la misma combinación de `location` y `period`.
 
@@ -376,35 +367,43 @@ En los formularios de creación y edición se permite dejar estos campos vacíos
 En la tabla de resultados, los valores `null` se muestran como `N/A`.
 
 ---
-## Avance 22 - Inicialización de datos mediante ruta GET
 
-Se ha añadido al backend una ruta GET para inicializar los datos de emisiones de CO₂ cuando la colección de MongoDB está vacía.
+## Avance 22 - Integración externa con Ember Energy mediante proxy propio
 
-La ruta añadida es:
+Se ha añadido una integración externa con la API de Ember Energy.
 
-```txt
-GET /api/v1/carbon-emission-records/loadInitialData
-```
+El objetivo de esta integración es complementar los registros propios de emisiones de CO₂ con datos externos de generación eléctrica anual. Para ello se ha creado una ruta de integración en el backend que actúa como proxy entre el frontend Angular y la API externa de Ember.
 
-Esta ruta comprueba primero si ya existen registros en la colección `carbon-emission-records`. Si la colección ya contiene datos, no realiza ninguna inserción y devuelve un mensaje indicando que la base de datos ya contiene registros.
-
-Si la colección está vacía, la ruta carga los datos iniciales desde el archivo:
+La ruta creada es:
 
 ```txt
-backend/data/carbonEmissionRecords.json
+GET /api/v1/integrations/renewable-electricity
 ```
 
-Con esta mejora, además del script local de carga de datos, la API permite inicializar los datos iniciales mediante una operación GET, acercándose mejor a los requisitos avanzados de la rúbrica.
+Esta ruta permite consultar datos usando parámetros como:
 
-La ruta devuelve diferentes estados según el resultado:
+| Parámetro | Descripción |
+|---|---|
+| `location` | Localización o país a consultar |
+| `fromPeriod` | Año inicial |
+| `toPeriod` | Año final |
 
-| Estado                      | Caso                                                              |
-| --------------------------- | ----------------------------------------------------------------- |
-| `201 Created`               | Los datos iniciales se han cargado correctamente                  |
-| `200 OK`                    | La colección ya contenía datos y no se ha realizado ninguna carga |
-| `500 Internal Server Error` | Se ha producido un error durante la carga                         |
+Ejemplo:
 
-Esta funcionalidad se ha probado primero en local y posteriormente puede verificarse en la API desplegada en Google App Engine.
+```txt
+GET /api/v1/integrations/renewable-electricity?location=Spain&fromPeriod=2020&toPeriod=2023
+```
+
+La integración combina dos fuentes:
+
+| Fuente | Tipo | Uso |
+|---|---|---|
+| `carbon-emission-records` | API propia | Registros de emisiones de CO₂ almacenados en MongoDB Atlas |
+| Ember Energy API | API externa | Datos externos de generación eléctrica anual |
+
+La llamada a Ember se realiza desde el backend y no directamente desde Angular. Esto evita exponer la API key en el frontend y permite cumplir mejor el requisito de integración mediante proxy propio.
+
+La ruta se ha probado correctamente tras configurar la variable de entorno `EMBER_API_KEY`.
 
 ---
 
@@ -438,15 +437,19 @@ Se ha incorporado Angular Router para separar vistas principales:
 | `/records/new` | Vista de creación de registros |
 | `/records/:id/edit` | Vista de edición de registros |
 
+## Uso de proxy propio para integración externa
+
+Se ha decidido que la integración con Ember Energy se realice desde el backend mediante un proxy propio. Esto permite ocultar la API key al frontend y mejora la seguridad de la integración.
+
 ---
 
 # Próximos pasos
 
-1. Completar y documentar las pruebas de todas las operaciones CRUD.
-2. Preparar documentación de API con ejemplos de operaciones y estados devueltos.
-3. Preparar colección de pruebas de Postman o Insomnia exportada.
-4. Añadir visualizaciones con Highcharts o Google Charts.
-5. Integrar una API externa de datos energéticos.
+1. Crear una vista frontend para mostrar los datos integrados con Ember Energy.
+2. Añadir visualizaciones con Highcharts o Google Charts.
+3. Completar y documentar las pruebas de todas las operaciones CRUD.
+4. Preparar documentación de API con ejemplos de operaciones y estados devueltos.
+5. Preparar colección de pruebas de Postman o Insomnia exportada.
 6. Enlazar la documentación y las visualizaciones desde la propia aplicación.
 7. Actualizar el diario con cada avance realizado.
 
@@ -469,3 +472,4 @@ Los tiempos de trabajo se irán registrando en Toggl.
 | Pendiente | Creación del frontend Angular | Pendiente |
 | Pendiente | Conexión del frontend con la API | Pendiente |
 | Pendiente | Mejoras de frontend, paginación y rutas | Pendiente |
+| Pendiente | Integración externa con Ember Energy | Pendiente |

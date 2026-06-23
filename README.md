@@ -16,7 +16,13 @@ https://datosmacro.expansion.com/energia-y-medio-ambiente/emisiones-co2
 
 La fuente seleccionada contiene información organizada en tablas HTML, por lo que los datos no se consumen directamente desde una API pública propia de la fuente.
 
-En fases posteriores, el sistema se integrará con una API externa de datos energéticos para poder realizar comparaciones relacionadas con la transición energética.
+Además, el backend integra una API externa de Ember Energy mediante un proxy propio para complementar la información de emisiones con datos de generación eléctrica anual.
+
+---
+
+## Repositorio
+
+[mii-dgsin/dgsin-2526-10](https://github.com/mii-dgsin/dgsin-2526-10)
 
 ---
 
@@ -35,6 +41,7 @@ GET https://dgsin-2526-10-mjcadenas.ew.r.appspot.com/
 GET https://dgsin-2526-10-mjcadenas.ew.r.appspot.com/api/v1/health
 GET https://dgsin-2526-10-mjcadenas.ew.r.appspot.com/api/v1/carbon-emission-records
 GET https://dgsin-2526-10-mjcadenas.ew.r.appspot.com/api/v1/carbon-emission-records?location=Spain
+GET https://dgsin-2526-10-mjcadenas.ew.r.appspot.com/api/v1/integrations/renewable-electricity?location=Spain&fromPeriod=2020&toPeriod=2023
 ```
 
 ---
@@ -55,6 +62,7 @@ GET https://dgsin-2526-10-mjcadenas.ew.r.appspot.com/api/v1/carbon-emission-reco
 - TypeScript
 - Font Awesome
 - Zone.js
+- Ember Energy API
 - Insomnia para pruebas de API
 
 ---
@@ -62,7 +70,7 @@ GET https://dgsin-2526-10-mjcadenas.ew.r.appspot.com/api/v1/carbon-emission-reco
 ## Estructura del proyecto
 
 ```txt
-DGSIN-2526-10/
+dgsin-2526-10/
 ├── .gitignore
 ├── README.md
 ├── backend/
@@ -77,15 +85,19 @@ DGSIN-2526-10/
 │       ├── config/
 │       │   └── db.js
 │       ├── controllers/
-│       │   └── carbonEmissionRecord.controller.js
+│       │   ├── carbonEmissionRecord.controller.js
+│       │   └── integration.controller.js
 │       ├── middlewares/
 │       │   └── notFound.middleware.js
 │       ├── models/
 │       │   └── carbonEmissionRecord.model.js
 │       ├── routes/
-│       │   └── carbonEmissionRecord.routes.js
+│       │   ├── carbonEmissionRecord.routes.js
+│       │   └── integration.routes.js
 │       ├── scripts/
 │       │   └── loadCarbonEmissionRecords.js
+│       ├── services/
+│       │   └── emberEnergy.service.js
 │       └── validators/
 │           └── carbonEmissionRecord.validator.js
 ├── docs/
@@ -114,8 +126,8 @@ DGSIN-2526-10/
 ## Instalación del backend
 
 ```bash
-git clone https://github.com/mii-dgsin/DGSIN-2526-10.git
-cd DGSIN-2526-10/backend
+git clone https://github.com/mii-dgsin/dgsin-2526-10.git
+cd dgsin-2526-10/backend
 npm install
 ```
 
@@ -128,6 +140,7 @@ Crear un archivo `.env` dentro de `backend/`:
 ```env
 PORT=8080
 MONGODB_URI=mongodb+srv://USER:PASSWORD@CLUSTER.mongodb.net/dgsin-2526-10?retryWrites=true&w=majority
+EMBER_API_KEY=YOUR_EMBER_API_KEY
 ```
 
 El archivo `.env` no debe subirse al repositorio porque contiene credenciales privadas.
@@ -136,7 +149,7 @@ El archivo `.env` no debe subirse al repositorio porque contiene credenciales pr
 
 ## Configuración de App Engine
 
-El archivo real `app.yaml` no se sube al repositorio porque puede contener credenciales reales de MongoDB Atlas.
+El archivo real `app.yaml` no se sube al repositorio porque puede contener credenciales reales de MongoDB Atlas y la API key de Ember.
 
 Se incluye una plantilla:
 
@@ -155,6 +168,7 @@ automatic_scaling:
 env_variables:
   NODE_ENV: "production"
   MONGODB_URI: "mongodb+srv://USER:PASSWORD@CLUSTER.mongodb.net/dgsin-2526-10?retryWrites=true&w=majority"
+  EMBER_API_KEY: "YOUR_EMBER_API_KEY"
 ```
 
 Para desplegar desde la carpeta `backend/`:
@@ -217,7 +231,6 @@ GET /api/v1/health
 
 Comprueba que la API está funcionando.
 
-
 ### Obtener registros de emisiones
 
 ```http
@@ -225,42 +238,6 @@ GET /api/v1/carbon-emission-records
 ```
 
 Obtiene registros de emisiones de CO₂.
-
-
-### Inicializar datos si la colección está vacía
-
-```http
-GET /api/v1/carbon-emission-records/loadInitialData
-```
-
-Inicializa la colección `carbon-emission-records` con los datos del archivo local:
-
-```txt
-backend/data/carbonEmissionRecords.json
-```
-
-La ruta solo inserta datos si la colección está vacía. Si ya existen registros, no realiza ninguna carga adicional.
-
-Posibles respuestas:
-
-| Estado                      | Descripción                                      |
-| --------------------------- | ------------------------------------------------ |
-| `201 Created`               | Los datos iniciales se han cargado correctamente |
-| `200 OK`                    | La colección ya contenía datos                   |
-| `500 Internal Server Error` | Error durante la carga de datos                  |
-
-Ejemplo de respuesta cuando la colección ya contiene registros:
-
-```json
-{
-  "message": "Database already contains carbon emission records",
-  "loaded": false,
-  "inserted": 0,
-  "total": 1234
-}
-```
-
-
 
 ### Filtrar por localización
 
@@ -354,6 +331,43 @@ Elimina un registro existente.
 
 ---
 
+## Integraciones externas
+
+### Ember Energy - Yearly electricity generation
+
+El backend incluye una integración externa con la API de Ember Energy mediante un proxy propio.
+
+La ruta expuesta por la API del proyecto es:
+
+```http
+GET /api/v1/integrations/renewable-electricity
+```
+
+Ejemplo:
+
+```http
+GET /api/v1/integrations/renewable-electricity?location=Spain&fromPeriod=2020&toPeriod=2023
+```
+
+Esta ruta combina:
+
+| Fuente | Descripción |
+|---|---|
+| `carbon-emission-records` | Datos propios de emisiones de CO₂ almacenados en MongoDB Atlas |
+| Ember Energy API | Datos externos de generación eléctrica anual |
+
+La llamada a Ember se realiza desde el backend para no exponer la API key en Angular.
+
+La integración requiere definir la variable de entorno:
+
+```env
+EMBER_API_KEY=YOUR_EMBER_API_KEY
+```
+
+La respuesta incluye una sección `source` con la atribución correspondiente a Ember Energy.
+
+---
+
 ## Modelo de datos
 
 | Campo | Tipo | Descripción |
@@ -438,6 +452,7 @@ Endpoints probados:
 - `POST /api/v1/carbon-emission-records`
 - `PUT /api/v1/carbon-emission-records/:id`
 - `DELETE /api/v1/carbon-emission-records/:id`
+- `GET /api/v1/integrations/renewable-electricity`
 
 Queda pendiente completar la documentación formal de las pruebas y exportar la colección para la entrega final si fuera necesario.
 
@@ -461,7 +476,7 @@ La aplicación desplegada responde correctamente desde la URL pública y accede 
 
 Actualmente el backend arranca correctamente en local y está desplegado en Google App Engine.
 
-La API dispone del recurso `carbon-emission-records` con operaciones CRUD, validación de datos, control de rutas no encontradas, filtros por localización y periodo, paginación, gestión de duplicados e inicialización de datos mediante ruta GET cuando la colección está vacía.
+La API dispone del recurso `carbon-emission-records` con operaciones CRUD, validación de datos, control de rutas no encontradas, filtros por localización y periodo, paginación, gestión de duplicados e integración externa con Ember Energy mediante proxy propio.
 
 El frontend Angular consume datos reales desde la API desplegada, muestra los registros en una tabla y permite filtrar, paginar, crear, editar y eliminar registros desde la interfaz web.
 
@@ -469,11 +484,11 @@ El frontend Angular consume datos reales desde la API desplegada, muestra los re
 
 ## Próximos pasos
 
+- Crear una vista frontend para mostrar los datos integrados con Ember Energy.
+- Añadir visualizaciones con Highcharts o Google Charts.
 - Completar la documentación formal de la API.
 - Preparar colección de pruebas de Postman o Insomnia con comprobaciones.
 - Enlazar la documentación desde la aplicación.
-- Añadir visualizaciones con Highcharts o Google Charts.
-- Integrar una API externa de datos energéticos.
 - Enlazar las visualizaciones desde la aplicación.
 - Actualizar el diario y el README con los nuevos avances.
 
