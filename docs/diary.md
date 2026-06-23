@@ -376,6 +376,37 @@ En los formularios de creación y edición se permite dejar estos campos vacíos
 En la tabla de resultados, los valores `null` se muestran como `N/A`.
 
 ---
+## Avance 22 - Inicialización de datos mediante ruta GET
+
+Se ha añadido al backend una ruta GET para inicializar los datos de emisiones de CO₂ cuando la colección de MongoDB está vacía.
+
+La ruta añadida es:
+
+```txt
+GET /api/v1/carbon-emission-records/loadInitialData
+```
+
+Esta ruta comprueba primero si ya existen registros en la colección `carbon-emission-records`. Si la colección ya contiene datos, no realiza ninguna inserción y devuelve un mensaje indicando que la base de datos ya contiene registros.
+
+Si la colección está vacía, la ruta carga los datos iniciales desde el archivo:
+
+```txt
+backend/data/carbonEmissionRecords.json
+```
+
+Con esta mejora, además del script local de carga de datos, la API permite inicializar los datos iniciales mediante una operación GET, acercándose mejor a los requisitos avanzados de la rúbrica.
+
+La ruta devuelve diferentes estados según el resultado:
+
+| Estado                      | Caso                                                              |
+| --------------------------- | ----------------------------------------------------------------- |
+| `201 Created`               | Los datos iniciales se han cargado correctamente                  |
+| `200 OK`                    | La colección ya contenía datos y no se ha realizado ninguna carga |
+| `500 Internal Server Error` | Se ha producido un error durante la carga                         |
+
+Esta funcionalidad se ha probado primero en local y posteriormente puede verificarse en la API desplegada en Google App Engine.
+
+---
 
 # Decisiones técnicas tomadas
 

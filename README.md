@@ -217,6 +217,7 @@ GET /api/v1/health
 
 Comprueba que la API está funcionando.
 
+
 ### Obtener registros de emisiones
 
 ```http
@@ -224,6 +225,42 @@ GET /api/v1/carbon-emission-records
 ```
 
 Obtiene registros de emisiones de CO₂.
+
+
+### Inicializar datos si la colección está vacía
+
+```http
+GET /api/v1/carbon-emission-records/loadInitialData
+```
+
+Inicializa la colección `carbon-emission-records` con los datos del archivo local:
+
+```txt
+backend/data/carbonEmissionRecords.json
+```
+
+La ruta solo inserta datos si la colección está vacía. Si ya existen registros, no realiza ninguna carga adicional.
+
+Posibles respuestas:
+
+| Estado                      | Descripción                                      |
+| --------------------------- | ------------------------------------------------ |
+| `201 Created`               | Los datos iniciales se han cargado correctamente |
+| `200 OK`                    | La colección ya contenía datos                   |
+| `500 Internal Server Error` | Error durante la carga de datos                  |
+
+Ejemplo de respuesta cuando la colección ya contiene registros:
+
+```json
+{
+  "message": "Database already contains carbon emission records",
+  "loaded": false,
+  "inserted": 0,
+  "total": 1234
+}
+```
+
+
 
 ### Filtrar por localización
 
@@ -424,7 +461,7 @@ La aplicación desplegada responde correctamente desde la URL pública y accede 
 
 Actualmente el backend arranca correctamente en local y está desplegado en Google App Engine.
 
-La API dispone del recurso `carbon-emission-records` con operaciones CRUD, validación de datos, control de rutas no encontradas, filtros por localización y periodo, paginación y gestión de duplicados.
+La API dispone del recurso `carbon-emission-records` con operaciones CRUD, validación de datos, control de rutas no encontradas, filtros por localización y periodo, paginación, gestión de duplicados e inicialización de datos mediante ruta GET cuando la colección está vacía.
 
 El frontend Angular consume datos reales desde la API desplegada, muestra los registros en una tabla y permite filtrar, paginar, crear, editar y eliminar registros desde la interfaz web.
 

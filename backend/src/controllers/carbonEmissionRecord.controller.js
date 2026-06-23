@@ -1,4 +1,39 @@
+const initialCarbonEmissionRecords = require("../../data/carbonEmissionRecords.json");
 const CarbonEmissionRecord = require("../models/carbonEmissionRecord.model");
+
+const loadInitialCarbonEmissionRecords = async (req, res) => {
+  try {
+    const existingRecords = await CarbonEmissionRecord.countDocuments();
+
+    if (existingRecords > 0) {
+      return res.status(200).json({
+        message: "Database already contains carbon emission records",
+        loaded: false,
+        inserted: 0,
+        total: existingRecords
+      });
+    }
+
+    const insertedRecords = await CarbonEmissionRecord.insertMany(
+      initialCarbonEmissionRecords,
+      {
+        ordered: false
+      }
+    );
+
+    return res.status(201).json({
+      message: "Initial carbon emission records loaded successfully",
+      loaded: true,
+      inserted: insertedRecords.length,
+      total: insertedRecords.length
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Error loading initial carbon emission records",
+      error: error.message
+    });
+  }
+};
 
 const getCarbonEmissionRecords = async (req, res) => {
   try {
@@ -150,5 +185,6 @@ module.exports = {
   getCarbonEmissionRecordById,
   createCarbonEmissionRecord,
   updateCarbonEmissionRecord,
-  deleteCarbonEmissionRecord
+  deleteCarbonEmissionRecord,
+  loadInitialCarbonEmissionRecords
 };

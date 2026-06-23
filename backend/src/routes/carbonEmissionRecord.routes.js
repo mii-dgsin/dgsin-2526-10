@@ -5,7 +5,8 @@ const {
   getCarbonEmissionRecordById,
   createCarbonEmissionRecord,
   updateCarbonEmissionRecord,
-  deleteCarbonEmissionRecord
+  deleteCarbonEmissionRecord,
+  loadInitialCarbonEmissionRecords
 } = require("../controllers/carbonEmissionRecord.controller");
 
 const validateCarbonEmissionRecord = require("../validators/carbonEmissionRecord.validator");
@@ -13,9 +14,11 @@ const validateCarbonEmissionRecord = require("../validators/carbonEmissionRecord
 const router = express.Router();
 
 router.get("/", getCarbonEmissionRecords);
+router.get("/loadInitialData", loadInitialCarbonEmissionRecords);
 router.get("/:id", getCarbonEmissionRecordById);
 router.post("/", validateCarbonEmissionRecord, createCarbonEmissionRecord);
 router.put("/:id", validateCarbonEmissionRecord, updateCarbonEmissionRecord);
 router.delete("/:id", deleteCarbonEmissionRecord);
+
 
 module.exports = router;
