@@ -20,6 +20,7 @@ const carbonEmissionRecordSchema = new mongoose.Schema(
     emissionsIntensity: {
       type: Number,
       required: false,
+      default: null,
       min: 0
     },
     emissionsPerCapita: {
@@ -29,7 +30,8 @@ const carbonEmissionRecordSchema = new mongoose.Schema(
     },
     annualVariation: {
       type: Number,
-      required: false
+      required: false,
+      default: null,
     }
   },
   {

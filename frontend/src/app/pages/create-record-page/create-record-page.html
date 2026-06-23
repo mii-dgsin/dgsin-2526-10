@@ -1,0 +1,109 @@
+<main class="page">
+  <section class="hero">
+    <h1>Create carbon emission record</h1>
+    <p>Add a new CO₂ emission record.</p>
+  </section>
+
+  <section class="status">
+    <p *ngIf="loading">Creating record...</p>
+    <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
+    <p *ngIf="successMessage" class="success">{{ successMessage }}</p>
+  </section>
+
+  <form
+    class="record-form"
+    (ngSubmit)="createRecord()"
+  >
+    <div class="field">
+      <label for="location">Location</label>
+      <input
+        id="location"
+        name="location"
+        type="text"
+        [(ngModel)]="newRecord.location"
+        placeholder="Spain and Andorra"
+        required
+      />
+    </div>
+
+    <div class="field">
+      <label for="period">Year</label>
+      <input
+        id="period"
+        name="period"
+        type="number"
+        [(ngModel)]="newRecord.period"
+        [min]="minPeriod"
+        [max]="maxPeriod"
+        required
+      />
+    </div>
+
+    <div class="field">
+      <label for="totalEmissionsMt">Total emissions Mt</label>
+      <input
+        id="totalEmissionsMt"
+        name="totalEmissionsMt"
+        type="number"
+        step="0.001"
+        [(ngModel)]="newRecord.totalEmissionsMt"
+        required
+      />
+    </div>
+
+    <div class="field">
+      <label for="emissionsIntensity">Intensity</label>
+      <input
+        id="emissionsIntensity"
+        name="emissionsIntensity"
+        type="number"
+        step="0.01"
+        [(ngModel)]="newRecord.emissionsIntensity"
+        placeholder="Leave empty if unavailable"
+      />
+    </div>
+
+    <div class="field">
+      <label for="emissionsPerCapita">Per capita</label>
+      <input
+        id="emissionsPerCapita"
+        name="emissionsPerCapita"
+        type="number"
+        step="0.01"
+        [(ngModel)]="newRecord.emissionsPerCapita"
+        required
+      />
+    </div>
+
+    <div class="field">
+      <label for="annualVariation">Annual variation</label>
+      <input
+        id="annualVariation"
+        name="annualVariation"
+        type="number"
+        step="0.01"
+        [(ngModel)]="newRecord.annualVariation"
+        placeholder="Leave empty if unavailable"
+      />
+    </div>
+
+    <div class="actions">
+      <button type="submit" [disabled]="loading">
+        Create
+      </button>
+
+      <button
+        type="button"
+        class="secondary"
+        (click)="resetForm()"
+        [disabled]="loading"
+      >
+        Reset
+      </button>
+
+      <a routerLink="/" class="button-link secondary">
+        Cancel
+      </a>
+    </div>
+  </form>
+</main>

@@ -1,0 +1,177 @@
+<main class="page">
+  <section class="hero">
+    <div>
+      <h1>Carbon Emission Records</h1>
+      <p>
+        Cloud information system for consulting CO₂ emission records by location and year.
+      </p>
+    </div>
+
+    <a routerLink="/records/new" class="button-link primary">
+      <i class="fa-solid fa-plus"></i>
+      New record
+    </a>
+  </section>
+
+  <section class="filters">
+    <div class="field">
+      <label for="location">Location</label>
+      <input
+        id="location"
+        type="text"
+        [(ngModel)]="location"
+        (ngModelChange)="onFiltersChanged()"
+        placeholder="Spain, France, Germany..."
+      />
+    </div>
+
+    <div class="field">
+      <label for="period">Year</label>
+      <input
+        id="period"
+        type="number"
+        [(ngModel)]="period"
+        (ngModelChange)="onFiltersChanged()"
+        [min]="minPeriod"
+        [max]="maxPeriod"
+        placeholder="2022"
+      />
+    </div>
+
+    <div class="field">
+      <label for="fromPeriod">From year</label>
+      <input
+        id="fromPeriod"
+        type="number"
+        [(ngModel)]="fromPeriod"
+        (ngModelChange)="onFiltersChanged()"
+        [min]="minPeriod"
+        [max]="maxPeriod"
+        placeholder="2020"
+      />
+    </div>
+
+    <div class="field">
+      <label for="toPeriod">To year</label>
+      <input
+        id="toPeriod"
+        type="number"
+        [(ngModel)]="toPeriod"
+        (ngModelChange)="onFiltersChanged()"
+        [min]="minPeriod"
+        [max]="maxPeriod"
+        placeholder="2023"
+      />
+    </div>
+
+    <div class="field">
+      <label for="limit">Page size</label>
+      <select id="limit" [(ngModel)]="limit" (change)="changePageSize()">
+        <option [ngValue]="25">25</option>
+        <option [ngValue]="50">50</option>
+        <option [ngValue]="100">100</option>
+      </select>
+    </div>
+
+    <div class="actions">
+      <button type="button" (click)="applyFilters()">
+        Search
+      </button>
+
+      <button type="button" class="secondary" (click)="clearFilters()">
+        Clear
+      </button>
+
+      <button type="button" class="secondary" (click)="loadRecords()">
+        Reload
+      </button>
+    </div>
+  </section>
+
+  <section class="filter-help">
+    <p class="hint">
+      Allowed years: {{ minPeriod }} - {{ maxPeriod }}
+    </p>
+  </section>
+
+  <section class="status">
+    <p *ngIf="loading">Loading records...</p>
+
+    <p *ngIf="errorMessage" class="error">
+      {{ errorMessage }}
+    </p>
+
+    <p *ngIf="successMessage" class="success">
+      {{ successMessage }}
+    </p>
+
+    <p *ngIf="!loading && !errorMessage && total > 0">
+      Showing {{ firstVisibleRecord }} - {{ lastVisibleRecord }} of {{ total }} records.
+      Page {{ currentPage }} of {{ totalPages }}.
+    </p>
+
+    <p *ngIf="!loading && !errorMessage && total === 0">
+      No records found.
+    </p>
+  </section>
+
+  <section class="pagination" *ngIf="!loading && total > 0">
+    <button type="button" (click)="previousPage()" [disabled]="!hasPreviousPage">
+      Previous
+    </button>
+
+    <span>Page {{ currentPage }} of {{ totalPages }}</span>
+
+    <button type="button" (click)="nextPage()" [disabled]="!hasNextPage">
+      Next
+    </button>
+  </section>
+
+  <section class="table-wrapper" *ngIf="!loading && records.length > 0">
+    <table>
+      <thead>
+        <tr>
+          <th>Location</th>
+          <th>Year</th>
+          <th>Total emissions Mt</th>
+          <th>Intensity</th>
+          <th>Per capita</th>
+          <th>Annual variation</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let record of records">
+          <td>{{ record.location }}</td>
+          <td>{{ record.period }}</td>
+          <td>{{ record.totalEmissionsMt }}</td>
+          <td>{{ record.emissionsIntensity ?? 'N/A' }}</td>
+          <td>{{ record.emissionsPerCapita }}</td>
+          <td>{{ record.annualVariation ?? 'N/A' }}</td>
+
+          <td class="table-actions">
+            <a
+              class="icon-button"
+              title="Edit record"
+              aria-label="Edit record"
+              [routerLink]="['/records', record._id, 'edit']"
+            >
+              <i class="fa-solid fa-pen-to-square"></i>
+            </a>
+
+            <button
+              type="button"
+              class="icon-button danger"
+              title="Delete record"
+              aria-label="Delete record"
+              (click)="deleteRecord(record._id)"
+            >
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</main>

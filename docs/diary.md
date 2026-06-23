@@ -2,19 +2,19 @@
 
 ## Equipo
 
-[María Jesús Cadenas Sánchez](https://github.com/TU-USUARIO-GITHUB)
+[María Jesús Cadenas Sánchez](https://github.com/mjcadenas)
 
 ## Descripción del proyecto
 
-El proyecto consistirá en desarrollar un sistema de información basado en microservicios para analizar la evolución de las emisiones de CO₂ por localización y año.
+El proyecto consiste en desarrollar un sistema de información en la nube para analizar la evolución de las emisiones de CO₂ por localización y año.
 
-La aplicación permitirá consultar, visualizar, crear, editar y eliminar datos sobre emisiones contaminantes procedentes de una fuente de información no ofrecida directamente mediante una API pública. Estos datos incluirán emisiones totales, emisiones por habitante, intensidad de emisiones y variación anual.
+La aplicación permite consultar, filtrar, crear, editar y eliminar registros de emisiones contaminantes procedentes de una fuente de información que no se consume directamente mediante una API pública propia. Los datos incluyen emisiones totales, emisiones por habitante, intensidad de emisiones y variación anual.
 
-En fases posteriores, el sistema se integrará con una API externa de datos energéticos para complementar la información disponible y permitir análisis comparativos relacionados con la transición energética.
+En una fase posterior, el sistema podrá integrarse con una API externa de datos energéticos para complementar la información disponible y permitir comparaciones relacionadas con la transición energética.
 
 ## Repositorio
 
-[mii-dgsin/DGSIN-2526-10](https://github.com/mii-dgsin/DGSIN-2526-10)
+[mii-dgsin/DGSIN-2526-10](https://github.com/mii-dgsin/dgsin-2526-10)
 
 ## URL
 
@@ -22,7 +22,7 @@ https://dgsin-2526-10-mjcadenas.ew.r.appspot.com
 
 ## APIs
 
-Pendiente de documentación final.
+Pendiente de documentación final con colección de pruebas y/o portal de documentación.
 
 ---
 
@@ -39,8 +39,6 @@ https://datosmacro.expansion.com/energia-y-medio-ambiente/emisiones-co2
 ## Descripción de la fuente
 
 La fuente de información seleccionada contiene datos de emisiones de CO₂ por localización y año. Se trata de una página web con información estructurada en tablas HTML, por lo que los datos no se obtienen directamente desde una API pública propia de la fuente.
-
-La fuente permite analizar la evolución de las emisiones contaminantes a nivel internacional, incluyendo información geográfica, información temporal y distintos indicadores relacionados con el volumen total de emisiones, las emisiones por habitante, la intensidad de emisiones y la variación anual.
 
 La fuente cumple los requisitos indicados para el proyecto porque:
 
@@ -68,18 +66,24 @@ La fuente cumple los requisitos indicados para el proyecto porque:
 | `emissions-per-capita` | Emisiones de CO₂ por habitante |
 | `annual-variation` | Variación anual de las emisiones |
 
+## Tratamiento de valores no disponibles
+
+Algunos registros pueden no disponer de todos los indicadores. En esos casos se utiliza `null` para representar datos no disponibles.
+
+Los campos `emissionsIntensity` y `annualVariation` pueden ser `null`. En la tabla del frontend se muestran como `N/A`. No se sustituyen por `0`, porque `0` indica un valor real y `null` indica ausencia de dato.
+
 ## Compatibilidad con otras fuentes
 
-Para facilitar la integración posterior con una API externa de datos energéticos, se utilizarán dos dimensiones principales:
+Para una futura integración con una API externa de datos energéticos, se utilizarán dos dimensiones principales:
 
 | Dimensión | Campo usado |
 |---|---|
 | Información geográfica | `location` |
 | Información temporal | `period` |
 
-Algunas localizaciones de la fuente pueden aparecer como valores compuestos. Por ejemplo, para España la fuente puede utilizar `Spain and Andorra`. Para no alterar el dato original, se conserva ese valor en el campo `location`.
+Algunas localizaciones pueden aparecer como valores compuestos. Por ejemplo, para España la fuente puede utilizar `Spain and Andorra`. Para no alterar el dato original, se conserva ese valor en `location`.
 
-Para facilitar las búsquedas, el backend implementa un filtro flexible por localización. Por ejemplo, al buscar `Spain`, la API puede devolver registros cuya localización original sea `Spain and Andorra`.
+Para facilitar las búsquedas, el backend implementa un filtro flexible por localización. Así, al buscar `Spain`, la API puede devolver registros cuya localización original sea `Spain and Andorra`.
 
 ---
 
@@ -110,30 +114,20 @@ DGSIN-2526-10/
 └── frontend/
 ```
 
-La carpeta `backend/` contiene la API REST, la carpeta `frontend/` contiene la aplicación Angular y la carpeta `docs/` contiene el diario y documentación del proyecto.
-
 ---
 
 ## Avance 3 - Creación del backend inicial
 
 Se ha creado el backend inicial usando Node.js y Express dentro de la carpeta `backend/`.
 
-Se han instalado las dependencias principales:
+Se han instalado dependencias principales como `express`, `cors`, `dotenv`, `mongoose` y `nodemon`.
 
-```txt
-express
-cors
-dotenv
-mongoose
-nodemon
-```
-
-Se han creado los primeros endpoints de comprobación:
+Se han creado los endpoints iniciales:
 
 | Método | Endpoint | Descripción |
 |---|---|---|
 | GET | `/` | Devuelve un mensaje indicando que la API está en ejecución |
-| GET | `/api/v1/health` | Comprueba que la API está funcionando correctamente |
+| GET | `/api/v1/health` | Comprueba que la API está funcionando |
 
 ---
 
@@ -141,48 +135,26 @@ Se han creado los primeros endpoints de comprobación:
 
 Se ha configurado la conexión del backend con MongoDB Atlas.
 
-Se ha creado el archivo:
+Se ha creado el archivo `backend/src/config/db.js` y se ha configurado la variable `MONGODB_URI` en `.env`.
 
-```txt
-backend/src/config/db.js
-```
-
-También se ha configurado la variable de entorno `MONGODB_URI` en el archivo `.env`.
-
-Durante la configuración se detectó un error de resolución DNS en la cadena de conexión de MongoDB Atlas:
-
-```txt
-querySrv ENOTFOUND _mongodb._tcp.cluster.g5cdqlu.mongodb.net
-```
-
-El problema se corrigió ajustando la URI de MongoDB Atlas.
+Durante la configuración se detectó un error de resolución DNS en la cadena de conexión de MongoDB Atlas. El problema se corrigió ajustando la URI de conexión.
 
 ---
 
 ## Avance 5 - Creación del modelo de datos
 
-Se ha creado el modelo principal:
+Se ha creado el modelo `CarbonEmissionRecord` en `backend/src/models/carbonEmissionRecord.model.js`.
 
-```txt
-CarbonEmissionRecord
-```
+El modelo contiene los campos:
 
-El archivo del modelo se encuentra en:
-
-```txt
-backend/src/models/carbonEmissionRecord.model.js
-```
-
-El modelo contiene los siguientes campos:
-
-| Campo en MongoDB | Campo del diario | Tipo |
-|---|---|---|
-| `location` | `location` | String |
-| `period` | `period` | Number |
-| `totalEmissionsMt` | `total-emissions-mt` | Number |
-| `emissionsIntensity` | `emissions-intensity` | Number o null |
-| `emissionsPerCapita` | `emissions-per-capita` | Number |
-| `annualVariation` | `annual-variation` | Number o null |
+| Campo en MongoDB | Tipo |
+|---|---|
+| `location` | String |
+| `period` | Number |
+| `totalEmissionsMt` | Number |
+| `emissionsIntensity` | Number o null |
+| `emissionsPerCapita` | Number |
+| `annualVariation` | Number o null |
 
 Se ha añadido una restricción para evitar registros duplicados con la misma combinación de `location` y `period`.
 
@@ -190,55 +162,27 @@ Se ha añadido una restricción para evitar registros duplicados con la misma co
 
 ## Avance 6 - Creación del recurso REST
 
-Se ha implementado el recurso REST:
-
-```txt
-/api/v1/carbon-emission-records
-```
+Se ha implementado el recurso REST `/api/v1/carbon-emission-records`.
 
 Endpoints implementados:
 
 | Método | Endpoint | Descripción |
 |---|---|---|
 | GET | `/api/v1/carbon-emission-records` | Obtiene registros de emisiones |
-| GET | `/api/v1/carbon-emission-records?location=Spain` | Filtra por localización |
-| GET | `/api/v1/carbon-emission-records?period=2022` | Filtra por año |
-| GET | `/api/v1/carbon-emission-records?fromPeriod=2020&toPeriod=2023` | Filtra por rango de años |
 | GET | `/api/v1/carbon-emission-records/:id` | Obtiene un registro por ID |
 | POST | `/api/v1/carbon-emission-records` | Crea un registro |
 | PUT | `/api/v1/carbon-emission-records/:id` | Actualiza un registro |
 | DELETE | `/api/v1/carbon-emission-records/:id` | Elimina un registro |
 
+También se han añadido filtros por localización, año, rango de años, límite y desplazamiento.
+
 ---
 
 ## Avance 7 - Carga inicial de datos
 
-Se ha creado el archivo:
+Se ha creado el archivo `backend/data/carbonEmissionRecords.json`.
 
-```txt
-backend/data/carbonEmissionRecords.json
-```
-
-El JSON contiene registros con esta estructura:
-
-```json
-{
-  "location": "Afghanistan",
-  "period": 1970,
-  "totalEmissionsMt": 1.734,
-  "emissionsIntensity": null,
-  "emissionsPerCapita": 0.16,
-  "annualVariation": null
-}
-```
-
-También se ha creado un script de carga:
-
-```txt
-backend/src/scripts/loadCarbonEmissionRecords.js
-```
-
-Se ejecuta con:
+Los datos se cargan en MongoDB mediante el script:
 
 ```bash
 npm run load:carbon
@@ -252,23 +196,13 @@ Durante esta fase se sustituyó `new: true` por `returnDocument: "after"` en las
 
 Se han comenzado a realizar pruebas de la API usando Insomnia.
 
-Pruebas realizadas:
-
-| Método | Endpoint | Estado |
-|---|---|---|
-| GET | `/api/v1/health` | Probado |
-| GET | `/api/v1/carbon-emission-records` | Probado |
-| GET | `/api/v1/carbon-emission-records?location=Spain` | Probado |
-| GET | `/api/v1/carbon-emission-records?period=2022` | Probado |
-| POST | `/api/v1/carbon-emission-records` | Probado inicialmente |
-| PUT | `/api/v1/carbon-emission-records/:id` | Pendiente de documentar |
-| DELETE | `/api/v1/carbon-emission-records/:id` | Pendiente de documentar |
+Se han probado peticiones `GET`, `POST`, `PUT` y `DELETE`, así como filtros por localización y año.
 
 ---
 
 ## Avance 9 - Organización de documentación
 
-Se ha creado la carpeta `docs/` para guardar la documentación del proyecto:
+Se ha creado la carpeta `docs/` para guardar el diario y documentación del proyecto:
 
 ```txt
 docs/
@@ -276,7 +210,7 @@ docs/
 └── postman/
 ```
 
-Aunque durante el desarrollo se está utilizando Insomnia, se mantiene la carpeta `postman/` por si posteriormente es necesario incluir documentación compatible con Postman.
+Aunque durante el desarrollo se utiliza Insomnia, se mantiene la carpeta `postman/` por si posteriormente es necesario incluir documentación compatible con Postman.
 
 ---
 
@@ -284,7 +218,9 @@ Aunque durante el desarrollo se está utilizando Insomnia, se mantiene la carpet
 
 Se ha añadido una capa de validación para el recurso `carbon-emission-records`.
 
-También se ha añadido un middleware para gestionar rutas no encontradas, devolviendo una respuesta JSON con código HTTP 404 cuando se solicita un endpoint inexistente.
+También se ha añadido un middleware para gestionar rutas no encontradas con respuesta JSON y código HTTP 404.
+
+Además, se ha tratado el error de duplicado cuando ya existe un registro con la misma combinación de `location` y `period`.
 
 ---
 
@@ -292,11 +228,7 @@ También se ha añadido un middleware para gestionar rutas no encontradas, devol
 
 Se ha preparado el backend para su despliegue en Google App Engine.
 
-Se ha creado una plantilla:
-
-```txt
-backend/app.example.yaml
-```
+Se ha creado la plantilla `backend/app.example.yaml`.
 
 El archivo real `app.yaml` no se subirá al repositorio porque puede contener credenciales reales de MongoDB Atlas.
 
@@ -312,30 +244,15 @@ La aplicación se encuentra disponible en:
 https://dgsin-2526-10-mjcadenas.ew.r.appspot.com
 ```
 
-Durante el despliegue se resolvieron incidencias relacionadas con:
-
-- Facturación del proyecto de Google Cloud.
-- Permisos sobre el bucket de staging de App Engine.
-- Acceso de red desde App Engine hacia MongoDB Atlas.
-
-Endpoints verificados:
-
-| Método | Endpoint | Estado |
-|---|---|---|
-| GET | `/` | Probado |
-| GET | `/api/v1/health` | Probado |
-| GET | `/api/v1/carbon-emission-records` | Probado |
-| GET | `/api/v1/carbon-emission-records?location=Spain` | Probado |
+Durante el despliegue se resolvieron incidencias relacionadas con facturación, permisos sobre el bucket de staging y acceso de red desde App Engine hacia MongoDB Atlas.
 
 ---
 
 ## Avance 13 - Corrección del filtrado por localización
 
-Se ha corregido el filtrado de registros por localización en el recurso `carbon-emission-records`.
+Se ha corregido el filtrado de registros por localización.
 
-Durante las pruebas se detectó que la fuente original utiliza valores de localización compuestos en algunos casos, como `Spain and Andorra`. Esto hacía que una búsqueda exacta por `Spain` no devolviera resultados.
-
-Para resolverlo, se ha modificado el controlador para que el parámetro `location` realice una búsqueda flexible sobre el campo `location`.
+La fuente puede usar valores compuestos como `Spain and Andorra`. Por eso se ha implementado un filtro flexible sobre el campo `location`.
 
 De esta forma, una consulta como:
 
@@ -343,19 +260,7 @@ De esta forma, una consulta como:
 GET /api/v1/carbon-emission-records?location=Spain
 ```
 
-puede encontrar y devolver registros cuya localización original sea:
-
-```txt
-Spain and Andorra
-```
-
-También sigue siendo posible buscar directamente por el valor completo de la fuente:
-
-```txt
-GET /api/v1/carbon-emission-records?location=Spain%20and%20Andorra
-```
-
-La corrección se ha probado correctamente tanto en local como en la API desplegada en Google App Engine.
+puede devolver registros cuya localización original sea `Spain and Andorra`.
 
 ---
 
@@ -363,30 +268,15 @@ La corrección se ha probado correctamente tanto en local como en la API despleg
 
 Se ha ampliado el conjunto inicial de datos de emisiones de CO₂ con más registros por localización y año.
 
-También se ha mejorado el endpoint `GET /api/v1/carbon-emission-records` para permitir búsquedas más flexibles mediante filtros por localización, año concreto y rango de años.
-
-Nuevos parámetros soportados:
-
-| Parámetro | Descripción |
-|---|---|
-| `location` | Filtra por localización mediante búsqueda flexible |
-| `period` | Filtra por un año concreto |
-| `fromPeriod` | Filtra desde un año inicial |
-| `toPeriod` | Filtra hasta un año final |
-| `limit` | Limita el número de registros devueltos |
-| `offset` | Permite paginar los resultados |
-
-Estos cambios preparan la API para ser consumida posteriormente desde el frontend Angular.
+También se ha mejorado el endpoint `GET /api/v1/carbon-emission-records` para permitir búsquedas por localización, año concreto, rango de años, límite y desplazamiento.
 
 ---
 
 ## Avance 15 - Creación del frontend Angular
 
-Se ha creado el frontend del proyecto con Angular dentro de la carpeta `frontend/`.
+Se ha creado el frontend con Angular dentro de la carpeta `frontend/`.
 
 Durante la creación del proyecto se decidió no activar SSR/SSG, ya que el objetivo inicial es desarrollar una aplicación SPA sencilla que consuma la API REST desplegada en Google App Engine.
-
-También se decidió no compartir métricas de uso con Angular.
 
 ---
 
@@ -398,65 +288,93 @@ Se ha creado un servicio Angular para consumir el endpoint desplegado de la API:
 https://dgsin-2526-10-mjcadenas.ew.r.appspot.com/api/v1/carbon-emission-records
 ```
 
-También se ha creado un modelo TypeScript para representar los registros de emisiones de CO₂.
+También se ha creado un modelo TypeScript para representar los registros.
 
-La primera pantalla del frontend muestra una tabla con los registros obtenidos desde la API y permite filtrar por localización, año concreto y rango de años.
-
-Durante esta fase se detectó un error de Angular relacionado con Zone.js:
-
-```txt
-NG0908: In this configuration Angular requires Zone.js
-```
-
-El problema se resolvió instalando `zone.js` y cargándolo desde `main.ts`.
-
-Con esto, el frontend ya muestra datos reales obtenidos desde el backend desplegado en App Engine.
+Durante esta fase se detectó un error de Angular relacionado con Zone.js. El problema se resolvió instalando `zone.js` y cargándolo desde `main.ts`.
 
 ---
+
 ## Avance 17 - Mejoras en el frontend Angular
 
-Se han realizado varias mejoras en el frontend Angular para facilitar la consulta de los registros de emisiones de CO₂.
+Se han añadido mejoras al frontend:
 
-En primer lugar, se ha añadido paginación a la tabla de resultados. La API ya soportaba los parámetros `limit` y `offset`, por lo que el frontend se ha actualizado para permitir navegar entre páginas de resultados sin cargar todos los registros de una sola vez.
+- Paginación con `limit` y `offset`.
+- Selector de tamaño de página: 25, 50 o 100 registros.
+- Filtros automáticos al escribir.
+- Validación de años entre 1970 y el año actual.
+- Botón de recarga.
+- Mensajes de estado.
+- Iconos mediante Font Awesome.
+- Corrección de TypeScript 6 en `tsconfig.app.json` añadiendo `rootDir: "./src"`.
 
-También se ha añadido un selector de tamaño de página, permitiendo mostrar 25, 50 o 100 registros por página.
-
-Además, se ha mejorado el comportamiento de los filtros. Ahora, al escribir en los campos de búsqueda, la tabla se actualiza automáticamente tras un breve retardo, sin necesidad de pulsar siempre el botón de búsqueda. Aun así, se mantiene el botón `Search` para poder forzar manualmente la consulta.
-
-Se han añadido restricciones a los campos de año para evitar búsquedas fuera del rango disponible en el conjunto de datos. Actualmente, los años permitidos están comprendidos entre 1970 y 2023. También se valida que el campo `From year` no sea mayor que el campo `To year`.
-
-Se ha añadido un botón de recarga y se han mejorado los mensajes visuales de estado, mostrando el número total de registros, la página actual y el rango de registros visible.
-
-Por último, se ha comenzado a preparar la tabla para acciones CRUD desde el frontend. Se ha añadido una columna de acciones y se ha incorporado Font Awesome para mostrar iconos en lugar de texto plano, por ejemplo usando un icono de papelera para la acción de borrado.
-
-Durante esta fase también se corrigió un aviso de TypeScript 6 en `tsconfig.app.json`, añadiendo explícitamente la propiedad `rootDir` para indicar que el directorio fuente común de la aplicación es `./src`.
 ---
+
 ## Avance 18 - Creación de registros desde Angular
 
-Se ha añadido al frontend Angular un formulario para crear nuevos registros de emisiones de CO₂.
+Se ha añadido al frontend Angular la posibilidad de crear nuevos registros de emisiones de CO₂.
 
-El formulario permite introducir los campos principales del recurso `carbon-emission-records`:
+Inicialmente la creación se planteó dentro de la vista de listado, pero posteriormente se decidió moverla a una vista separada para mejorar la organización y acercarse mejor a los criterios de la rúbrica.
 
-| Campo                | Descripción                               |
-| -------------------- | ----------------------------------------- |
-| `location`           | Localización del registro                 |
-| `period`             | Año del registro                          |
-| `totalEmissionsMt`   | Emisiones totales de CO₂ en megatoneladas |
-| `emissionsIntensity` | Intensidad de emisiones                   |
-| `emissionsPerCapita` | Emisiones por habitante                   |
-| `annualVariation`    | Variación anual de emisiones              |
+El formulario permite introducir `location`, `period`, `totalEmissionsMt`, `emissionsIntensity`, `emissionsPerCapita` y `annualVariation`.
 
-Desde Angular se envía una petición `POST` al endpoint desplegado en Google App Engine:
+Desde Angular se envía una petición:
 
 ```txt
 POST /api/v1/carbon-emission-records
 ```
 
-Durante esta fase se detectó inicialmente un error `400 Bad Request` al crear registros desde el frontend. El error estaba relacionado con la validación de los datos enviados al backend. Tras revisar el cuerpo de la petición y la validación del recurso, se corrigió el problema y la creación de registros desde Angular quedó funcionando correctamente.
+También se ha mejorado la gestión de errores para mostrar en pantalla mensajes devueltos por el backend, como el error de registro duplicado.
 
-Una vez creado un registro, el formulario se limpia, se oculta y la tabla se recarga automáticamente para mostrar los datos actualizados.
+---
 
-Con este avance, el frontend ya permite consultar, filtrar, paginar y crear registros de emisiones desde la interfaz web.
+## Avance 19 - Edición de registros en una vista separada con Angular Router
+
+Se ha refactorizado el frontend Angular para utilizar Angular Router y separar la vista de listado de la vista de edición.
+
+La aplicación cuenta ahora con una vista principal donde se muestran los registros de emisiones de CO₂ en una tabla con filtros, paginación y acciones sobre cada registro.
+
+La vista de edición se encuentra en:
+
+```txt
+/records/:id/edit
+```
+
+En esta vista se cargan los datos actuales del registro mediante una petición `GET` por identificador y se muestran en un formulario independiente. Al guardar los cambios, Angular envía una petición:
+
+```txt
+PUT /api/v1/carbon-emission-records/:id
+```
+
+Con este cambio, el frontend permite editar recursos en una vista distinta a la lista y utiliza Angular Router para organizar la navegación.
+
+---
+
+## Avance 20 - Creación de registros en una vista separada y mejora de mensajes de error
+
+Se ha añadido una vista específica para crear registros, accesible desde la ruta:
+
+```txt
+/records/new
+```
+
+La vista principal ya no contiene el formulario de creación directamente. En su lugar, muestra un botón `New record` que redirige al formulario de alta.
+
+También se han corregido problemas de refresco visual en Angular. En algunas operaciones, la API respondía correctamente, pero la pantalla no actualizaba el estado hasta que el usuario hacía clic en algún campo. Para resolverlo, se utilizó `ChangeDetectorRef` en las vistas donde era necesario forzar la actualización de la interfaz tras respuestas HTTP.
+
+Además, se ha mejorado el tratamiento de errores en la vista de creación, de forma que los errores de la API se muestran en pantalla y no solo en consola.
+
+---
+
+## Avance 21 - Tratamiento de campos opcionales y valores no disponibles
+
+Se ha revisado el tratamiento de los campos que pueden no estar disponibles en la fuente de datos.
+
+Los campos `emissionsIntensity` y `annualVariation` se consideran opcionales y pueden tomar el valor `null`.
+
+En los formularios de creación y edición se permite dejar estos campos vacíos. Cuando el usuario los deja sin valor, Angular los transforma en `null` antes de enviar la petición al backend.
+
+En la tabla de resultados, los valores `null` se muestran como `N/A`.
+
 ---
 
 # Decisiones técnicas tomadas
@@ -475,24 +393,30 @@ El proyecto se ha estructurado separando backend y frontend en carpetas independ
 
 ## Uso del campo `location`
 
-Se ha decidido mantener el campo `location` tal y como aparece en la fuente de información.
+Se mantiene el campo `location` tal y como aparece en la fuente de información.
 
-Para facilitar la búsqueda, el backend implementa un filtro flexible por localización. Así, una búsqueda por `Spain` puede devolver registros cuya localización original sea `Spain and Andorra`.
+Para facilitar la búsqueda, el backend implementa un filtro flexible por localización.
 
-## Uso de Insomnia para pruebas
+## Uso de Angular Router
 
-Se está utilizando Insomnia para probar los endpoints de la API durante el desarrollo.
+Se ha incorporado Angular Router para separar vistas principales:
+
+| Ruta | Descripción |
+|---|---|
+| `/` | Vista principal de listado, filtros, paginación y acciones |
+| `/records/new` | Vista de creación de registros |
+| `/records/:id/edit` | Vista de edición de registros |
 
 ---
 
 # Próximos pasos
 
-1. Completar las pruebas de todos los endpoints CRUD.
-2. Revisar y completar la documentación de la API.
-3. Mejorar el diseño visual del frontend Angular.
-4. Añadir operaciones de creación, edición y eliminación desde Angular.
+1. Completar y documentar las pruebas de todas las operaciones CRUD.
+2. Preparar documentación de API con ejemplos de operaciones y estados devueltos.
+3. Preparar colección de pruebas de Postman o Insomnia exportada.
+4. Añadir visualizaciones con Highcharts o Google Charts.
 5. Integrar una API externa de datos energéticos.
-6. Añadir visualizaciones de datos.
+6. Enlazar la documentación y las visualizaciones desde la propia aplicación.
 7. Actualizar el diario con cada avance realizado.
 
 ---
@@ -513,3 +437,4 @@ Los tiempos de trabajo se irán registrando en Toggl.
 | Pendiente | Preparación y despliegue en App Engine | Pendiente |
 | Pendiente | Creación del frontend Angular | Pendiente |
 | Pendiente | Conexión del frontend con la API | Pendiente |
+| Pendiente | Mejoras de frontend, paginación y rutas | Pendiente |

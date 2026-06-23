@@ -25,16 +25,17 @@ const validateCarbonEmissionRecord = (req, res, next) => {
     errors.push("totalEmissionsMt is required and must be a positive number");
   }
 
-  if (typeof emissionsIntensity !== "number" || emissionsIntensity < 0) {
-    errors.push("emissionsIntensity is required and must be a positive number");
+  if (emissionsIntensity !== null && emissionsIntensity !== undefined && typeof emissionsIntensity !== "number") {
+    errors.push("emissionsIntensity must be a number or null");
   }
 
   if (typeof emissionsPerCapita !== "number" || emissionsPerCapita < 0) {
     errors.push("emissionsPerCapita is required and must be a positive number");
   }
 
-  if (typeof annualVariation !== "number") {
-    errors.push("annualVariation is required and must be a number");
+  if (
+    annualVariation !== null && annualVariation !== undefined && typeof annualVariation !== "number") {
+    errors.push("annualVariation must be a number or null");
   }
 
   if (errors.length > 0) {

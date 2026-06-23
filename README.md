@@ -51,6 +51,7 @@ GET https://dgsin-2526-10-mjcadenas.ew.r.appspot.com/api/v1/carbon-emission-reco
 - Google App Engine
 - Google Cloud CLI
 - Angular
+- Angular Router
 - TypeScript
 - Font Awesome
 - Zone.js
@@ -96,6 +97,13 @@ DGSIN-2526-10/
     ├── package.json
     ├── public/
     ├── src/
+    │   └── app/
+    │       ├── models/
+    │       ├── pages/
+    │       │   ├── create-record-page/
+    │       │   ├── edit-record-page/
+    │       │   └── records-page/
+    │       └── services/
     ├── tsconfig.app.json
     ├── tsconfig.json
     └── tsconfig.spec.json
@@ -105,16 +113,9 @@ DGSIN-2526-10/
 
 ## Instalación del backend
 
-Clonar el repositorio:
-
 ```bash
 git clone https://github.com/mii-dgsin/DGSIN-2526-10.git
 cd DGSIN-2526-10/backend
-```
-
-Instalar dependencias:
-
-```bash
 npm install
 ```
 
@@ -122,7 +123,7 @@ npm install
 
 ## Variables de entorno del backend
 
-Crear un archivo `.env` dentro de la carpeta `backend/` con el siguiente contenido:
+Crear un archivo `.env` dentro de `backend/`:
 
 ```env
 PORT=8080
@@ -137,13 +138,13 @@ El archivo `.env` no debe subirse al repositorio porque contiene credenciales pr
 
 El archivo real `app.yaml` no se sube al repositorio porque puede contener credenciales reales de MongoDB Atlas.
 
-Se incluye una plantilla de ejemplo:
+Se incluye una plantilla:
 
 ```txt
 backend/app.example.yaml
 ```
 
-Ejemplo de configuración:
+Ejemplo:
 
 ```yaml
 runtime: nodejs24
@@ -166,13 +167,13 @@ gcloud app deploy
 
 ## Scripts del backend
 
-Dentro de la carpeta `backend/` se pueden ejecutar los siguientes comandos:
+Desde `backend/`:
 
 ```bash
 npm run dev
 ```
 
-Arranca el servidor en modo desarrollo usando nodemon.
+Arranca el servidor en modo desarrollo.
 
 ```bash
 npm start
@@ -195,11 +196,6 @@ Desde la raíz del proyecto:
 ```bash
 cd frontend
 npm install
-```
-
-Arrancar Angular en local:
-
-```bash
 ng serve
 ```
 
@@ -237,19 +233,13 @@ GET /api/v1/carbon-emission-records?location=Spain
 
 El filtro de localización usa búsqueda flexible. Por ejemplo, si se busca `Spain`, la API puede devolver registros cuya localización original sea `Spain and Andorra`.
 
-También puede buscarse por el valor completo:
-
-```http
-GET /api/v1/carbon-emission-records?location=Spain%20and%20Andorra
-```
-
 ### Filtrar por año
 
 ```http
 GET /api/v1/carbon-emission-records?period=2022
 ```
 
-Obtiene los registros correspondientes a un año concreto.
+Obtiene registros de un año concreto.
 
 ### Filtrar por rango de años
 
@@ -257,7 +247,7 @@ Obtiene los registros correspondientes a un año concreto.
 GET /api/v1/carbon-emission-records?fromPeriod=2020&toPeriod=2023
 ```
 
-Obtiene los registros incluidos dentro de un rango de años.
+Obtiene registros incluidos dentro de un rango de años.
 
 ### Filtrar con paginación
 
@@ -294,6 +284,8 @@ Ejemplo de body:
 }
 ```
 
+Si ya existe un registro con la misma combinación de `location` y `period`, la API devuelve un error indicando que el registro ya existe.
+
 ### Actualizar un registro
 
 ```http
@@ -314,8 +306,6 @@ Elimina un registro existente.
 
 ## Parámetros de consulta soportados
 
-El endpoint principal permite los siguientes parámetros:
-
 | Parámetro | Descripción |
 |---|---|
 | `location` | Filtra por localización mediante búsqueda flexible |
@@ -325,19 +315,9 @@ El endpoint principal permite los siguientes parámetros:
 | `limit` | Define el número máximo de registros devueltos |
 | `offset` | Define desde qué posición comienzan los resultados |
 
-Ejemplo:
-
-```http
-GET /api/v1/carbon-emission-records?location=Spain&fromPeriod=2020&toPeriod=2023&limit=50&offset=0
-```
-
-Si se busca `Spain`, la API puede devolver registros cuya localización original sea `Spain and Andorra`, ya que el filtro de localización usa una búsqueda flexible.
-
 ---
 
 ## Modelo de datos
-
-El recurso principal de la API es `carbon-emission-records`.
 
 | Campo | Tipo | Descripción |
 |---|---|---|
@@ -350,7 +330,7 @@ El recurso principal de la API es `carbon-emission-records`.
 
 El modelo incluye una restricción para evitar duplicados con la misma combinación de `location` y `period`.
 
-Ejemplo de registro:
+Ejemplo:
 
 ```json
 {
@@ -363,11 +343,13 @@ Ejemplo de registro:
 }
 ```
 
+Los campos `emissionsIntensity` y `annualVariation` pueden ser `null` cuando la fuente no dispone de ese dato.
+
 ---
 
 ## Frontend
 
-El frontend se ha creado con Angular.
+El frontend se ha creado con Angular y utiliza Angular Router.
 
 La aplicación permite actualmente:
 
@@ -379,20 +361,27 @@ La aplicación permite actualmente:
 - Aplicar filtros automáticamente al escribir.
 - Paginar resultados mediante `limit` y `offset`.
 - Seleccionar el tamaño de página: 25, 50 o 100 registros.
-- Validar que los años introducidos estén entre 1970 y 2023.
-- Evitar rangos de años incorrectos, por ejemplo cuando `fromPeriod` es mayor que `toPeriod`.
-- Crear nuevos registros desde un formulario Angular.
+- Validar que los años introducidos estén entre 1970 y el año actual.
+- Evitar rangos de años incorrectos.
+- Crear nuevos registros desde una vista separada.
+- Editar registros existentes desde una vista separada.
+- Eliminar registros desde la tabla.
 - Mostrar iconos de acción mediante Font Awesome.
+- Mostrar mensajes de error devueltos por la API.
 
-Durante la configuración inicial del frontend se detectó el error:
+Rutas principales:
 
-```txt
-NG0908: In this configuration Angular requires Zone.js
-```
+| Ruta | Descripción |
+|---|---|
+| `/` | Listado, búsqueda, paginación y acciones |
+| `/records/new` | Creación de un nuevo registro |
+| `/records/:id/edit` | Edición de un registro existente |
 
-El problema se resolvió instalando `zone.js` y cargándolo en `main.ts`.
+Durante la configuración inicial del frontend se detectó el error `NG0908: In this configuration Angular requires Zone.js`. El problema se resolvió instalando `zone.js` y cargándolo en `main.ts`.
 
 También se corrigió un aviso de TypeScript 6 en `tsconfig.app.json`, añadiendo explícitamente la propiedad `rootDir` con el valor `./src`.
+
+En algunas vistas se utilizó `ChangeDetectorRef` para asegurar que la interfaz se actualiza correctamente tras recibir respuestas HTTP.
 
 ---
 
@@ -408,10 +397,12 @@ Endpoints probados:
 - `GET /api/v1/carbon-emission-records?period=2022`
 - `GET /api/v1/carbon-emission-records?fromPeriod=2020&toPeriod=2023`
 - `GET /api/v1/carbon-emission-records?limit=50&offset=0`
+- `GET /api/v1/carbon-emission-records/:id`
 - `POST /api/v1/carbon-emission-records`
+- `PUT /api/v1/carbon-emission-records/:id`
 - `DELETE /api/v1/carbon-emission-records/:id`
 
-Queda pendiente completar y documentar las pruebas de `PUT`.
+Queda pendiente completar la documentación formal de las pruebas y exportar la colección para la entrega final si fuera necesario.
 
 ---
 
@@ -433,27 +424,27 @@ La aplicación desplegada responde correctamente desde la URL pública y accede 
 
 Actualmente el backend arranca correctamente en local y está desplegado en Google App Engine.
 
-La API dispone del recurso `carbon-emission-records` con operaciones CRUD básicas, validación de datos, control de rutas no encontradas y filtros por localización y periodo.
+La API dispone del recurso `carbon-emission-records` con operaciones CRUD, validación de datos, control de rutas no encontradas, filtros por localización y periodo, paginación y gestión de duplicados.
 
-El frontend Angular ya consume datos reales desde la API desplegada, muestra los registros en una tabla, permite filtrar, paginar y crear nuevos registros desde la interfaz web.
+El frontend Angular consume datos reales desde la API desplegada, muestra los registros en una tabla y permite filtrar, paginar, crear, editar y eliminar registros desde la interfaz web.
 
 ---
 
 ## Próximos pasos
 
-- Completar pruebas CRUD con Insomnia.
-- Revisar y completar la documentación final de la API.
-- Mejorar el diseño visual del frontend Angular.
-- Añadir edición de registros desde Angular.
-- Revisar eliminación de registros desde Angular.
+- Completar la documentación formal de la API.
+- Preparar colección de pruebas de Postman o Insomnia con comprobaciones.
+- Enlazar la documentación desde la aplicación.
+- Añadir visualizaciones con Highcharts o Google Charts.
 - Integrar una API externa de datos energéticos.
-- Añadir visualizaciones de datos.
+- Enlazar las visualizaciones desde la aplicación.
+- Actualizar el diario y el README con los nuevos avances.
 
 ---
 
 ## Notas de seguridad
 
-No deben subirse al repositorio los siguientes archivos o carpetas:
+No deben subirse al repositorio:
 
 ```txt
 backend/.env
