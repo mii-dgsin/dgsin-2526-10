@@ -419,6 +419,8 @@ La aplicación permite actualmente:
 - Eliminar registros desde la tabla.
 - Mostrar iconos de acción mediante Font Awesome.
 - Mostrar mensajes de error devueltos por la API.
+- Consultar la integración externa con Ember Energy desde una vista Angular.
+- Mostrar un resumen de datos combinados entre registros locales de CO₂ y datos externos de generación eléctrica.
 
 Rutas principales:
 
@@ -427,6 +429,7 @@ Rutas principales:
 | `/` | Listado, búsqueda, paginación y acciones |
 | `/records/new` | Creación de un nuevo registro |
 | `/records/:id/edit` | Edición de un registro existente |
+| `/integrations/renewable-electricity` | Vista de integración externa con Ember Energy |
 
 Durante la configuración inicial del frontend se detectó el error `NG0908: In this configuration Angular requires Zone.js`. El problema se resolvió instalando `zone.js` y cargándolo en `main.ts`.
 

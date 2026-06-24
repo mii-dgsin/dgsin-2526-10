@@ -407,6 +407,25 @@ La ruta se ha probado correctamente tras configurar la variable de entorno `EMBE
 
 ---
 
+## Avance 23 - Vista Angular para la integración externa con Ember Energy
+
+Se ha añadido una nueva vista en el frontend Angular para consultar la integración externa con Ember Energy.
+
+La vista se encuentra disponible en la ruta:
+
+```txt
+/integrations/renewable-electricity
+```
+Desde esta pantalla se pueden introducir los parámetros location, fromPeriod y toPeriod. Angular llama al backend del proyecto, que actúa como proxy propio hacia la API externa de Ember Energy.
+
+La vista muestra un resumen de la integración, incluyendo la localización consultada, el código de entidad utilizado por Ember, el rango temporal, el número de registros locales de emisiones de CO₂ y el número de registros externos obtenidos desde Ember.
+
+También se muestran los registros locales de emisiones en una tabla y, de forma temporal, la respuesta externa de Ember en formato JSON para poder analizar la estructura real de los datos antes de construir las visualizaciones.
+
+Con este avance, el frontend ya incorpora una vista específica para la integración externa, cumpliendo mejor los requisitos de integración de la rúbrica y dejando preparada la base para añadir gráficos en el siguiente paso.
+
+---
+
 # Decisiones técnicas tomadas
 
 ## Uso de Node.js y Express

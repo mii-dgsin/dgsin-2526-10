@@ -13,6 +13,11 @@
   color: #222;
 }
 
+nav {
+  display: flex;
+  gap: 16px;
+}
+
 nav a {
   text-decoration: none;
   color: #333;

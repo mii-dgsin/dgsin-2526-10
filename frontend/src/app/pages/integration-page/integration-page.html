@@ -1,0 +1,149 @@
+<main class="page">
+  <section class="hero">
+    <h1>Renewable Electricity Integration</h1>
+    <p>
+      This view integrates local CO₂ emission records with external yearly electricity
+      generation data from Ember Energy.
+    </p>
+  </section>
+
+  <section class="filters">
+    <div class="field">
+      <label for="location">Location</label>
+      <input
+        id="location"
+        type="text"
+        [(ngModel)]="location"
+        placeholder="Spain"
+      />
+    </div>
+
+    <div class="field">
+      <label for="fromPeriod">From year</label>
+      <input
+        id="fromPeriod"
+        type="number"
+        [(ngModel)]="fromPeriod"
+        [min]="minPeriod"
+        [max]="maxPeriod"
+      />
+    </div>
+
+    <div class="field">
+      <label for="toPeriod">To year</label>
+      <input
+        id="toPeriod"
+        type="number"
+        [(ngModel)]="toPeriod"
+        [min]="minPeriod"
+        [max]="maxPeriod"
+      />
+    </div>
+
+    <div class="actions">
+      <button
+        type="button"
+        (click)="loadIntegration()"
+        [disabled]="loading || hasInvalidFilters"
+      >
+        Load integration
+      </button>
+    </div>
+  </section>
+
+  <section class="status">
+    <p class="hint">
+      Allowed years: {{ minPeriod }} - {{ maxPeriod }}
+    </p>
+
+    <p *ngIf="loading">Loading integration...</p>
+
+    <p *ngIf="errorMessage" class="error">
+      {{ errorMessage }}
+    </p>
+  </section>
+
+  <section *ngIf="integration" class="summary">
+    <h2>Integration summary</h2>
+
+    <table>
+      <tbody>
+        <tr>
+          <th>Location</th>
+          <td>{{ integration.location }}</td>
+        </tr>
+        <tr>
+          <th>Ember entity code</th>
+          <td>{{ integration.entityCode }}</td>
+        </tr>
+        <tr>
+          <th>Period</th>
+          <td>{{ integration.fromPeriod }} - {{ integration.toPeriod }}</td>
+        </tr>
+        <tr>
+          <th>CO₂ records</th>
+          <td>{{ integration.emissions.length }}</td>
+        </tr>
+        <tr>
+          <th>External electricity records</th>
+          <td>{{ integration.electricityGeneration.length }}</td>
+        </tr>
+        <tr>
+          <th>External source</th>
+          <td>
+            {{ integration.source.name }} -
+            {{ integration.source.dataset }} -
+            {{ integration.source.license }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section *ngIf="integration" class="tables">
+    <section>
+      <h2>CO₂ emission records</h2>
+
+      <div class="table-wrapper" *ngIf="integration.emissions.length > 0">
+        <table>
+          <thead>
+            <tr>
+              <th>Location</th>
+              <th>Year</th>
+              <th>Total emissions Mt</th>
+              <th>Intensity</th>
+              <th>Per capita</th>
+              <th>Annual variation</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let record of integration.emissions">
+              <td>{{ record.location }}</td>
+              <td>{{ record.period }}</td>
+              <td>{{ record.totalEmissionsMt }}</td>
+              <td>{{ record.emissionsIntensity ?? 'N/A' }}</td>
+              <td>{{ record.emissionsPerCapita }}</td>
+              <td>{{ record.annualVariation ?? 'N/A' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p *ngIf="integration.emissions.length === 0">
+        No local CO₂ records found for this selection.
+      </p>
+    </section>
+
+    <section>
+      <h2>External Ember records</h2>
+
+      <p class="hint">
+        Raw external records are shown temporarily. In the next step these values will be
+        transformed into chart-ready data.
+      </p>
+
+      <pre>{{ integration.electricityGeneration | json }}</pre>
+    </section>
+  </section>
+</main>
