@@ -2,7 +2,10 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { RenewableElectricityIntegrationResponse } from '../models/renewable-electricity-integration.model';
+import {
+  RenewableElectricityIntegrationResponse,
+  SupportedIntegrationLocation
+} from '../models/renewable-electricity-integration.model';
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +15,16 @@ export class IntegrationService {
     'https://dgsin-2526-10-mjcadenas.ew.r.appspot.com/api/v1/integrations';
 
   constructor(private readonly http: HttpClient) {}
+
+  getSupportedLocations(): Observable<{
+    total: number;
+    locations: SupportedIntegrationLocation[];
+  }> {
+    return this.http.get<{
+      total: number;
+      locations: SupportedIntegrationLocation[];
+    }>(`${this.apiUrl}/supported-locations`);
+  }
 
   getRenewableElectricityIntegration(filters: {
     location: string;

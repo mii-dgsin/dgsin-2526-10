@@ -17,6 +17,7 @@ export class RecordsPage implements OnInit {
   readonly maxPeriod = new Date().getFullYear();
 
   records: CarbonEmissionRecord[] = [];
+  locations: string[] = [];
   total = 0;
   loading = false;
   errorMessage = '';
@@ -38,6 +39,7 @@ export class RecordsPage implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.loadLocations();
     this.loadRecords();
   }
 
@@ -144,6 +146,17 @@ export class RecordsPage implements OnInit {
           this.finishLoading();
         }
       });
+  }
+  loadLocations(): void {
+    this.carbonEmissionService.getLocations().subscribe({
+      next: (response) => {
+        this.locations = response.locations;
+        this.changeDetectorRef.detectChanges();
+      },
+      error: (error) => {
+        console.error('Load locations error:', error);
+      }
+    });
   }
 
   onFiltersChanged(): void {

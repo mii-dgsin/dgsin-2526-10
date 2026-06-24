@@ -67,4 +67,10 @@ export class CarbonEmissionRecordService {
   deleteRecord(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
+  getLocations() {
+    return this.http.get<{
+      total: number;
+      locations: string[];
+    }>(`${this.apiUrl}/locations`);
+  }
 }

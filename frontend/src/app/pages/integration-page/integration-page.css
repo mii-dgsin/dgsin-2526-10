@@ -34,7 +34,8 @@
   font-weight: bold;
 }
 
-.field input {
+.field input,
+.field select {
   padding: 8px;
   border: 1px solid #bbb;
   border-radius: 4px;
@@ -73,6 +74,28 @@ button:disabled {
 
 .summary {
   margin-bottom: 24px;
+}
+
+.charts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.chart-card {
+  padding: 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.chart-card h2 {
+  margin-top: 0;
+}
+
+.chart-container {
+  width: 100%;
+  min-height: 380px;
 }
 
 .tables {
@@ -115,4 +138,11 @@ pre {
   .filters {
     grid-template-columns: 1fr;
   }
+
+  .charts {
+    grid-template-columns: 1fr;
+  }
+}
+.chart-card-wide {
+  grid-column: 1 / -1;
 }

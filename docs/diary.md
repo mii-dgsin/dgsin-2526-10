@@ -10,7 +10,7 @@ El proyecto consiste en desarrollar un sistema de información en la nube para a
 
 La aplicación permite consultar, filtrar, crear, editar y eliminar registros de emisiones contaminantes procedentes de una fuente de información que no se consume directamente mediante una API pública propia. Los datos incluyen emisiones totales, emisiones por habitante, intensidad de emisiones y variación anual.
 
-Además, el proyecto se integra con una API externa de Ember Energy para complementar la información de emisiones con datos de generación eléctrica anual, utilizando un proxy propio en el backend para no exponer la API key en el frontend.
+Además, el proyecto se integra con la API externa de Ember Energy para complementar la información de emisiones con datos de generación eléctrica anual, utilizando un proxy propio en el backend para no exponer la API key en el frontend.
 
 ## Repositorio
 
@@ -71,19 +71,6 @@ La fuente cumple los requisitos indicados para el proyecto porque:
 Algunos registros pueden no disponer de todos los indicadores. En esos casos se utiliza `null` para representar datos no disponibles.
 
 Los campos `emissionsIntensity` y `annualVariation` pueden ser `null`. En la tabla del frontend se muestran como `N/A`. No se sustituyen por `0`, porque `0` indica un valor real y `null` indica ausencia de dato.
-
-## Compatibilidad con otras fuentes
-
-Para la integración con Ember Energy se utilizan principalmente dos dimensiones:
-
-| Dimensión | Campo usado |
-|---|---|
-| Información geográfica | `location` |
-| Información temporal | `period` |
-
-Algunas localizaciones pueden aparecer como valores compuestos. Por ejemplo, para España la fuente puede utilizar `Spain and Andorra`. Para no alterar el dato original, se conserva ese valor en `location`.
-
-Para facilitar las búsquedas, el backend implementa un filtro flexible por localización. Así, al buscar `Spain`, la API puede devolver registros cuya localización original sea `Spain and Andorra`.
 
 ---
 
@@ -416,13 +403,65 @@ La vista se encuentra disponible en la ruta:
 ```txt
 /integrations/renewable-electricity
 ```
-Desde esta pantalla se pueden introducir los parámetros location, fromPeriod y toPeriod. Angular llama al backend del proyecto, que actúa como proxy propio hacia la API externa de Ember Energy.
 
-La vista muestra un resumen de la integración, incluyendo la localización consultada, el código de entidad utilizado por Ember, el rango temporal, el número de registros locales de emisiones de CO₂ y el número de registros externos obtenidos desde Ember.
+Desde esta pantalla se pueden introducir los parámetros `location`, `fromPeriod` y `toPeriod`. Angular llama al backend del proyecto, que actúa como proxy propio hacia la API externa de Ember Energy.
 
-También se muestran los registros locales de emisiones en una tabla y, de forma temporal, la respuesta externa de Ember en formato JSON para poder analizar la estructura real de los datos antes de construir las visualizaciones.
+La vista muestra un resumen de la integración, incluyendo la localización consultada, la entidad utilizada por Ember, el rango temporal, el número de registros locales de emisiones de CO₂ y el número de registros externos obtenidos desde Ember.
 
-Con este avance, el frontend ya incorpora una vista específica para la integración externa, cumpliendo mejor los requisitos de integración de la rúbrica y dejando preparada la base para añadir gráficos en el siguiente paso.
+También se muestran los registros locales de emisiones en una tabla y la respuesta externa de Ember en formato JSON para documentar la estructura real de los datos utilizados.
+
+---
+
+## Avance 24 - Visualizaciones de la integración externa con Highcharts
+
+Se han añadido visualizaciones al frontend Angular utilizando Highcharts.
+
+Las visualizaciones se han incorporado en la vista de integración externa con Ember Energy:
+
+```txt
+/integrations/renewable-electricity
+```
+
+Se han añadido tres gráficos principales:
+
+| Gráfico | Fuente | Descripción |
+|---|---|---|
+| CO₂ emissions by year | API propia `carbon-emission-records` | Muestra la evolución de las emisiones totales de CO₂ por año |
+| External Ember electricity data by year | API externa Ember Energy | Muestra datos anuales procedentes de la fuente externa integrada |
+| CO₂ emissions vs Ember electricity data | API propia + API externa | Muestra una comparación visual entre ambas fuentes usando dos ejes Y |
+
+El primer gráfico utiliza los registros de emisiones almacenados en MongoDB Atlas. El segundo gráfico utiliza la respuesta externa de Ember obtenida a través del proxy propio del backend.
+
+El tercer gráfico combina ambas fuentes en una única visualización. Al tratarse de métricas con unidades diferentes, se utilizan dos ejes Y: uno para las emisiones de CO₂ y otro para los valores de generación eléctrica.
+
+Con este avance, la aplicación ya incorpora widgets de visualización y no se limita a mostrar los datos en tablas.
+
+---
+
+## Avance 25 - Localizaciones dinámicas compatibles para la integración
+
+Se ha mejorado la selección de localizaciones de la vista de integración externa.
+
+El backend incorpora la ruta:
+
+```txt
+GET /api/v1/integrations/supported-locations
+```
+
+Esta ruta obtiene dinámicamente las entidades disponibles en Ember Energy y las cruza con las localizaciones existentes en la colección local `carbon-emission-records`.
+
+Para evitar emparejamientos incorrectos, el cruce se realiza mediante coincidencia exacta normalizada y alias controlados para casos concretos en los que la fuente local agrupa varios territorios.
+
+Ejemplos de alias controlados:
+
+| Ember entity | Local CO₂ dataset location |
+|---|---|
+| Spain | Spain and Andorra |
+| France | France and Monaco |
+| Italy | Italy, San Marino and the Holy See |
+| Switzerland | Switzerland and Liechtenstein |
+
+En el frontend, la vista de integración utiliza un selector desplegable con las localizaciones compatibles devueltas por el backend. Esto evita que el usuario introduzca valores no soportados por la integración externa.
 
 ---
 
@@ -455,22 +494,26 @@ Se ha incorporado Angular Router para separar vistas principales:
 | `/` | Vista principal de listado, filtros, paginación y acciones |
 | `/records/new` | Vista de creación de registros |
 | `/records/:id/edit` | Vista de edición de registros |
+| `/integrations/renewable-electricity` | Vista de integración externa con Ember Energy y visualizaciones |
 
 ## Uso de proxy propio para integración externa
 
 Se ha decidido que la integración con Ember Energy se realice desde el backend mediante un proxy propio. Esto permite ocultar la API key al frontend y mejora la seguridad de la integración.
 
+## Localizaciones compatibles dinámicas
+
+La vista de integración no utiliza una lista fija de países. El backend obtiene dinámicamente las entidades disponibles en Ember Energy y las cruza con las localizaciones presentes en la fuente propia, utilizando coincidencia exacta y alias controlados para evitar falsos positivos.
+
 ---
 
 # Próximos pasos
 
-1. Crear una vista frontend para mostrar los datos integrados con Ember Energy.
-2. Añadir visualizaciones con Highcharts o Google Charts.
-3. Completar y documentar las pruebas de todas las operaciones CRUD.
-4. Preparar documentación de API con ejemplos de operaciones y estados devueltos.
-5. Preparar colección de pruebas de Postman o Insomnia exportada.
-6. Enlazar la documentación y las visualizaciones desde la propia aplicación.
-7. Actualizar el diario con cada avance realizado.
+1. Completar y documentar las pruebas de todas las operaciones CRUD y de integración.
+2. Preparar documentación de API con ejemplos de operaciones y estados devueltos.
+3. Preparar colección de pruebas de Postman o Insomnia exportada.
+4. Enlazar la documentación y las visualizaciones desde la propia aplicación si fuera necesario.
+5. Revisar visualmente la aplicación para preparar la grabación del vídeo.
+6. Actualizar el diario con los últimos avances antes de la entrega.
 
 ---
 
@@ -492,3 +535,4 @@ Los tiempos de trabajo se irán registrando en Toggl.
 | Pendiente | Conexión del frontend con la API | Pendiente |
 | Pendiente | Mejoras de frontend, paginación y rutas | Pendiente |
 | Pendiente | Integración externa con Ember Energy | Pendiente |
+| Pendiente | Visualizaciones con Highcharts | Pendiente |

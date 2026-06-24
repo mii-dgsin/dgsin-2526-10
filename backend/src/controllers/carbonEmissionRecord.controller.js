@@ -179,10 +179,30 @@ const deleteCarbonEmissionRecord = async (req, res) => {
     });
   }
 };
+const getCarbonEmissionRecordLocations = async (req, res) => {
+  try {
+    const locations = await CarbonEmissionRecord.distinct("location");
+
+    const sortedLocations = locations
+      .filter((location) => location && location.trim().length > 0)
+      .sort((a, b) => a.localeCompare(b));
+
+    return res.status(200).json({
+      total: sortedLocations.length,
+      locations: sortedLocations
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Error retrieving carbon emission record locations",
+      error: error.message
+    });
+  }
+};
 
 module.exports = {
   getCarbonEmissionRecords,
   getCarbonEmissionRecordById,
+  getCarbonEmissionRecordLocations,
   createCarbonEmissionRecord,
   updateCarbonEmissionRecord,
   deleteCarbonEmissionRecord,

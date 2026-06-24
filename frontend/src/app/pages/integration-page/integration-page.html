@@ -10,12 +10,17 @@
   <section class="filters">
     <div class="field">
       <label for="location">Location</label>
-      <input
+      <select
         id="location"
-        type="text"
-        [(ngModel)]="location"
-        placeholder="Spain"
-      />
+        [(ngModel)]="selectedLocation"
+      >
+        <option
+          *ngFor="let locationOption of supportedLocations"
+          [ngValue]="locationOption.label"
+        >
+          {{ locationOption.label }}
+        </option>
+      </select>
     </div>
 
     <div class="field">
@@ -69,25 +74,35 @@
     <table>
       <tbody>
         <tr>
-          <th>Location</th>
+          <th>Selected location</th>
           <td>{{ integration.location }}</td>
         </tr>
+
         <tr>
-          <th>Ember entity code</th>
-          <td>{{ integration.entityCode }}</td>
+          <th>Ember entity</th>
+          <td>{{ integration.emberEntity }}</td>
         </tr>
+
+        <tr>
+          <th>Local CO₂ dataset location</th>
+          <td>{{ integration.localLocation }}</td>
+        </tr>
+
         <tr>
           <th>Period</th>
           <td>{{ integration.fromPeriod }} - {{ integration.toPeriod }}</td>
         </tr>
+
         <tr>
           <th>CO₂ records</th>
           <td>{{ integration.emissions.length }}</td>
         </tr>
+
         <tr>
           <th>External electricity records</th>
           <td>{{ integration.electricityGeneration.length }}</td>
         </tr>
+
         <tr>
           <th>External source</th>
           <td>
@@ -98,6 +113,31 @@
         </tr>
       </tbody>
     </table>
+  </section>
+
+  <section *ngIf="integration" class="charts">
+    <section class="chart-card">
+      <h2>CO₂ emissions by year</h2>
+      <div #emissionsChart class="chart-container"></div>
+    </section>
+
+    <section class="chart-card">
+      <h2>External Ember electricity data by year</h2>
+      <div #electricityChart class="chart-container"></div>
+
+      <p *ngIf="externalChartWarning" class="hint">
+        {{ externalChartWarning }}
+      </p>
+    </section>
+
+    <section class="chart-card chart-card-wide">
+      <h2>CO₂ emissions vs Ember electricity data</h2>
+      <div #combinedChart class="chart-container"></div>
+
+      <p *ngIf="combinedChartWarning" class="hint">
+        {{ combinedChartWarning }}
+      </p>
+    </section>
   </section>
 
   <section *ngIf="integration" class="tables">
@@ -139,8 +179,7 @@
       <h2>External Ember records</h2>
 
       <p class="hint">
-        Raw external records are shown temporarily. In the next step these values will be
-        transformed into chart-ready data.
+        Raw external records are shown to document the external API response used by the integration.
       </p>
 
       <pre>{{ integration.electricityGeneration | json }}</pre>

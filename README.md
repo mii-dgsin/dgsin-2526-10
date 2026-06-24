@@ -12,17 +12,23 @@ La aplicación permite consultar, crear, editar y eliminar datos de emisiones de
 
 La fuente principal de datos es:
 
+```txt
 https://datosmacro.expansion.com/energia-y-medio-ambiente/emisiones-co2
+```
 
 La fuente seleccionada contiene información organizada en tablas HTML, por lo que los datos no se consumen directamente desde una API pública propia de la fuente.
 
-Además, el backend integra una API externa de Ember Energy mediante un proxy propio para complementar la información de emisiones con datos de generación eléctrica anual.
+Además, el backend integra la API externa de Ember Energy mediante un proxy propio. Esta integración permite complementar los registros locales de emisiones de CO₂ con datos externos de generación eléctrica anual.
+
+La aplicación también incluye visualizaciones con Highcharts para mostrar la evolución de los datos propios, los datos externos y una gráfica combinada entre ambas fuentes.
 
 ---
 
 ## Repositorio
 
-[mii-dgsin/dgsin-2526-10](https://github.com/mii-dgsin/dgsin-2526-10)
+```txt
+https://github.com/mii-dgsin/dgsin-2526-10
+```
 
 ---
 
@@ -41,6 +47,7 @@ GET https://dgsin-2526-10-mjcadenas.ew.r.appspot.com/
 GET https://dgsin-2526-10-mjcadenas.ew.r.appspot.com/api/v1/health
 GET https://dgsin-2526-10-mjcadenas.ew.r.appspot.com/api/v1/carbon-emission-records
 GET https://dgsin-2526-10-mjcadenas.ew.r.appspot.com/api/v1/carbon-emission-records?location=Spain
+GET https://dgsin-2526-10-mjcadenas.ew.r.appspot.com/api/v1/integrations/supported-locations
 GET https://dgsin-2526-10-mjcadenas.ew.r.appspot.com/api/v1/integrations/renewable-electricity?location=Spain&fromPeriod=2020&toPeriod=2023
 ```
 
@@ -62,6 +69,7 @@ GET https://dgsin-2526-10-mjcadenas.ew.r.appspot.com/api/v1/integrations/renewab
 - TypeScript
 - Font Awesome
 - Zone.js
+- Highcharts
 - Ember Energy API
 - Insomnia para pruebas de API
 
@@ -114,6 +122,7 @@ dgsin-2526-10/
     │       ├── pages/
     │       │   ├── create-record-page/
     │       │   ├── edit-record-page/
+    │       │   ├── integration-page/
     │       │   └── records-page/
     │       └── services/
     ├── tsconfig.app.json
@@ -271,6 +280,14 @@ GET /api/v1/carbon-emission-records?location=Spain&fromPeriod=2020&toPeriod=2023
 
 Permite filtrar registros y limitar la cantidad de resultados devueltos.
 
+### Obtener localizaciones disponibles
+
+```http
+GET /api/v1/carbon-emission-records/locations
+```
+
+Devuelve las localizaciones únicas existentes en la colección local de emisiones de CO₂. Se utiliza para mejorar la usabilidad del frontend mediante sugerencias de localización.
+
 ### Obtener un registro por ID
 
 ```http
@@ -358,13 +375,26 @@ Esta ruta combina:
 
 La llamada a Ember se realiza desde el backend para no exponer la API key en Angular.
 
-La integración requiere definir la variable de entorno:
+### Localizaciones soportadas por la integración
 
-```env
-EMBER_API_KEY=YOUR_EMBER_API_KEY
+```http
+GET /api/v1/integrations/supported-locations
 ```
 
-La respuesta incluye una sección `source` con la atribución correspondiente a Ember Energy.
+Esta ruta obtiene dinámicamente las entidades disponibles en Ember Energy y las cruza con las localizaciones existentes en la colección local `carbon-emission-records`.
+
+Para evitar falsos positivos, el cruce entre ambas fuentes se realiza mediante coincidencia exacta normalizada y alias controlados para casos en los que la fuente local agrupa varios territorios.
+
+Ejemplo:
+
+| Ember entity | Local CO₂ dataset location |
+|---|---|
+| Spain | Spain and Andorra |
+| France | France and Monaco |
+| Italy | Italy, San Marino and the Holy See |
+| Switzerland | Switzerland and Liechtenstein |
+
+La respuesta incluye las localizaciones compatibles que pueden utilizarse en la vista de integración del frontend.
 
 ---
 
@@ -420,7 +450,11 @@ La aplicación permite actualmente:
 - Mostrar iconos de acción mediante Font Awesome.
 - Mostrar mensajes de error devueltos por la API.
 - Consultar la integración externa con Ember Energy desde una vista Angular.
-- Mostrar un resumen de datos combinados entre registros locales de CO₂ y datos externos de generación eléctrica.
+- Seleccionar dinámicamente las localizaciones compatibles entre Ember Energy y el dataset local.
+- Mostrar visualizaciones con Highcharts.
+- Visualizar datos propios de emisiones de CO₂ por año.
+- Visualizar datos externos de Ember Energy por año.
+- Visualizar una gráfica combinada entre emisiones de CO₂ y datos externos de generación eléctrica.
 
 Rutas principales:
 
@@ -429,11 +463,11 @@ Rutas principales:
 | `/` | Listado, búsqueda, paginación y acciones |
 | `/records/new` | Creación de un nuevo registro |
 | `/records/:id/edit` | Edición de un registro existente |
-| `/integrations/renewable-electricity` | Vista de integración externa con Ember Energy |
+| `/integrations/renewable-electricity` | Vista de integración externa con Ember Energy y visualizaciones |
 
 Durante la configuración inicial del frontend se detectó el error `NG0908: In this configuration Angular requires Zone.js`. El problema se resolvió instalando `zone.js` y cargándolo en `main.ts`.
 
-También se corrigió un aviso de TypeScript 6 en `tsconfig.app.json`, añadiendo explícitamente la propiedad `rootDir` con el valor `./src`.
+También se corrigió un aviso de TypeScript 6 en `tsconfig.app.json` y `tsconfig.spec.json`, añadiendo explícitamente la propiedad `rootDir` con el valor `./src`.
 
 En algunas vistas se utilizó `ChangeDetectorRef` para asegurar que la interfaz se actualiza correctamente tras recibir respuestas HTTP.
 
@@ -447,6 +481,7 @@ Endpoints probados:
 
 - `GET /api/v1/health`
 - `GET /api/v1/carbon-emission-records`
+- `GET /api/v1/carbon-emission-records/locations`
 - `GET /api/v1/carbon-emission-records?location=Spain`
 - `GET /api/v1/carbon-emission-records?period=2022`
 - `GET /api/v1/carbon-emission-records?fromPeriod=2020&toPeriod=2023`
@@ -455,6 +490,7 @@ Endpoints probados:
 - `POST /api/v1/carbon-emission-records`
 - `PUT /api/v1/carbon-emission-records/:id`
 - `DELETE /api/v1/carbon-emission-records/:id`
+- `GET /api/v1/integrations/supported-locations`
 - `GET /api/v1/integrations/renewable-electricity`
 
 Queda pendiente completar la documentación formal de las pruebas y exportar la colección para la entrega final si fuera necesario.
@@ -479,21 +515,19 @@ La aplicación desplegada responde correctamente desde la URL pública y accede 
 
 Actualmente el backend arranca correctamente en local y está desplegado en Google App Engine.
 
-La API dispone del recurso `carbon-emission-records` con operaciones CRUD, validación de datos, control de rutas no encontradas, filtros por localización y periodo, paginación, gestión de duplicados e integración externa con Ember Energy mediante proxy propio.
+La API dispone del recurso `carbon-emission-records` con operaciones CRUD, validación de datos, control de rutas no encontradas, filtros por localización y periodo, paginación, gestión de duplicados, endpoint de localizaciones e integración externa con Ember Energy mediante proxy propio.
 
-El frontend Angular consume datos reales desde la API desplegada, muestra los registros en una tabla y permite filtrar, paginar, crear, editar y eliminar registros desde la interfaz web.
+El frontend Angular consume datos reales desde la API desplegada, muestra los registros en una tabla y permite filtrar, paginar, crear, editar y eliminar registros desde la interfaz web. Además, incluye una vista específica de integración externa con Ember Energy y visualizaciones realizadas con Highcharts.
 
 ---
 
 ## Próximos pasos
 
-- Crear una vista frontend para mostrar los datos integrados con Ember Energy.
-- Añadir visualizaciones con Highcharts o Google Charts.
 - Completar la documentación formal de la API.
 - Preparar colección de pruebas de Postman o Insomnia con comprobaciones.
 - Enlazar la documentación desde la aplicación.
-- Enlazar las visualizaciones desde la aplicación.
-- Actualizar el diario y el README con los nuevos avances.
+- Revisar visualmente la aplicación para preparar la grabación del vídeo.
+- Actualizar el diario y el README con los últimos avances antes de la entrega.
 
 ---
 

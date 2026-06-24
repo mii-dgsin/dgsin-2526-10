@@ -12,7 +12,7 @@ const buildEmberUrl = (path, params) => {
 };
 
 const fetchYearlyElectricityGeneration = async ({
-  entityCode,
+  entity,
   startDate,
   endDate
 }) => {
@@ -21,7 +21,7 @@ const fetchYearlyElectricityGeneration = async ({
   }
 
   const url = buildEmberUrl("/v1/electricity-generation/yearly", {
-    entity_code: entityCode,
+    entity,
     is_aggregate_series: "false",
     start_date: startDate,
     end_date: endDate,
@@ -41,6 +41,29 @@ const fetchYearlyElectricityGeneration = async ({
   return response.json();
 };
 
+const fetchYearlyElectricityEntityOptions = async () => {
+  if (!process.env.EMBER_API_KEY) {
+    throw new Error("EMBER_API_KEY is not defined");
+  }
+
+  const url = buildEmberUrl("/v1/options/electricity-generation/yearly/entity", {
+    api_key: process.env.EMBER_API_KEY
+  });
+
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    const responseText = await response.text();
+
+    throw new Error(
+      `Ember options request failed with status ${response.status}: ${responseText}`
+    );
+  }
+
+  return response.json();
+};
+
 module.exports = {
-  fetchYearlyElectricityGeneration
+  fetchYearlyElectricityGeneration,
+  fetchYearlyElectricityEntityOptions
 };

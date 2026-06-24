@@ -21,8 +21,13 @@
         type="text"
         [(ngModel)]="location"
         (ngModelChange)="onFiltersChanged()"
+        list="recordLocations"
         placeholder="Spain, France, Germany..."
       />
+
+      <datalist id="recordLocations">
+        <option *ngFor="let locationOption of locations" [value]="locationOption"></option>
+      </datalist>
     </div>
 
     <div class="field">
