@@ -464,6 +464,14 @@ Ejemplos de alias controlados:
 En el frontend, la vista de integración utiliza un selector desplegable con las localizaciones compatibles devueltas por el backend. Esto evita que el usuario introduzca valores no soportados por la integración externa.
 
 ---
+## Avance 26 - Documentación formal de la API
+
+Se ha creado el documento `docs/api.md`, donde se describen los endpoints principales de la API propia `carbon-emission-records` y de la API de integración `integrations`.
+
+El documento incluye ejemplos de peticiones, respuestas correctas, errores esperados, códigos de estado y una explicación del uso del proxy propio para la integración con Ember Energy.
+
+Con esta documentación se cubre mejor el requisito de explicar las APIs correspondientes a las fuentes de datos, mostrando ejemplos de operaciones y estados devueltos.
+---
 
 # Decisiones técnicas tomadas
 
