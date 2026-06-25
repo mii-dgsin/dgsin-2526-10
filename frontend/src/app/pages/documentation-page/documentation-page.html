@@ -1,0 +1,204 @@
+<main class="page">
+  <section class="hero">
+    <h1>Project Documentation</h1>
+    <p>
+      DGSIN-2526-10 is a cloud information system for managing CO₂ emission records
+      and integrating them with external yearly electricity generation data from Ember Energy.
+    </p>
+  </section>
+
+  <section class="card">
+    <h2>Project summary</h2>
+
+    <p>
+      The application provides a REST API and an Angular frontend to query, filter,
+      create, edit and delete CO₂ emission records by location and year.
+    </p>
+
+    <p>
+      The main data source is a structured HTML dataset about CO₂ emissions. The project
+      also integrates an external API from Ember Energy through a backend proxy, avoiding
+      the exposure of the external API key in the frontend.
+    </p>
+  </section>
+
+  <section class="grid">
+    <article class="card">
+      <h2>Local data source</h2>
+
+      <dl>
+        <dt>Resource</dt>
+        <dd><code>carbon-emission-records</code></dd>
+
+        <dt>Source</dt>
+        <dd>Datosmacro CO₂ emissions dataset</dd>
+
+        <dt>Main dimensions</dt>
+        <dd>Location and year</dd>
+
+        <dt>Main operations</dt>
+        <dd>GET, POST, PUT and DELETE</dd>
+      </dl>
+    </article>
+
+    <article class="card">
+      <h2>External integration</h2>
+
+      <dl>
+        <dt>External API</dt>
+        <dd>Ember Energy API</dd>
+
+        <dt>Integration route</dt>
+        <dd><code>/api/v1/integrations/renewable-electricity</code></dd>
+
+        <dt>Proxy</dt>
+        <dd>The backend calls Ember Energy and returns the integrated response to Angular.</dd>
+
+        <dt>Visualizations</dt>
+        <dd>Highcharts charts for local emissions, external electricity data and a combined chart.</dd>
+      </dl>
+    </article>
+  </section>
+
+  <section class="card">
+    <h2>Application routes</h2>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Route</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td><a routerLink="/">/</a></td>
+            <td>Carbon emission records list, filters, pagination and actions.</td>
+          </tr>
+
+          <tr>
+            <td><a routerLink="/records/new">/records/new</a></td>
+            <td>Create a new carbon emission record.</td>
+          </tr>
+
+          <tr>
+            <td><code>/records/:id/edit</code></td>
+            <td>Edit an existing carbon emission record in a separate view.</td>
+          </tr>
+
+          <tr>
+            <td>
+              <a routerLink="/integrations/renewable-electricity">
+                /integrations/renewable-electricity
+              </a>
+            </td>
+            <td>External Ember Energy integration with Highcharts visualizations.</td>
+          </tr>
+
+          <tr>
+            <td><a routerLink="/documentation">/documentation</a></td>
+            <td>Project documentation and useful links.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Main API endpoints</h2>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Method</th>
+            <th>Endpoint</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td>GET</td>
+            <td><code>/api/v1/health</code></td>
+            <td>Checks API status.</td>
+          </tr>
+
+          <tr>
+            <td>GET</td>
+            <td><code>/api/v1/carbon-emission-records</code></td>
+            <td>Lists and filters CO₂ emission records.</td>
+          </tr>
+
+          <tr>
+            <td>POST</td>
+            <td><code>/api/v1/carbon-emission-records</code></td>
+            <td>Creates a new CO₂ emission record.</td>
+          </tr>
+
+          <tr>
+            <td>PUT</td>
+            <td><code>/api/v1/carbon-emission-records/:id</code></td>
+            <td>Updates an existing CO₂ emission record.</td>
+          </tr>
+
+          <tr>
+            <td>DELETE</td>
+            <td><code>/api/v1/carbon-emission-records/:id</code></td>
+            <td>Deletes an existing CO₂ emission record.</td>
+          </tr>
+
+          <tr>
+            <td>GET</td>
+            <td><code>/api/v1/carbon-emission-records/locations</code></td>
+            <td>Returns available local dataset locations.</td>
+          </tr>
+
+          <tr>
+            <td>GET</td>
+            <td><code>/api/v1/integrations/supported-locations</code></td>
+            <td>Returns locations compatible between Ember Energy and the local dataset.</td>
+          </tr>
+
+          <tr>
+            <td>GET</td>
+            <td><code>/api/v1/integrations/renewable-electricity</code></td>
+            <td>Returns integrated local emissions and external Ember Energy data.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>External links</h2>
+
+    <div class="links">
+      <a [href]="repositoryUrl" target="_blank" rel="noopener noreferrer">
+        GitHub repository
+      </a>
+
+      <a [href]="appEngineUrl" target="_blank" rel="noopener noreferrer">
+        Deployed API
+      </a>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Project documents</h2>
+
+    <div class="document-list">
+      <article *ngFor="let link of documentationLinks" class="document-item">
+        <h3>
+          <a [href]="link.url" target="_blank" rel="noopener noreferrer">
+            {{ link.label }}
+          </a>
+        </h3>
+
+        <p>{{ link.description }}</p>
+      </article>
+    </div>
+  </section>
+</main>

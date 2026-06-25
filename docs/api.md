@@ -290,7 +290,7 @@ Example response:
 Status code:
 
 ```txt
-400 Bad Request
+409 Conflict
 ```
 
 Example response:
@@ -369,7 +369,7 @@ If the record does not exist:
 If the update creates a duplicate `location` and `period` combination:
 
 ```txt
-400 Bad Request
+409 Conflict
 ```
 
 ```json
@@ -399,10 +399,15 @@ DELETE /api/v1/carbon-emission-records/68585f4f5c93c6ab1f2c1234
 Status code:
 
 ```txt
-204 No Content
+200 OK
 ```
 
-The response body is empty.
+Example response:
+```json
+{
+  "message": "Carbon emission record deleted successfully"
+}
+```
 
 ### Error response
 
@@ -766,7 +771,7 @@ Example response:
 Status code:
 
 ```txt
-400 Bad Request
+409 Conflict
 ```
 
 Example response:
@@ -798,14 +803,14 @@ Example response:
 
 # 5. Status codes summary
 
-|                 Status code | Meaning            | Used when                                                       |
-| --------------------------: | ------------------ | --------------------------------------------------------------- |
-|                    `200 OK` | Successful request | GET and PUT operations                                          |
-|               `201 Created` | Resource created   | POST operation or initial data load                             |
-|            `204 No Content` | Resource deleted   | DELETE operation                                                |
-|           `400 Bad Request` | Invalid request    | Validation errors, duplicates, unsupported integration location |
-|             `404 Not Found` | Resource not found | Invalid ID, route not found, no compatible local data           |
-| `500 Internal Server Error` | Server error       | Database or external API failure                                |
+|                 Status code | Meaning                         | Used when                                                       |
+| --------------------------: | ------------------------------- | --------------------------------------------------------------- |
+|                    `200 OK` | Successful request              | GET, PUT and DELETE operations                                   |
+|               `201 Created` | Resource created                | POST operation or initial data load                             |
+|           `400 Bad Request` | Invalid request                 | Validation errors and unsupported integration location          |
+|              `409 Conflict` | Conflict with existing resource | Duplicate `location` and `period` combination                   |
+|             `404 Not Found` | Resource not found              | Invalid ID, route not found, no compatible local data           |
+| `500 Internal Server Error` | Server error                    | Database or external API failure                                |
 
 ---
 
@@ -834,3 +839,4 @@ This design has two advantages:
 | `/records/new`                        | Creates a new CO₂ record                                         |
 | `/records/:id/edit`                   | Edits an existing CO₂ record                                     |
 | `/integrations/renewable-electricity` | Shows the Ember Energy integration and Highcharts visualizations |
+| `/documentation` | Shows the project documentation page with links to README, diary, API documentation and test evidence |

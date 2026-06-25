@@ -1,0 +1,121 @@
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px;
+  font-family: Arial, sans-serif;
+}
+
+.hero {
+  margin-bottom: 24px;
+}
+
+.hero h1 {
+  margin-bottom: 8px;
+}
+
+.card {
+  margin-bottom: 24px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.card h2 {
+  margin-top: 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+dl {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 10px 16px;
+}
+
+dt {
+  font-weight: bold;
+}
+
+dd {
+  margin: 0;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  background: #f5f5f5;
+}
+
+code {
+  padding: 2px 4px;
+  border-radius: 4px;
+  background: #f5f5f5;
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.links a,
+.document-item a {
+  color: #0057b8;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.links a:hover,
+.document-item a:hover {
+  text-decoration: underline;
+}
+
+.document-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.document-item {
+  padding: 16px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+}
+
+.document-item h3 {
+  margin-top: 0;
+}
+
+.document-item p {
+  margin-bottom: 0;
+}
+
+@media (max-width: 900px) {
+  .grid,
+  .document-list {
+    grid-template-columns: 1fr;
+  }
+
+  dl {
+    grid-template-columns: 1fr;
+  }
+}

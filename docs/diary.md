@@ -18,15 +18,20 @@ Además, el proyecto se integra con la API externa de Ember Energy para compleme
 
 ## URL
 
+```txt
 https://dgsin-2526-10-mjcadenas.ew.r.appspot.com
+```
 
-## APIs
+## Documentación
 
-Pendiente de documentación final con colección de pruebas y/o portal de documentación.
+```txt
+docs/api.md
+docs/postman/DGSIN-2526-10.postman_collection.json
+```
 
 ---
 
-# María Jesús Cadenas Sánchez - Fuente de datos
+# Fuente de datos
 
 ## Datos
 
@@ -34,7 +39,9 @@ Pendiente de documentación final con colección de pruebas y/o portal de docume
 
 ## Fuente de información
 
+```txt
 https://datosmacro.expansion.com/energia-y-medio-ambiente/emisiones-co2
+```
 
 ## Descripción de la fuente
 
@@ -122,15 +129,13 @@ Se han creado los endpoints iniciales:
 
 Se ha configurado la conexión del backend con MongoDB Atlas.
 
-Se ha creado el archivo `backend/src/config/db.js` y se ha configurado la variable `MONGODB_URI` en `.env`.
-
-Durante la configuración se detectó un error de resolución DNS en la cadena de conexión de MongoDB Atlas. El problema se corrigió ajustando la URI de conexión.
+Se ha creado el archivo `backend/src/config/db.js` y se ha configurado la variable `MONGODB_URI`.
 
 ---
 
 ## Avance 5 - Creación del modelo de datos
 
-Se ha creado el modelo `CarbonEmissionRecord` en `backend/src/models/carbonEmissionRecord.model.js`.
+Se ha creado el modelo `CarbonEmissionRecord`.
 
 El modelo contiene los campos `location`, `period`, `totalEmissionsMt`, `emissionsIntensity`, `emissionsPerCapita` y `annualVariation`.
 
@@ -172,7 +177,7 @@ Durante esta fase se sustituyó `new: true` por `returnDocument: "after"` en las
 
 ## Avance 8 - Pruebas iniciales de la API
 
-Se han comenzado a realizar pruebas de la API usando Insomnia.
+Se han comenzado a realizar pruebas manuales de la API usando Insomnia.
 
 Se han probado peticiones `GET`, `POST`, `PUT` y `DELETE`, así como filtros por localización y año.
 
@@ -335,11 +340,7 @@ Se ha añadido una vista específica para crear registros, accesible desde la ru
 /records/new
 ```
 
-La vista principal ya no contiene el formulario de creación directamente. En su lugar, muestra un botón `New record` que redirige al formulario de alta.
-
-También se han corregido problemas de refresco visual en Angular. En algunas operaciones, la API respondía correctamente, pero la pantalla no actualizaba el estado hasta que el usuario hacía clic en algún campo. Para resolverlo, se utilizó `ChangeDetectorRef` en las vistas donde era necesario forzar la actualización de la interfaz tras respuestas HTTP.
-
-Además, se ha mejorado el tratamiento de errores en la vista de creación, de forma que los errores de la API se muestran en pantalla y no solo en consola.
+También se han mejorado los mensajes de error devueltos por la API y el refresco visual de la interfaz.
 
 ---
 
@@ -348,10 +349,6 @@ Además, se ha mejorado el tratamiento de errores en la vista de creación, de f
 Se ha revisado el tratamiento de los campos que pueden no estar disponibles en la fuente de datos.
 
 Los campos `emissionsIntensity` y `annualVariation` se consideran opcionales y pueden tomar el valor `null`.
-
-En los formularios de creación y edición se permite dejar estos campos vacíos. Cuando el usuario los deja sin valor, Angular los transforma en `null` antes de enviar la petición al backend.
-
-En la tabla de resultados, los valores `null` se muestran como `N/A`.
 
 ---
 
@@ -464,13 +461,102 @@ Ejemplos de alias controlados:
 En el frontend, la vista de integración utiliza un selector desplegable con las localizaciones compatibles devueltas por el backend. Esto evita que el usuario introduzca valores no soportados por la integración externa.
 
 ---
+
 ## Avance 26 - Documentación formal de la API
 
-Se ha creado el documento `docs/api.md`, donde se describen los endpoints principales de la API propia `carbon-emission-records` y de la API de integración `integrations`.
+Se ha creado el documento:
 
-El documento incluye ejemplos de peticiones, respuestas correctas, errores esperados, códigos de estado y una explicación del uso del proxy propio para la integración con Ember Energy.
+```txt
+docs/api.md
+```
 
-Con esta documentación se cubre mejor el requisito de explicar las APIs correspondientes a las fuentes de datos, mostrando ejemplos de operaciones y estados devueltos.
+En este documento se describen los endpoints principales de la API propia `carbon-emission-records` y de la API de integración `integrations`.
+
+La documentación incluye ejemplos de peticiones, respuestas correctas, errores esperados, códigos de estado y una explicación del uso del proxy propio para la integración externa.
+
+---
+
+## Avance 27 - Página de documentación en Angular
+
+Se ha añadido una página de documentación dentro del frontend Angular.
+
+La vista se encuentra disponible en:
+
+```txt
+/documentation
+```
+
+Esta página resume el objetivo del proyecto, la fuente de datos local, la integración externa con Ember Energy, las rutas principales de la aplicación y los endpoints principales de la API.
+
+También incluye enlaces al repositorio de GitHub, a la API desplegada en Google App Engine y a los documentos del proyecto.
+
+---
+
+## Avance 28 - Despliegue del frontend, actualización de documentación y pruebas Postman
+
+Se ha preparado el despliegue del frontend Angular junto con el backend de Express en Google App Engine.
+
+Para ello, se ha generado la versión de producción del frontend Angular mediante el proceso de build y se ha integrado el resultado dentro del backend, de forma que Express pueda servir tanto la API REST como la aplicación web Angular desde la misma URL desplegada.
+
+Con este cambio, la aplicación completa queda accesible desde:
+
+https://dgsin-2526-10-mjcadenas.ew.r.appspot.com
+
+Además de los endpoints de la API, también quedan disponibles las rutas principales del frontend:
+
+```txt
+/
+ /records/new
+ /records/:id/edit
+ /integrations/renewable-electricity
+ /documentation
+```
+También se ha actualizado la documentación del proyecto para reflejar el estado actual de la aplicación. Se han actualizado el README.md, el diario del proyecto y la documentación formal de la API en:
+
+```txt
+docs/api.md
+```
+
+La documentación recoge los endpoints principales de la API propia carbon-emission-records, los endpoints de integración con Ember Energy, ejemplos de peticiones y respuestas, errores esperados y códigos de estado.
+
+Por último, se ha creado y ejecutado una colección Postman para validar el comportamiento de la API desplegada en producción.
+
+El archivo de la colección se encuentra en:
+
+```txt
+docs/postman/DGSIN-2526-10.postman_collection.json
+```
+ 
+La colección está configurada para apuntar por defecto al backend desplegado en Google App Engine:
+
+```txt
+https://dgsin-2526-10-mjcadenas.ew.r.appspot.com
+```
+
+La colección incluye pruebas para:
+
+- Comprobar el estado de la API.
+- Obtener registros de emisiones.
+- Filtrar registros por localización y rango de años.
+- Obtener localizaciones disponibles.
+- Crear un registro de prueba.
+- Validar el error de duplicado.
+- Obtener el registro creado por ID.
+- Actualizar el registro creado.
+- Eliminar el registro creado.
+- Verificar que el registro eliminado ya no existe.
+- Obtener localizaciones soportadas por la integración.
+- Obtener datos integrados con Ember Energy.
+- Validar error de localización no soportada.
+- Validar error de ruta inexistente.
+
+Las pruebas incluyen comprobaciones de códigos de estado y de estructura básica de las respuestas.
+
+Como evidencia de ejecución final, se conserva una captura del Runner de Postman con el resultado de las pruebas ejecutadas contra producción:
+```txt
+docs/postman/postman-run-results.png
+```
+
 ---
 
 # Decisiones técnicas tomadas
@@ -487,12 +573,6 @@ Se ha decidido utilizar MongoDB Atlas como base de datos en la nube.
 
 El proyecto se ha estructurado separando backend y frontend en carpetas independientes.
 
-## Uso del campo `location`
-
-Se mantiene el campo `location` tal y como aparece en la fuente de información.
-
-Para facilitar la búsqueda, el backend implementa un filtro flexible por localización.
-
 ## Uso de Angular Router
 
 Se ha incorporado Angular Router para separar vistas principales:
@@ -503,6 +583,7 @@ Se ha incorporado Angular Router para separar vistas principales:
 | `/records/new` | Vista de creación de registros |
 | `/records/:id/edit` | Vista de edición de registros |
 | `/integrations/renewable-electricity` | Vista de integración externa con Ember Energy y visualizaciones |
+| `/documentation` | Página de documentación del proyecto |
 
 ## Uso de proxy propio para integración externa
 
@@ -510,37 +591,32 @@ Se ha decidido que la integración con Ember Energy se realice desde el backend 
 
 ## Localizaciones compatibles dinámicas
 
-La vista de integración no utiliza una lista fija de países. El backend obtiene dinámicamente las entidades disponibles en Ember Energy y las cruza con las localizaciones presentes en la fuente propia, utilizando coincidencia exacta y alias controlados para evitar falsos positivos.
+La vista de integración no utiliza una lista fija de países. El backend obtiene dinámicamente las entidades disponibles en Ember Energy y las cruza con las localizaciones presentes en la fuente propia.
 
 ---
 
 # Próximos pasos
 
-1. Completar y documentar las pruebas de todas las operaciones CRUD y de integración.
-2. Preparar documentación de API con ejemplos de operaciones y estados devueltos.
-3. Preparar colección de pruebas de Postman o Insomnia exportada.
-4. Enlazar la documentación y las visualizaciones desde la propia aplicación si fuera necesario.
-5. Revisar visualmente la aplicación para preparar la grabación del vídeo.
-6. Actualizar el diario con los últimos avances antes de la entrega.
+1. Revisar visualmente la aplicación para preparar la grabación del vídeo.
+2. Enlazar el vídeo explicativo en la aplicación si se genera antes de la entrega.
+3. Preparar la revisión final del README, diario y documentación antes de entregar.
 
 ---
 
+
 # Registro de tiempos
 
-Los tiempos de trabajo se irán registrando en Toggl.
+Los tiempos de trabajo se han registrado en Toggl bajo el proyecto `dgsin-2526-10`.
 
-| Fecha | Tarea | Tiempo |
-|---|---|---|
-| Pendiente | Definición inicial del proyecto y fuente de datos | Pendiente |
-| Pendiente | Creación del repositorio y estructura inicial | Pendiente |
-| Pendiente | Creación del backend con Express | Pendiente |
-| Pendiente | Configuración de MongoDB Atlas | Pendiente |
-| Pendiente | Implementación del recurso `carbon-emission-records` | Pendiente |
-| Pendiente | Creación del script de carga de datos | Pendiente |
-| Pendiente | Pruebas iniciales con Insomnia | Pendiente |
-| Pendiente | Preparación y despliegue en App Engine | Pendiente |
-| Pendiente | Creación del frontend Angular | Pendiente |
-| Pendiente | Conexión del frontend con la API | Pendiente |
-| Pendiente | Mejoras de frontend, paginación y rutas | Pendiente |
-| Pendiente | Integración externa con Ember Energy | Pendiente |
-| Pendiente | Visualizaciones con Highcharts | Pendiente |
+El total registrado para el proyecto es de **63 h 30 min**. La distribución por semanas refleja una primera fase de preparación, análisis de requisitos y seguimiento de materiales de la asignatura, y una segunda fase centrada en el desarrollo, despliegue, integración, visualización y documentación final.
+
+| Semana | Bloque de trabajo | Descripción | Tiempo |
+|---|---|---|---:|
+| 4-10 Mayo | Preparación inicial y análisis de la asignatura | Revisión de vídeos y materiales de la asignatura, análisis de la rúbrica, comprensión de requisitos, selección inicial de temática y definición preliminar del proyecto. | 9 h |
+| 11-17 Mayo | Definición del proyecto y preparación técnica inicial | Revisión adicional de materiales, elección definitiva de la fuente de datos, definición del recurso `carbon-emission-records`, planificación de la arquitectura, creación de la estructura inicial del repositorio y primeras pruebas de backend. | 10 h |
+| 22-28 Junio | Desarrollo principal y cierre del proyecto | Implementación del backend REST, modelo de datos, validaciones, carga inicial de datos, conexión con MongoDB Atlas, despliegue en Google App Engine, desarrollo del frontend Angular, vistas de listado, creación y edición, integración externa con Ember Energy mediante proxy propio, visualizaciones con Highcharts, documentación formal de API, colección Postman y página de documentación en Angular. | 44 h 30 min |
+
+**Tiempo total registrado:** 63 h 30 min
+
+**Media diaria en los días con actividad registrada:** 10 h 35 min aproximadamente.
+
