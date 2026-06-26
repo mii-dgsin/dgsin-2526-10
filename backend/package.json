@@ -6,9 +6,10 @@
   "scripts": {
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
-    "load:carbon": "node src/scripts/loadCarbonEmissionRecords.js"
+    "load:carbon": "node src/scripts/loadCarbonEmissionRecords.js",
+    "test:postman": "newman run ../docs/postman/DGSIN-2526-10.postman_collection.json"
   },
-    "engines": {
+  "engines": {
     "node": "24.x.x"
   },
   "keywords": [
@@ -26,6 +27,7 @@
     "mongoose": "^9.6.2"
   },
   "devDependencies": {
+    "newman": "^6.2.2",
     "nodemon": "^3.1.9"
   },
   "homepage": "https://github.com/mii-dgsin/dgsin-2526-10#readme",
