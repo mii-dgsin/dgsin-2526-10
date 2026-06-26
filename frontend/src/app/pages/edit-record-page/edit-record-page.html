@@ -17,13 +17,22 @@
   >
     <div class="field">
       <label for="location">Location</label>
+
       <input
         id="location"
-        name="location"
         type="text"
-        [(ngModel)]="recordToEdit.location"
-        required
+        [(ngModel)]="locations"
+        list="editRecordLocations"
+        placeholder="Example: Spain and Andorra"
       />
+
+      <datalist id="editRecordLocations">
+        <option *ngFor="let locationOption of locations" [value]="locationOption"></option>
+      </datalist>
+
+      <p class="field-help">
+        You can select an existing location or type a new one.
+      </p>
     </div>
 
     <div class="field">

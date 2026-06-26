@@ -18,12 +18,18 @@
       <label for="location">Location</label>
       <input
         id="location"
-        name="location"
         type="text"
-        [(ngModel)]="newRecord.location"
-        placeholder="Spain and Andorra"
-        required
+        [(ngModel)]="locations"
+        list="createRecordLocations"
+        placeholder="Example: Spain and Andorra"
       />
+
+      <datalist id="createRecordLocations">
+        <option *ngFor="let locationOption of locations" [value]="locationOption"></option>
+      </datalist>
+      <p class="field-help">
+        You can select an existing location or type a new one.
+      </p>
     </div>
 
     <div class="field">

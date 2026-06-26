@@ -1,0 +1,68 @@
+<main class="page">
+  <section class="hero">
+    <h1>About</h1>
+    <p>
+      General information about the DGSIN-2526-10 project and the project video.
+    </p>
+  </section>
+
+  <section class="card">
+    <h2>Project</h2>
+
+    <dl>
+      <dt>Name</dt>
+      <dd>DGSIN-2526-10</dd>
+
+      <dt>Author</dt>
+      <dd>María Jesús Cadenas Sánchez</dd>
+
+      <dt>Repository</dt>
+      <dd>
+        <a href="https://github.com/mii-dgsin/dgsin-2526-10" target="_blank" rel="noopener noreferrer">
+          GitHub repository
+        </a>
+      </dd>
+
+      <dt>Deployment</dt>
+      <dd>
+        <a href="https://dgsin-2526-10-mjcadenas.ew.r.appspot.com" target="_blank" rel="noopener noreferrer">
+          Google App Engine deployment
+        </a>
+      </dd>
+    </dl>
+  </section>
+
+  <section class="card">
+    <h2>Project video</h2>
+
+    <ng-container *ngIf="hasVideo; else pendingVideo">
+      <p>
+        A video explaining the project functionality is available here:
+      </p>
+
+      <a [href]="projectVideoUrl" target="_blank" rel="noopener noreferrer" class="button">
+        Open project video
+      </a>
+    </ng-container>
+
+    <ng-template #pendingVideo>
+      <p class="warning">
+        The project video link is pending.
+      </p>
+    </ng-template>
+  </section>
+
+  <section class="card">
+    <h2>Implemented functionality</h2>
+
+    <ul>
+      <li>REST API deployed on Google App Engine.</li>
+      <li>Persistence with MongoDB Atlas.</li>
+      <li>Angular frontend with routing.</li>
+      <li>CRUD operations for CO₂ emission records.</li>
+      <li>External integration with Ember Energy through a backend proxy.</li>
+      <li>Highcharts visualizations.</li>
+      <li>Postman tests and public Postman documentation portal.</li>
+    </ul>
+  </section>
+</main>

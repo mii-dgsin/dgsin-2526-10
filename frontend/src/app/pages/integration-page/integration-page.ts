@@ -7,11 +7,15 @@ import {
   ViewChild
 } from '@angular/core';
 
-import { CommonModule } from '@angular/common';
+import { CommonModule, ViewportScroller } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import * as Highcharts from 'highcharts';
 
-import { RenewableElectricityIntegrationResponse, SupportedIntegrationLocation} from '../../models/renewable-electricity-integration.model';
+import {
+  RenewableElectricityIntegrationResponse,
+  SupportedIntegrationLocation
+} from '../../models/renewable-electricity-integration.model';
 import { IntegrationService } from '../../services/integration.service';
 import { CarbonEmissionRecordService } from '../../services/carbon-emission-record.service';
 
@@ -30,9 +34,6 @@ export class IntegrationPage implements OnInit, AfterViewInit {
   readonly minPeriod = 1970;
   readonly maxPeriod = new Date().getFullYear();
 
-  ngOnInit(): void {
-    this.loadSupportedLocations();
-  }
   @ViewChild('emissionsChart') emissionsChart?: ElementRef<HTMLDivElement>;
   @ViewChild('electricityChart') electricityChart?: ElementRef<HTMLDivElement>;
   @ViewChild('combinedChart') combinedChart?: ElementRef<HTMLDivElement>;
@@ -40,7 +41,6 @@ export class IntegrationPage implements OnInit, AfterViewInit {
   supportedLocations: SupportedIntegrationLocation[] = [];
   selectedLocation = 'Spain';
 
-  location = 'Spain';
   fromPeriod = '2020';
   toPeriod = '2023';
   locations: string[] = [];
@@ -52,22 +52,61 @@ export class IntegrationPage implements OnInit, AfterViewInit {
   integration?: RenewableElectricityIntegrationResponse;
 
   private viewInitialized = false;
+  private pendingFragment: string | null = null;
+  private queryParamsApplied = false;
 
   constructor(
     private readonly integrationService: IntegrationService,
     private readonly carbonEmissionRecordService: CarbonEmissionRecordService,
-    private readonly changeDetectorRef: ChangeDetectorRef
+    private readonly changeDetectorRef: ChangeDetectorRef,
+    private readonly route: ActivatedRoute,
+    private readonly viewportScroller: ViewportScroller
   ) {}
+
+  ngOnInit(): void {
+    this.route.fragment.subscribe((fragment) => {
+      this.pendingFragment = fragment;
+    });
+
+    this.route.queryParams.subscribe((params) => {
+      const location = params['location'];
+      const fromPeriod = params['fromPeriod'];
+      const toPeriod = params['toPeriod'];
+
+      if (location) {
+        this.selectedLocation = location;
+      }
+
+      if (fromPeriod) {
+        this.fromPeriod = String(fromPeriod);
+      }
+
+      if (toPeriod) {
+        this.toPeriod = String(toPeriod);
+      }
+
+      this.queryParamsApplied = Boolean(location && fromPeriod && toPeriod);
+    });
+
+    this.loadSupportedLocations();
+  }
 
   ngAfterViewInit(): void {
     this.viewInitialized = true;
+
+    if (this.integration) {
+      setTimeout(() => {
+        this.renderCharts();
+        this.scrollToPendingFragment();
+      }, 0);
+    }
   }
 
   get hasInvalidFilters(): boolean {
     const fromYear = Number(this.fromPeriod);
     const toYear = Number(this.toPeriod);
 
-    if (!this.location || this.location.trim().length === 0) {
+    if (!this.selectedLocation || this.selectedLocation.trim().length === 0) {
       return true;
     }
 
@@ -81,6 +120,7 @@ export class IntegrationPage implements OnInit, AfterViewInit {
 
     return fromYear > toYear;
   }
+
   loadSupportedLocations(): void {
     this.integrationService.getSupportedLocations().subscribe({
       next: (response) => {
@@ -91,6 +131,10 @@ export class IntegrationPage implements OnInit, AfterViewInit {
           !this.supportedLocations.some((item) => item.label === this.selectedLocation)
         ) {
           this.selectedLocation = this.supportedLocations[0].label;
+        }
+
+        if (this.queryParamsApplied) {
+          this.loadIntegration();
         }
 
         this.changeDetectorRef.detectChanges();
@@ -136,6 +180,7 @@ export class IntegrationPage implements OnInit, AfterViewInit {
 
           setTimeout(() => {
             this.renderCharts();
+            this.scrollToPendingFragment();
           }, 0);
         },
         error: (error) => {
@@ -149,6 +194,7 @@ export class IntegrationPage implements OnInit, AfterViewInit {
         }
       });
   }
+
   loadLocations(): void {
     this.carbonEmissionRecordService.getLocations().subscribe({
       next: (response) => {
@@ -160,6 +206,7 @@ export class IntegrationPage implements OnInit, AfterViewInit {
       }
     });
   }
+
   private renderCharts(): void {
     if (!this.integration || !this.viewInitialized) {
       return;
@@ -484,6 +531,17 @@ export class IntegrationPage implements OnInit, AfterViewInit {
     }
 
     return null;
+  }
+
+  private scrollToPendingFragment(): void {
+    if (!this.pendingFragment) {
+      return;
+    }
+
+    setTimeout(() => {
+      this.viewportScroller.scrollToAnchor(this.pendingFragment as string);
+      this.pendingFragment = null;
+    }, 300);
   }
 
   private getApiErrorMessage(error: any, defaultMessage: string): string {

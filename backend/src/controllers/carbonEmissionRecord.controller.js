@@ -1,6 +1,9 @@
 const initialCarbonEmissionRecords = require("../../data/carbonEmissionRecords.json");
 const CarbonEmissionRecord = require("../models/carbonEmissionRecord.model");
 
+const POSTMAN_DOCUMENTATION_URL =
+  "https://documenter.getpostman.com/view/15287747/2sBXwyF6es";
+
 const loadInitialCarbonEmissionRecords = async (req, res) => {
   try {
     const existingRecords = await CarbonEmissionRecord.countDocuments();
@@ -16,9 +19,7 @@ const loadInitialCarbonEmissionRecords = async (req, res) => {
 
     const insertedRecords = await CarbonEmissionRecord.insertMany(
       initialCarbonEmissionRecords,
-      {
-        ordered: false
-      }
+      { ordered: false }
     );
 
     return res.status(201).json({
@@ -35,38 +36,36 @@ const loadInitialCarbonEmissionRecords = async (req, res) => {
   }
 };
 
+const redirectCarbonEmissionRecordDocs = (req, res) => {
+  return res.redirect(POSTMAN_DOCUMENTATION_URL);
+};
+
 const getCarbonEmissionRecords = async (req, res) => {
   try {
-    const {
-      location,
-      period,
-      fromPeriod,
-      toPeriod,
-      limit = 50,
-      offset = 0
-    } = req.query;
+    const { location, period, fromPeriod, toPeriod, limit = 50, offset = 0 } =
+      req.query;
 
-  const filter = {};
+    const filter = {};
 
-  if (location) {
-    filter.location = new RegExp(location, "i");
-  }
-
-  if (period) {
-    filter.period = Number(period);
-  }
-
-  if (fromPeriod || toPeriod) {
-    filter.period = {};
-
-    if (fromPeriod) {
-      filter.period.$gte = Number(fromPeriod);
+    if (location) {
+      filter.location = new RegExp(location, "i");
     }
 
-    if (toPeriod) {
-      filter.period.$lte = Number(toPeriod);
+    if (period) {
+      filter.period = Number(period);
     }
-  }
+
+    if (fromPeriod || toPeriod) {
+      filter.period = {};
+
+      if (fromPeriod) {
+        filter.period.$gte = Number(fromPeriod);
+      }
+
+      if (toPeriod) {
+        filter.period.$lte = Number(toPeriod);
+      }
+    }
 
     const records = await CarbonEmissionRecord.find(filter)
       .sort({ location: 1, period: 1 })
@@ -75,14 +74,14 @@ const getCarbonEmissionRecords = async (req, res) => {
 
     const total = await CarbonEmissionRecord.countDocuments(filter);
 
-    res.status(200).json({
+    return res.status(200).json({
       total,
       limit: Number(limit),
       offset: Number(offset),
       records
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       message: "Error retrieving carbon emission records",
       error: error.message
     });
@@ -99,9 +98,9 @@ const getCarbonEmissionRecordById = async (req, res) => {
       });
     }
 
-    res.status(200).json(record);
+    return res.status(200).json(record);
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       message: "Error retrieving carbon emission record",
       error: error.message
     });
@@ -112,15 +111,16 @@ const createCarbonEmissionRecord = async (req, res) => {
   try {
     const record = await CarbonEmissionRecord.create(req.body);
 
-    res.status(201).json(record);
+    return res.status(201).json(record);
   } catch (error) {
     if (error.code === 11000) {
       return res.status(409).json({
-        message: "A carbon emission record already exists for this location and period"
+        message:
+          "A carbon emission record already exists for this location and period"
       });
     }
 
-    res.status(400).json({
+    return res.status(400).json({
       message: "Error creating carbon emission record",
       error: error.message
     });
@@ -129,6 +129,12 @@ const createCarbonEmissionRecord = async (req, res) => {
 
 const updateCarbonEmissionRecord = async (req, res) => {
   try {
+    if (req.body._id && req.body._id !== req.params.id) {
+      return res.status(400).json({
+        message: "The request body id must match the URL resource id"
+      });
+    }
+
     const record = await CarbonEmissionRecord.findByIdAndUpdate(
       req.params.id,
       req.body,
@@ -144,15 +150,16 @@ const updateCarbonEmissionRecord = async (req, res) => {
       });
     }
 
-    res.status(200).json(record);
+    return res.status(200).json(record);
   } catch (error) {
     if (error.code === 11000) {
       return res.status(409).json({
-        message: "A carbon emission record already exists for this location and period"
+        message:
+          "A carbon emission record already exists for this location and period"
       });
     }
 
-    res.status(400).json({
+    return res.status(400).json({
       message: "Error updating carbon emission record",
       error: error.message
     });
@@ -169,16 +176,33 @@ const deleteCarbonEmissionRecord = async (req, res) => {
       });
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Carbon emission record deleted successfully"
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       message: "Error deleting carbon emission record",
       error: error.message
     });
   }
 };
+
+const deleteCarbonEmissionRecords = async (req, res) => {
+  try {
+    const result = await CarbonEmissionRecord.deleteMany({});
+
+    return res.status(200).json({
+      message: "Carbon emission records deleted successfully",
+      deleted: result.deletedCount
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Error deleting carbon emission records",
+      error: error.message
+    });
+  }
+};
+
 const getCarbonEmissionRecordLocations = async (req, res) => {
   try {
     const locations = await CarbonEmissionRecord.distinct("location");
@@ -206,5 +230,7 @@ module.exports = {
   createCarbonEmissionRecord,
   updateCarbonEmissionRecord,
   deleteCarbonEmissionRecord,
-  loadInitialCarbonEmissionRecords
+  deleteCarbonEmissionRecords,
+  loadInitialCarbonEmissionRecords,
+  redirectCarbonEmissionRecordDocs
 };

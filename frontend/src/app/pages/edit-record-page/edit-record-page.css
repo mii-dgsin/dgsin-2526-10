@@ -87,3 +87,8 @@ button[type='submit'] {
     flex-wrap: wrap;
   }
 }
+.field-help {
+  margin: 6px 0 0;
+  color: #666;
+  font-size: 0.85rem;
+}

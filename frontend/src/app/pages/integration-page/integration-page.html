@@ -116,13 +116,21 @@
   </section>
 
   <section *ngIf="integration" class="charts">
-    <section class="chart-card">
+    <section id="co2-chart" class="chart-card chart-section">
       <h2>CO₂ emissions by year</h2>
+      <p class="hint">
+        Local data from the <code>carbon-emission-records</code> API.
+      </p>
+
       <div #emissionsChart class="chart-container"></div>
     </section>
 
-    <section class="chart-card">
+    <section id="ember-chart" class="chart-card chart-section">
       <h2>External Ember electricity data by year</h2>
+      <p class="hint">
+        External data obtained from Ember Energy through the project backend proxy.
+      </p>
+
       <div #electricityChart class="chart-container"></div>
 
       <p *ngIf="externalChartWarning" class="hint">
@@ -130,8 +138,12 @@
       </p>
     </section>
 
-    <section class="chart-card chart-card-wide">
+    <section id="combined-chart" class="chart-card chart-card-wide chart-section">
       <h2>CO₂ emissions vs Ember electricity data</h2>
+      <p class="hint">
+        Combined visualization using the local CO₂ emissions API and the external Ember Energy API.
+      </p>
+
       <div #combinedChart class="chart-container"></div>
 
       <p *ngIf="combinedChartWarning" class="hint">

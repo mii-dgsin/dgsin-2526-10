@@ -7,129 +7,198 @@
       </p>
     </div>
 
-    <a routerLink="/records/new" class="button-link primary">
-      <i class="fa-solid fa-plus"></i>
-      New record
-    </a>
-  </section>
+    <div class="hero-actions">
+      <a routerLink="/records/new" class="button-link primary">
+        <i class="fa-solid fa-plus"></i>
+        New record
+      </a>
 
-  <section class="filters">
-    <div class="field">
-      <label for="location">Location</label>
-      <input
-        id="location"
-        type="text"
-        [(ngModel)]="location"
-        (ngModelChange)="onFiltersChanged()"
-        list="recordLocations"
-        placeholder="Spain, France, Germany..."
-      />
-
-      <datalist id="recordLocations">
-        <option *ngFor="let locationOption of locations" [value]="locationOption"></option>
-      </datalist>
-    </div>
-
-    <div class="field">
-      <label for="period">Year</label>
-      <input
-        id="period"
-        type="number"
-        [(ngModel)]="period"
-        (ngModelChange)="onFiltersChanged()"
-        [min]="minPeriod"
-        [max]="maxPeriod"
-        placeholder="2022"
-      />
-    </div>
-
-    <div class="field">
-      <label for="fromPeriod">From year</label>
-      <input
-        id="fromPeriod"
-        type="number"
-        [(ngModel)]="fromPeriod"
-        (ngModelChange)="onFiltersChanged()"
-        [min]="minPeriod"
-        [max]="maxPeriod"
-        placeholder="2020"
-      />
-    </div>
-
-    <div class="field">
-      <label for="toPeriod">To year</label>
-      <input
-        id="toPeriod"
-        type="number"
-        [(ngModel)]="toPeriod"
-        (ngModelChange)="onFiltersChanged()"
-        [min]="minPeriod"
-        [max]="maxPeriod"
-        placeholder="2023"
-      />
-    </div>
-
-    <div class="field">
-      <label for="limit">Page size</label>
-      <select id="limit" [(ngModel)]="limit" (change)="changePageSize()">
-        <option [ngValue]="25">25</option>
-        <option [ngValue]="50">50</option>
-        <option [ngValue]="100">100</option>
-      </select>
-    </div>
-
-    <div class="actions">
-      <button type="button" (click)="applyFilters()">
-        Search
+      <button
+        type="button"
+        class="button-link secondary"
+        (click)="loadInitialData()"
+        [disabled]="loading"
+      >
+        <i class="fa-solid fa-database"></i>
+        Load initial data
       </button>
 
-      <button type="button" class="secondary" (click)="clearFilters()">
-        Clear
-      </button>
-
-      <button type="button" class="secondary" (click)="loadRecords()">
-        Reload
+      <button
+        type="button"
+        class="danger-button"
+        (click)="deleteAllRecords()"
+        [disabled]="loading || total === 0"
+      >
+        <i class="fa-solid fa-trash"></i>
+        Delete all
       </button>
     </div>
   </section>
 
-  <section class="filter-help">
-    <p class="hint">
-      Allowed years: {{ minPeriod }} - {{ maxPeriod }}
-    </p>
+  <section class="filters-panel">
+    <div class="filters-header">
+      <div>
+        <h2>Filters</h2>
+        <p>
+          Search records by location, exact year or year range.
+        </p>
+      </div>
+
+      <p class="year-help">
+        Allowed years: {{ minPeriod }} - {{ maxPeriod }}
+      </p>
+    </div>
+
+    <div class="main-filters-row">
+      <div class="field location-field">
+        <label for="location">Location</label>
+        <input
+          id="location"
+          type="text"
+          [(ngModel)]="location"
+          (ngModelChange)="onFiltersChanged()"
+          list="recordLocations"
+          placeholder="Example: Spain"
+        />
+
+        <datalist id="recordLocations">
+          <option *ngFor="let locationOption of locations" [value]="locationOption"></option>
+        </datalist>
+      </div>
+
+      <div class="field">
+        <label for="period">Exact year</label>
+        <input
+          id="period"
+          type="number"
+          [(ngModel)]="period"
+          (ngModelChange)="onExactYearChanged()"
+          [min]="minPeriod"
+          [max]="maxPeriod"
+          placeholder="2022"
+        />
+      </div>
+
+    </div>
+
+    <div class="range-and-actions-row">
+      <fieldset class="year-range-box">
+        <legend>Year range</legend>
+
+        <div class="year-range-fields">
+          <div class="field">
+            <label for="fromPeriod">From year</label>
+            <input
+              id="fromPeriod"
+              type="number"
+              [(ngModel)]="fromPeriod"
+              (ngModelChange)="onRangeYearChanged()"
+              [min]="minPeriod"
+              [max]="maxPeriod"
+              placeholder="2020"
+            />
+          </div>
+
+          <div class="field">
+            <label for="toPeriod">To year</label>
+            <input
+              id="toPeriod"
+              type="number"
+              [(ngModel)]="toPeriod"
+              (ngModelChange)="onRangeYearChanged()"
+              [min]="minPeriod"
+              [max]="maxPeriod"
+              placeholder="2023"
+            />
+          </div>
+        </div>
+      </fieldset>
+
+      <div class="actions-box">
+        <div class="actions">
+          <button type="button" (click)="applyFilters()">
+            Search
+          </button>
+
+          <button type="button" class="secondary" (click)="clearFilters()">
+            Clear
+          </button>
+
+          <button type="button" class="secondary" (click)="loadRecords()">
+            Reload
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="filters-footer">
+      <p class="hint">
+        {{ activeYearFilterDescription }}
+        Location search is flexible, so searching <strong>Spain</strong> can return
+        <strong>Spain and Andorra</strong>.
+      </p>
+    </div>
   </section>
 
-  <section class="status">
-    <p *ngIf="loading">Loading records...</p>
+  <section class="results-panel">
+    <div class="results-summary">
+      <div class="page-size-control">
+        <label for="limit">Items per page:</label>
 
-    <p *ngIf="errorMessage" class="error">
+        <select id="limit" [(ngModel)]="limit" (change)="changePageSize()">
+          <option [ngValue]="10">10</option>
+          <option [ngValue]="25">25</option>
+          <option [ngValue]="50">50</option>
+          <option [ngValue]="100">100</option>
+        </select>
+      </div>
+
+      <div class="results-text">
+        <p *ngIf="loading">
+          {{ operationMessage }}
+        </p>
+
+        <p *ngIf="!loading && !errorMessage && total > 0">
+          {{ firstVisibleRecord }} - {{ lastVisibleRecord }} of {{ total }}
+        </p>
+
+        <p *ngIf="!loading && !errorMessage && total === 0">
+          No records found.
+        </p>
+      </div>
+
+      <div class="pagination" *ngIf="!loading && total > 0">
+        <button
+          type="button"
+          class="pagination-button"
+          (click)="previousPage()"
+          [disabled]="!hasPreviousPage"
+          aria-label="Previous page"
+        >
+          ‹
+        </button>
+
+        <span>Page {{ currentPage }} of {{ totalPages }}</span>
+
+        <button
+          type="button"
+          class="pagination-button"
+          (click)="nextPage()"
+          [disabled]="!hasNextPage"
+          aria-label="Next page"
+        >
+          ›
+        </button>
+      </div>
+    </div>
+
+    <p *ngIf="errorMessage" class="message error">
       {{ errorMessage }}
     </p>
 
-    <p *ngIf="successMessage" class="success">
+    <p *ngIf="successMessage" class="message success">
       {{ successMessage }}
     </p>
-
-    <p *ngIf="!loading && !errorMessage && total > 0">
-      Showing {{ firstVisibleRecord }} - {{ lastVisibleRecord }} of {{ total }} records.
-      Page {{ currentPage }} of {{ totalPages }}.
-    </p>
-
-    <p *ngIf="!loading && !errorMessage && total === 0">
-      No records found.
-    </p>
-  </section>
-
-  <section class="pagination" *ngIf="!loading && total > 0">
-    <button type="button" (click)="previousPage()" [disabled]="!hasPreviousPage">
-      Previous
-    </button>
-
-    <span>Page {{ currentPage }} of {{ totalPages }}</span>
-
-    <button type="button" (click)="nextPage()" [disabled]="!hasNextPage">
-      Next
-    </button>
   </section>
 
   <section class="table-wrapper" *ngIf="!loading && records.length > 0">

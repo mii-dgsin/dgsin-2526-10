@@ -14,18 +14,93 @@
 }
 
 .hero h1 {
-  margin-bottom: 8px;
+  margin: 0 0 8px;
 }
 
-.filters {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(140px, 1fr));
-  gap: 16px;
-  align-items: end;
+.hero p {
+  margin: 0;
+  color: #555;
+}
+
+/* Filters */
+
+.filters-panel {
   margin-bottom: 16px;
-  padding: 16px;
+  padding: 18px;
   border: 1px solid #ddd;
   border-radius: 8px;
+}
+
+.filters-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.filters-header h2 {
+  margin: 0 0 6px;
+  font-size: 1.1rem;
+}
+
+.filters-header p {
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.year-help {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #f5f5f5;
+  color: #555;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.main-filters-row {
+  display: grid;
+  grid-template-columns: minmax(280px, 2fr) minmax(140px, 1fr);
+  gap: 14px;
+  align-items: end;
+  margin-bottom: 14px;
+}
+
+.range-and-actions-row {
+  display: grid;
+  grid-template-columns: minmax(300px, 420px) 1fr;
+  gap: 16px;
+  align-items: end;
+}
+
+.year-range-box {
+  margin: 0;
+  padding: 12px 14px 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.year-range-box legend {
+  padding: 0 6px;
+  font-weight: bold;
+  color: #333;
+}
+
+.year-range-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(120px, 1fr));
+  gap: 14px;
+}
+
+.actions-box {
+  display: flex;
+  justify-content: flex-end;
+  align-items: end;
+}
+
+.filters-footer {
+  margin-top: 12px;
 }
 
 .field {
@@ -40,26 +115,47 @@
 
 .field input,
 .field select {
-  padding: 8px;
+  padding: 9px 10px;
   border: 1px solid #bbb;
-  border-radius: 4px;
+  border-radius: 6px;
+  font-size: 0.95rem;
 }
+
+.location-field {
+  min-width: 0;
+}
+
+.hint {
+  margin: 0;
+  color: #666;
+  font-size: 14px;
+}
+
+/* Buttons */
 
 .actions {
   display: flex;
+  flex-wrap: nowrap;
   gap: 8px;
-  align-items: end;
 }
 
 button,
 .button-link {
   padding: 9px 14px;
-  border-radius: 4px;
+  border: 1px solid transparent;
+  border-radius: 6px;
   cursor: pointer;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
+  font-size: 0.95rem;
+}
+
+button {
+  background: #222;
+  color: white;
 }
 
 .button-link.primary {
@@ -73,23 +169,91 @@ button.secondary,
   color: #222;
 }
 
+button:hover,
+.button-link:hover {
+  opacity: 0.88;
+}
+
 button:disabled {
   cursor: not-allowed;
   opacity: 0.5;
 }
 
-.filter-help {
-  margin-bottom: 16px;
+/* Status */
+
+.error {
+  color: #b00020;
+  font-weight: bold;
 }
 
-.hint {
-  margin: 0 0 8px 0;
-  color: #666;
-  font-size: 14px;
+.success {
+  color: #1b7f37;
+  font-weight: bold;
+}
+/* Results and pagination */
+
+.results-panel {
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fafafa;
 }
 
-.status {
-  margin-bottom: 16px;
+.results-summary {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 20px;
+}
+
+.page-size-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.page-size-control label {
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.page-size-control select {
+  padding: 6px 28px 6px 8px;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.results-text p {
+  margin: 0;
+  color: #333;
+  font-weight: 500;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pagination span {
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.pagination-button {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border-radius: 999px;
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.message {
+  margin: 10px 0 0;
 }
 
 .error {
@@ -102,42 +266,7 @@ button:disabled {
   font-weight: bold;
 }
 
-.create-panel {
-  margin-bottom: 24px;
-  padding: 16px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-}
-
-.create-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-}
-
-.create-header h2 {
-  margin: 0;
-}
-
-.create-form {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(180px, 1fr));
-  gap: 16px;
-  margin-top: 16px;
-  align-items: end;
-}
-
-.pagination {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 16px;
-}
-
-.pagination span {
-  font-weight: bold;
-}
+/* Table */
 
 .table-wrapper {
   overflow-x: auto;
@@ -189,14 +318,109 @@ th {
 .icon-button:hover {
   opacity: 0.85;
 }
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
 
-@media (max-width: 900px) {
-  .filters,
-  .create-form {
+.danger-button {
+  background: #b00020;
+  color: white;
+}
+
+.danger-button:hover {
+  opacity: 0.88;
+}
+/* Responsive */
+
+@media (max-width: 750px) {
+  .results-summary {
     grid-template-columns: 1fr;
+    align-items: flex-start;
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 1000px) {
+  .filters-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .filters-footer,
+  .filters-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .year-help {
+    white-space: normal;
   }
 
   .actions {
     flex-wrap: wrap;
   }
+}
+
+@media (max-width: 1000px) {
+  .main-filters-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .range-and-actions-row {
+    grid-template-columns: 1fr;
+  }
+
+  .actions-box {
+    justify-content: flex-start;
+  }
+
+  .filters-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .year-help {
+    white-space: normal;
+  }
+
+  .actions {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 650px) {
+  .page {
+    padding: 20px;
+  }
+
+  .hero {
+    flex-direction: column;
+  }
+
+  .main-filters-row,
+  .year-range-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+.results-summary {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.pagination {
+  flex-wrap: wrap;
+}
+.hero-actions {
+  width: 100%;
+  flex-direction: column;
+}
 }

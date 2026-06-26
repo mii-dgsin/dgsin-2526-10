@@ -83,6 +83,11 @@ button:disabled {
   color: #1b7f37;
   font-weight: bold;
 }
+.field-help {
+  margin: 6px 0 0;
+  color: #666;
+  font-size: 0.85rem;
+}
 
 @media (max-width: 900px) {
   .record-form {

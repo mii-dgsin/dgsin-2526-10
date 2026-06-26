@@ -4,89 +4,50 @@
 
 **DGSIN-2526-10**
 
-Cloud information system for managing and visualizing CO₂ emission records and integrating them with external yearly electricity generation data from Ember Energy.
+REST API and integration backend for the CO₂ emissions dashboard.
 
-## Base URL
-
-### Local development
-
-```txt
-http://localhost:8080
-```
-
-### Deployed API
+Deployed base URL:
 
 ```txt
 https://dgsin-2526-10-mjcadenas.ew.r.appspot.com
 ```
 
----
-
-# 1. Carbon Emission Records API
-
-The main API resource is:
+Local base URL:
 
 ```txt
-/api/v1/carbon-emission-records
-```
-
-This API manages CO₂ emission records stored in MongoDB Atlas.
-
-Each record represents the CO₂ emissions of a location in a specific year.
-
----
-
-## 1.1. Data model
-
-| Field                | Type           | Required | Description                                    |
-| -------------------- | -------------- | -------: | ---------------------------------------------- |
-| `_id`                | String         |      Yes | MongoDB identifier                             |
-| `location`           | String         |      Yes | Original location name from the source dataset |
-| `period`             | Number         |      Yes | Year of the record                             |
-| `totalEmissionsMt`   | Number         |      Yes | Total CO₂ emissions in megatonnes              |
-| `emissionsIntensity` | Number or null |       No | Emissions intensity                            |
-| `emissionsPerCapita` | Number         |      Yes | CO₂ emissions per capita                       |
-| `annualVariation`    | Number or null |       No | Annual variation of CO₂ emissions              |
-
-The combination of `location` and `period` must be unique.
-
-Some fields can be `null` because the original source does not always provide all values. This is especially relevant for `emissionsIntensity` and `annualVariation`.
-
-Example:
-
-```json
-{
-  "_id": "68585f4f5c93c6ab1f2c1234",
-  "location": "Spain and Andorra",
-  "period": 2022,
-  "totalEmissionsMt": 235.471,
-  "emissionsIntensity": 0.11,
-  "emissionsPerCapita": 5.07,
-  "annualVariation": -0.84
-}
+http://localhost:8080
 ```
 
 ---
 
-# 2. Endpoints
+# 1. API overview
 
-## 2.1. Health check
+The backend exposes two main API groups:
 
-```http
-GET /api/v1/health
+| API group | Base path | Description |
+|---|---|---|
+| Carbon emission records | `/api/v1/carbon-emission-records` | Own REST API backed by MongoDB Atlas |
+| Integrations | `/api/v1/integrations` | Integration endpoints with external APIs |
+
+The backend also serves the Angular production build from:
+
+```txt
+backend/public/
 ```
+
+---
+
+# 2. Health check
+
+## GET `/api/v1/health`
 
 Checks whether the API is running.
 
 ### Successful response
 
-Status code:
-
-```txt
+```http
 200 OK
 ```
-
-Example response:
 
 ```json
 {
@@ -98,24 +59,54 @@ Example response:
 
 ---
 
-## 2.2. Get all carbon emission records
+# 3. Carbon emission records API
+
+Base resource:
+
+```txt
+/api/v1/carbon-emission-records
+```
+
+This resource manages CO₂ emission records stored in MongoDB Atlas.
+
+---
+
+## 3.1. Data model
+
+| Field | Type | Required | Description |
+|---|---|---:|---|
+| `_id` | String | Yes | MongoDB ObjectId |
+| `location` | String | Yes | Original location name from the dataset |
+| `period` | Number | Yes | Year |
+| `totalEmissionsMt` | Number | Yes | Total CO₂ emissions in megatonnes |
+| `emissionsIntensity` | Number or null | No | Emissions intensity |
+| `emissionsPerCapita` | Number | Yes | CO₂ emissions per capita |
+| `annualVariation` | Number or null | No | Annual variation |
+
+The fields `emissionsIntensity` and `annualVariation` may be `null` when the original source does not provide those values.
+
+The combination of `location` and `period` must be unique.
+
+---
+
+## 3.2. GET collection
 
 ```http
 GET /api/v1/carbon-emission-records
 ```
 
-Returns a paginated list of CO₂ emission records.
+Returns a paginated list of records.
 
 ### Query parameters
 
-| Parameter    | Type   | Required | Description                                       |
-| ------------ | ------ | -------: | ------------------------------------------------- |
-| `location`   | String |       No | Filters records by location using flexible search |
-| `period`     | Number |       No | Filters records by exact year                     |
-| `fromPeriod` | Number |       No | Filters records from this year                    |
-| `toPeriod`   | Number |       No | Filters records up to this year                   |
-| `limit`      | Number |       No | Maximum number of records returned                |
-| `offset`     | Number |       No | Number of records skipped for pagination          |
+| Parameter | Type | Required | Description |
+|---|---|---:|---|
+| `location` | String | No | Flexible location filter |
+| `period` | Number | No | Exact year |
+| `fromPeriod` | Number | No | Start year |
+| `toPeriod` | Number | No | End year |
+| `limit` | Number | No | Page size |
+| `offset` | Number | No | Pagination offset |
 
 ### Example request
 
@@ -125,13 +116,9 @@ GET /api/v1/carbon-emission-records?location=Spain&fromPeriod=2020&toPeriod=2023
 
 ### Successful response
 
-Status code:
-
-```txt
+```http
 200 OK
 ```
-
-Example response:
 
 ```json
 {
@@ -142,95 +129,27 @@ Example response:
     {
       "_id": "68585f4f5c93c6ab1f2c1234",
       "location": "Spain and Andorra",
-      "period": 2020,
-      "totalEmissionsMt": 215.921,
-      "emissionsIntensity": 0.1,
-      "emissionsPerCapita": 4.63,
-      "annualVariation": -12.32
+      "period": 2022,
+      "totalEmissionsMt": 235.471,
+      "emissionsIntensity": 0.11,
+      "emissionsPerCapita": 5.07,
+      "annualVariation": -0.84
     }
   ]
 }
 ```
 
-### Notes
-
-The location filter is flexible. For example:
-
-```http
-GET /api/v1/carbon-emission-records?location=Spain
-```
-
-can return records whose original location is:
-
-```txt
-Spain and Andorra
-```
-
 ---
 
-## 2.3. Get one carbon emission record by ID
-
-```http
-GET /api/v1/carbon-emission-records/:id
-```
-
-Returns one CO₂ emission record by MongoDB ID.
-
-### Example request
-
-```http
-GET /api/v1/carbon-emission-records/68585f4f5c93c6ab1f2c1234
-```
-
-### Successful response
-
-Status code:
-
-```txt
-200 OK
-```
-
-Example response:
-
-```json
-{
-  "_id": "68585f4f5c93c6ab1f2c1234",
-  "location": "Spain and Andorra",
-  "period": 2022,
-  "totalEmissionsMt": 235.471,
-  "emissionsIntensity": 0.11,
-  "emissionsPerCapita": 5.07,
-  "annualVariation": -0.84
-}
-```
-
-### Error response
-
-Status code:
-
-```txt
-404 Not Found
-```
-
-Example response:
-
-```json
-{
-  "message": "Carbon emission record not found"
-}
-```
-
----
-
-## 2.4. Create a carbon emission record
+## 3.3. POST collection
 
 ```http
 POST /api/v1/carbon-emission-records
 ```
 
-Creates a new CO₂ emission record.
+Creates a new record.
 
-### Request body
+### Example request body
 
 ```json
 {
@@ -245,13 +164,9 @@ Creates a new CO₂ emission record.
 
 ### Successful response
 
-Status code:
-
-```txt
+```http
 201 Created
 ```
-
-Example response:
 
 ```json
 {
@@ -267,13 +182,9 @@ Example response:
 
 ### Validation error
 
-Status code:
-
-```txt
+```http
 400 Bad Request
 ```
-
-Example response:
 
 ```json
 {
@@ -285,15 +196,11 @@ Example response:
 }
 ```
 
-### Duplicate record error
+### Duplicate error
 
-Status code:
-
-```txt
+```http
 409 Conflict
 ```
-
-Example response:
 
 ```json
 {
@@ -303,42 +210,84 @@ Example response:
 
 ---
 
-## 2.5. Update a carbon emission record
+## 3.4. DELETE collection
+
+```http
+DELETE /api/v1/carbon-emission-records
+```
+
+Deletes all records from the collection.
+
+### Successful response
+
+```http
+200 OK
+```
+
+```json
+{
+  "message": "Carbon emission records deleted successfully",
+  "deleted": 1200
+}
+```
+
+---
+
+## 3.5. GET one resource
+
+```http
+GET /api/v1/carbon-emission-records/:id
+```
+
+Returns one record by MongoDB ObjectId.
+
+### Example request
+
+```http
+GET /api/v1/carbon-emission-records/68585f4f5c93c6ab1f2c1234
+```
+
+### Successful response
+
+```http
+200 OK
+```
+
+```json
+{
+  "_id": "68585f4f5c93c6ab1f2c1234",
+  "location": "Spain and Andorra",
+  "period": 2022,
+  "totalEmissionsMt": 235.471,
+  "emissionsIntensity": 0.11,
+  "emissionsPerCapita": 5.07,
+  "annualVariation": -0.84
+}
+```
+
+### Not found
+
+```http
+404 Not Found
+```
+
+```json
+{
+  "message": "Carbon emission record not found"
+}
+```
+
+---
+
+## 3.6. PUT one resource
 
 ```http
 PUT /api/v1/carbon-emission-records/:id
 ```
 
-Updates an existing CO₂ emission record.
+Updates one record.
 
-### Example request
-
-```http
-PUT /api/v1/carbon-emission-records/68585f4f5c93c6ab1f2c1234
-```
-
-### Request body
-
-```json
-{
-  "location": "Spain and Andorra",
-  "period": 2026,
-  "totalEmissionsMt": 3,
-  "emissionsIntensity": null,
-  "emissionsPerCapita": 22,
-  "annualVariation": null
-}
-```
-
-### Successful response
-
-Status code:
-
-```txt
-200 OK
-```
-
-Example response:
+### Example request body
 
 ```json
 {
@@ -352,23 +301,43 @@ Example response:
 }
 ```
 
-### Error responses
+### Successful response
 
-If the record does not exist:
-
-```txt
-404 Not Found
+```http
+200 OK
 ```
 
 ```json
 {
-  "message": "Carbon emission record not found"
+  "_id": "68585f4f5c93c6ab1f2c1234",
+  "location": "Spain and Andorra",
+  "period": 2026,
+  "totalEmissionsMt": 3,
+  "emissionsIntensity": null,
+  "emissionsPerCapita": 22,
+  "annualVariation": null
 }
 ```
 
-If the update creates a duplicate `location` and `period` combination:
+### Wrong body id
 
-```txt
+If the request body contains an `_id` different from the URL resource id:
+
+```http
+400 Bad Request
+```
+
+```json
+{
+  "message": "The request body id must match the URL resource id"
+}
+```
+
+### Duplicate conflict
+
+If the update creates a duplicated `location` and `period` combination:
+
+```http
 409 Conflict
 ```
 
@@ -378,46 +347,11 @@ If the update creates a duplicate `location` and `period` combination:
 }
 ```
 
----
-
-## 2.6. Delete a carbon emission record
+### Not found
 
 ```http
-DELETE /api/v1/carbon-emission-records/:id
-```
-
-Deletes an existing CO₂ emission record.
-
-### Example request
-
-```http
-DELETE /api/v1/carbon-emission-records/68585f4f5c93c6ab1f2c1234
-```
-
-### Successful response
-
-Status code:
-
-```txt
-200 OK
-```
-
-Example response:
-```json
-{
-  "message": "Carbon emission record deleted successfully"
-}
-```
-
-### Error response
-
-Status code:
-
-```txt
 404 Not Found
 ```
-
-Example response:
 
 ```json
 {
@@ -427,32 +361,60 @@ Example response:
 
 ---
 
-## 2.7. Get available local locations
+## 3.7. DELETE one resource
+
+```http
+DELETE /api/v1/carbon-emission-records/:id
+```
+
+Deletes one record.
+
+### Successful response
+
+```http
+200 OK
+```
+
+```json
+{
+  "message": "Carbon emission record deleted successfully"
+}
+```
+
+### Not found
+
+```http
+404 Not Found
+```
+
+```json
+{
+  "message": "Carbon emission record not found"
+}
+```
+
+---
+
+## 3.8. GET available locations
 
 ```http
 GET /api/v1/carbon-emission-records/locations
 ```
 
-Returns the unique locations available in the local CO₂ emissions dataset.
-
-This endpoint is used by the frontend to provide location suggestions.
+Returns the unique local locations stored in the dataset.
 
 ### Successful response
 
-Status code:
-
-```txt
+```http
 200 OK
 ```
-
-Example response:
 
 ```json
 {
   "total": 200,
   "locations": [
     "Afghanistan",
-    "Albania",
+    "France and Monaco",
     "Spain and Andorra"
   ]
 }
@@ -460,29 +422,19 @@ Example response:
 
 ---
 
-## 2.8. Load initial data if collection is empty
+## 3.9. GET load initial data
 
 ```http
 GET /api/v1/carbon-emission-records/loadInitialData
 ```
 
-Loads the initial CO₂ emission records from:
+Loads the initial dataset only if the collection is empty.
 
-```txt
-backend/data/carbonEmissionRecords.json
-```
+### Loaded response
 
-This route only inserts data if the MongoDB collection is empty.
-
-### Successful response when data is loaded
-
-Status code:
-
-```txt
+```http
 201 Created
 ```
-
-Example response:
 
 ```json
 {
@@ -493,15 +445,11 @@ Example response:
 }
 ```
 
-### Successful response when collection already has data
+### Already loaded response
 
-Status code:
-
-```txt
+```http
 200 OK
 ```
-
-Example response:
 
 ```json
 {
@@ -514,109 +462,110 @@ Example response:
 
 ---
 
-# 3. Integration API
+## 3.10. GET Postman documentation redirect
 
-The integration API resource is:
+```http
+GET /api/v1/carbon-emission-records/docs
+```
+
+Redirects to the public Postman documentation portal.
+
+### Response
+
+```http
+302 Found
+```
+
+Redirect target:
+
+```txt
+https://documenter.getpostman.com/view/15287747/2sBXwyF6od
+```
+
+---
+
+## 3.11. Method not allowed
+
+Known routes return `405 Method Not Allowed` when a non-supported HTTP method is used.
+
+Example:
+
+```http
+PATCH /api/v1/carbon-emission-records
+```
+
+Response:
+
+```http
+405 Method Not Allowed
+```
+
+```json
+{
+  "message": "Method not allowed for this endpoint",
+  "method": "PATCH",
+  "path": "/api/v1/carbon-emission-records"
+}
+```
+
+---
+
+# 4. Integration API
+
+Base path:
 
 ```txt
 /api/v1/integrations
 ```
 
-This API connects the local CO₂ emissions dataset with the external Ember Energy API.
-
-The frontend does not call Ember directly. The backend acts as a proxy, which avoids exposing the Ember API key in Angular.
+The integration API connects local CO₂ emission records with the external Ember Energy API.
 
 ---
 
-## 3.1. Get supported integration locations
+## 4.1. GET supported locations
 
 ```http
 GET /api/v1/integrations/supported-locations
 ```
 
-Returns the locations that are compatible between the local CO₂ emissions dataset and the Ember Energy API.
-
-The backend obtains the list of available entities from Ember Energy and crosses it with the locations available in MongoDB.
-
-To avoid incorrect matches, the backend uses normalized exact matching and controlled aliases for special cases where the local source groups several territories together.
-
-### Example controlled aliases
-
-| Ember entity | Local CO₂ dataset location         |
-| ------------ | ---------------------------------- |
-| Spain        | Spain and Andorra                  |
-| France       | France and Monaco                  |
-| Italy        | Italy, San Marino and the Holy See |
-| Switzerland  | Switzerland and Liechtenstein      |
-| Israel       | Israel and Palestine, State of     |
+Returns locations that can be matched between the local dataset and Ember Energy.
 
 ### Successful response
 
-Status code:
-
-```txt
+```http
 200 OK
 ```
 
-Example response:
-
 ```json
 {
-  "total": 150,
+  "total": 4,
   "locations": [
     {
       "label": "Spain",
       "emberEntity": "Spain",
       "localLocation": "Spain and Andorra"
-    },
-    {
-      "label": "France",
-      "emberEntity": "France",
-      "localLocation": "France and Monaco"
     }
   ]
 }
 ```
 
-### Error response
-
-Status code:
-
-```txt
-500 Internal Server Error
-```
-
-Example response:
-
-```json
-{
-  "message": "Error retrieving supported integration locations",
-  "error": "EMBER_API_KEY is not defined"
-}
-```
-
 ---
 
-## 3.2. Get renewable electricity integration
+## 4.2. GET renewable electricity integration
 
 ```http
 GET /api/v1/integrations/renewable-electricity
 ```
 
-Returns data from two sources:
-
-| Source           | Description                                  |
-| ---------------- | -------------------------------------------- |
-| Local API        | CO₂ emission records stored in MongoDB Atlas |
-| Ember Energy API | External yearly electricity generation data  |
+Returns integrated data from the local API and Ember Energy.
 
 ### Query parameters
 
-| Parameter    | Type   | Required | Description                                            |
-| ------------ | ------ | -------: | ------------------------------------------------------ |
-| `location`   | String |      Yes | Location selected from supported integration locations |
-| `fromPeriod` | Number |      Yes | Start year                                             |
-| `toPeriod`   | Number |      Yes | End year                                               |
+| Parameter | Type | Required | Description |
+|---|---|---:|---|
+| `location` | String | Yes | Selected supported location |
+| `fromPeriod` | Number | Yes | Start year |
+| `toPeriod` | Number | Yes | End year |
 
 ### Example request
 
@@ -626,13 +575,9 @@ GET /api/v1/integrations/renewable-electricity?location=Spain&fromPeriod=2020&to
 
 ### Successful response
 
-Status code:
-
-```txt
+```http
 200 OK
 ```
-
-Example response:
 
 ```json
 {
@@ -656,7 +601,7 @@ Example response:
     {
       "entity": "Spain",
       "year": 2022,
-      "generation_twh": 280.0
+      "generation_twh": 280
     }
   ],
   "source": {
@@ -668,22 +613,16 @@ Example response:
 }
 ```
 
-The exact structure of the `electricityGeneration` items depends on the Ember Energy API response.
+### Unsupported location
 
-### Unsupported location error
-
-Status code:
-
-```txt
+```http
 400 Bad Request
 ```
-
-Example response:
 
 ```json
 {
   "message": "Unsupported location for Ember integration",
-  "location": "Example",
+  "location": "UnsupportedTestLocation",
   "supportedLocations": [
     "Spain",
     "France",
@@ -692,151 +631,31 @@ Example response:
 }
 ```
 
-### Missing local records error
-
-Status code:
-
-```txt
-404 Not Found
-```
-
-Example response:
-
-```json
-{
-  "message": "No local carbon emission records found for this Ember entity",
-  "emberEntity": "Spain"
-}
-```
-
-### External API error
-
-Status code:
-
-```txt
-500 Internal Server Error
-```
-
-Example response:
-
-```json
-{
-  "message": "Error retrieving renewable electricity integration",
-  "error": "Ember API request failed with status 401"
-}
-```
-
----
-
-# 4. Common error responses
-
-## Route not found
-
-Status code:
-
-```txt
-404 Not Found
-```
-
-Example response:
-
-```json
-{
-  "message": "Route not found",
-  "path": "/api/v1/no-existe"
-}
-```
-
-## Validation error
-
-Status code:
-
-```txt
-400 Bad Request
-```
-
-Example response:
-
-```json
-{
-  "message": "Validation error",
-  "errors": [
-    "period must be between 1970 and the current year"
-  ]
-}
-```
-
-## Duplicate record
-
-Status code:
-
-```txt
-409 Conflict
-```
-
-Example response:
-
-```json
-{
-  "message": "A carbon emission record already exists for this location and period"
-}
-```
-
-## Internal server error
-
-Status code:
-
-```txt
-500 Internal Server Error
-```
-
-Example response:
-
-```json
-{
-  "message": "Error retrieving renewable electricity integration",
-  "error": "Unexpected error message"
-}
-```
-
 ---
 
 # 5. Status codes summary
 
-|                 Status code | Meaning                         | Used when                                                       |
-| --------------------------: | ------------------------------- | --------------------------------------------------------------- |
-|                    `200 OK` | Successful request              | GET, PUT and DELETE operations                                   |
-|               `201 Created` | Resource created                | POST operation or initial data load                             |
-|           `400 Bad Request` | Invalid request                 | Validation errors and unsupported integration location          |
-|              `409 Conflict` | Conflict with existing resource | Duplicate `location` and `period` combination                   |
-|             `404 Not Found` | Resource not found              | Invalid ID, route not found, no compatible local data           |
-| `500 Internal Server Error` | Server error                    | Database or external API failure                                |
+| Status code | Meaning | Used when |
+|---:|---|---|
+| `200 OK` | Successful request | GET, PUT, DELETE |
+| `201 Created` | Resource created | POST or initial data loaded |
+| `302 Found` | Redirect | Postman documentation route |
+| `400 Bad Request` | Invalid request | Validation, wrong body id, unsupported location |
+| `404 Not Found` | Resource not found | Missing record or route |
+| `405 Method Not Allowed` | Unsupported method | Known route with wrong HTTP method |
+| `409 Conflict` | Duplicate conflict | Existing `location` and `period` combination |
+| `500 Internal Server Error` | Server error | Database or external API errors |
 
 ---
 
-# 6. Notes about CORS and proxy integration
+# 6. CORS and proxy
 
-The backend enables CORS so that the Angular frontend can call the API.
+The backend enables CORS headers so the Angular frontend can consume the API.
 
 The Ember Energy integration is implemented through a backend proxy:
 
 ```txt
-Angular frontend → Project backend → Ember Energy API
+Angular frontend -> Project backend -> Ember Energy API
 ```
 
-This design has two advantages:
-
-1. The Ember API key is not exposed in the frontend.
-2. The integration is controlled by the project backend and can normalize the response before sending it to Angular.
-
----
-
-# 7. Frontend routes related to the API
-
-| Frontend route                        | API usage                                                        |
-| ------------------------------------- | ---------------------------------------------------------------- |
-| `/`                                   | Lists, filters, paginates and deletes CO₂ records                |
-| `/records/new`                        | Creates a new CO₂ record                                         |
-| `/records/:id/edit`                   | Edits an existing CO₂ record                                     |
-| `/integrations/renewable-electricity` | Shows the Ember Energy integration and Highcharts visualizations |
-| `/documentation` | Shows the project documentation page with links to README, diary, API documentation and test evidence |
+This prevents exposing the external API key in the browser.

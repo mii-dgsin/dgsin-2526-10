@@ -1,0 +1,33 @@
+<main class="page">
+  <section class="hero">
+    <h1>Integrations</h1>
+    <p>
+      This page provides access to the external data integrations implemented in the project.
+    </p>
+  </section>
+
+  <section class="card">
+    <h2>Renewable electricity integration</h2>
+
+    <p>
+      This integration combines the local CO₂ emission records stored in MongoDB Atlas
+      with external yearly electricity generation data provided by Ember Energy.
+    </p>
+
+    <p>
+      The frontend calls the project backend, and the backend acts as a proxy to the
+      external Ember Energy API. This avoids exposing the external API key in Angular.
+    </p>
+
+    <ul>
+      <li>Local source: <strong>carbon-emission-records</strong></li>
+      <li>External source: <strong>Ember Energy API</strong></li>
+      <li>Proxy route: <code>/api/v1/integrations/renewable-electricity</code></li>
+      <li>Location selector: dynamic compatible locations from both sources</li>
+    </ul>
+
+    <a routerLink="/integrations/renewable-electricity" class="button">
+      Open renewable electricity integration
+    </a>
+  </section>
+</main>

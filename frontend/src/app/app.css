@@ -1,37 +1,92 @@
 .app-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  border-bottom: 1px solid #ddd;
+  background: #ffffff;
+}
+
+.app-header-inner {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 16px 32px;
+  padding: 14px 32px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 24px;
 }
 
-.app-title {
-  font-weight: bold;
+.app-brand {
+  display: flex;
+  flex-direction: column;
   text-decoration: none;
   color: #222;
+  min-width: 180px;
 }
 
-nav {
+.brand-title {
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+}
+
+.brand-subtitle {
+  margin-top: 2px;
+  color: #666;
+  font-size: 0.78rem;
+}
+
+.app-tabs {
   display: flex;
+  align-items: center;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 6px;
+  padding: 4px;
+  border: 1px solid #e1e1e1;
+  border-radius: 999px;
+  background: #f7f7f7;
 }
 
-nav a {
-  text-decoration: none;
+.app-tabs a {
+  padding: 8px 14px;
+  border-radius: 999px;
   color: #333;
+  text-decoration: none;
+  font-size: 0.92rem;
+  font-weight: 500;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
-nav a:hover {
-  text-decoration: underline;
+.app-tabs a:hover {
+  background: #e9e9e9;
 }
 
-@media (max-width: 800px) {
-  .app-header {
+.app-tabs a.active {
+  background: #222;
+  color: #fff;
+}
+
+@media (max-width: 900px) {
+  .app-header-inner {
     align-items: flex-start;
     flex-direction: column;
-    gap: 12px;
+    padding: 14px 20px;
+  }
+
+  .app-tabs {
+    width: 100%;
+    justify-content: flex-start;
+    border-radius: 12px;
+  }
+}
+
+@media (max-width: 600px) {
+  .app-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .app-tabs a {
+    text-align: center;
   }
 }

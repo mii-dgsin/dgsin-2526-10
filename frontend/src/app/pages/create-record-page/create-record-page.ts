@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -12,13 +12,16 @@ import { CarbonEmissionRecordService } from '../../services/carbon-emission-reco
   templateUrl: './create-record-page.html',
   styleUrl: './create-record-page.css'
 })
-export class CreateRecordPage {
+export class CreateRecordPage implements OnInit {
   readonly minPeriod = 1970;
   readonly maxPeriod = new Date().getFullYear();
-
+  locations: string[] = [];
+  
   loading = false;
   errorMessage = '';
   successMessage = '';
+
+
 
   newRecord: CarbonEmissionRecordRequest = {
     location: '',
@@ -34,7 +37,20 @@ export class CreateRecordPage {
     private readonly carbonEmissionService: CarbonEmissionRecordService,
     private readonly changeDetectorRef: ChangeDetectorRef
   ) {}
-
+  ngOnInit(): void {
+    this.loadLocations();
+  }
+  loadLocations(): void {
+    this.carbonEmissionService.getLocations().subscribe({
+      next: (response) => {
+        this.locations = response.locations;
+        this.changeDetectorRef.detectChanges();
+      },
+      error: (error) => {
+        console.error('Load locations error:', error);
+      }
+    });
+  }
   createRecord(): void {
     if (!this.newRecord.location || this.newRecord.location.trim().length === 0) {
       this.errorMessage = 'Location is required';

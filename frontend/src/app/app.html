@@ -1,11 +1,49 @@
 <header class="app-header">
-  <a routerLink="/" class="app-title">DGSIN-2526-10</a>
+  <div class="app-header-inner">
+    <a routerLink="/" class="app-brand">
+      <span class="brand-title">DGSIN-2526-10</span>
+      <span class="brand-subtitle">CO₂ Emissions Dashboard</span>
+    </a>
 
-  <nav>
-    <a routerLink="/">Carbon emission records</a>
-    <a routerLink="/integrations/renewable-electricity">Renewable electricity integration</a>
-    <a routerLink="/documentation">Documentation</a>
-  </nav>
+    <nav class="app-tabs" aria-label="Main navigation">
+      <a
+        routerLink="/"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        Records
+      </a>
+
+      <a
+        routerLink="/integrations"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: false }"
+      >
+        Integrations
+      </a>
+
+      <a
+        routerLink="/analytics"
+        routerLinkActive="active"
+      >
+        Analytics
+      </a>
+
+      <a
+        routerLink="/documentation"
+        routerLinkActive="active"
+      >
+        Documentation
+      </a>
+
+      <a
+        routerLink="/about"
+        routerLinkActive="active"
+      >
+        About
+      </a>
+    </nav>
+  </div>
 </header>
 
 <router-outlet></router-outlet>

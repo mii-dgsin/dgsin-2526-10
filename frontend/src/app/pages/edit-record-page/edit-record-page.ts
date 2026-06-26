@@ -24,6 +24,7 @@ export class EditRecordPage implements OnInit {
   loading = false;
   errorMessage = '';
   successMessage = '';
+  locations: string[] = [];  
 
   recordToEdit: CarbonEmissionRecordRequest = {
     location: '',
@@ -52,8 +53,19 @@ export class EditRecordPage implements OnInit {
     }
 
     this.loadRecord();
+    this.loadLocations();
   }
-
+  loadLocations(): void {
+    this.carbonEmissionService.getLocations().subscribe({
+      next: (response) => {
+        this.locations = response.locations;
+        this.changeDetectorRef.detectChanges();
+      },
+      error: (error) => {
+        console.error('Load locations error:', error);
+      }
+    });
+  }
   loadRecord(): void {
     this.loading = true;
     this.errorMessage = '';

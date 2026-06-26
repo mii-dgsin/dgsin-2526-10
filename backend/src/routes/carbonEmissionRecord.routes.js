@@ -7,20 +7,50 @@ const {
   createCarbonEmissionRecord,
   updateCarbonEmissionRecord,
   deleteCarbonEmissionRecord,
-  loadInitialCarbonEmissionRecords
+  deleteCarbonEmissionRecords,
+  loadInitialCarbonEmissionRecords,
+  redirectCarbonEmissionRecordDocs
 } = require("../controllers/carbonEmissionRecord.controller");
 
 const validateCarbonEmissionRecord = require("../validators/carbonEmissionRecord.validator");
 
 const router = express.Router();
 
-router.get("/", getCarbonEmissionRecords);
-router.get("/loadInitialData", loadInitialCarbonEmissionRecords);
-router.get("/locations", getCarbonEmissionRecordLocations);
-router.get("/:id", getCarbonEmissionRecordById);
+const methodNotAllowed = (req, res) => {
+  return res.status(405).json({
+    message: "Method not allowed for this endpoint",
+    method: req.method,
+    path: req.originalUrl
+  });
+};
 
-router.post("/", validateCarbonEmissionRecord, createCarbonEmissionRecord);
-router.put("/:id", validateCarbonEmissionRecord, updateCarbonEmissionRecord);
-router.delete("/:id", deleteCarbonEmissionRecord);
+router
+  .route("/")
+  .get(getCarbonEmissionRecords)
+  .post(validateCarbonEmissionRecord, createCarbonEmissionRecord)
+  .delete(deleteCarbonEmissionRecords)
+  .all(methodNotAllowed);
+
+router
+  .route("/loadInitialData")
+  .get(loadInitialCarbonEmissionRecords)
+  .all(methodNotAllowed);
+
+router
+  .route("/locations")
+  .get(getCarbonEmissionRecordLocations)
+  .all(methodNotAllowed);
+
+router
+  .route("/docs")
+  .get(redirectCarbonEmissionRecordDocs)
+  .all(methodNotAllowed);
+
+router
+  .route("/:id")
+  .get(getCarbonEmissionRecordById)
+  .put(validateCarbonEmissionRecord, updateCarbonEmissionRecord)
+  .delete(deleteCarbonEmissionRecord)
+  .all(methodNotAllowed);
 
 module.exports = router;

@@ -73,4 +73,20 @@ export class CarbonEmissionRecordService {
       locations: string[];
     }>(`${this.apiUrl}/locations`);
   }
+  deleteAllRecords() {
+    return this.http.delete<{ message: string; deleted: number }>(
+      this.apiUrl
+    );
+  }
+
+  loadInitialData() {
+    return this.http.get<{
+      message: string;
+      loaded: boolean;
+      inserted: number;
+      total: number;
+    }>(
+      `${this.apiUrl}/loadInitialData`
+    );
+  }
 }

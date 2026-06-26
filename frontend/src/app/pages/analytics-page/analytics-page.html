@@ -1,0 +1,84 @@
+<main class="page">
+  <section class="hero">
+    <h1>Analytics</h1>
+    <p>
+      This page lists the analytical views and widgets implemented in the project.
+      The charts are generated with Highcharts and use both the local CO₂ emissions API
+      and the external Ember Energy integration.
+    </p>
+  </section>
+
+  <section class="grid">
+    <article class="card">
+      <h2>CO₂ emissions by year</h2>
+
+      <p>
+        This chart shows the evolution of total CO₂ emissions by year using the local
+        <code>carbon-emission-records</code> API stored in MongoDB Atlas.
+      </p>
+
+      <ul>
+        <li>Source: local API</li>
+        <li>Widget: Highcharts visualization</li>
+        <li>Metric: total CO₂ emissions</li>
+        <li>Default example: Spain, 2020-2023</li>
+      </ul>
+
+      <a
+        routerLink="/integrations/renewable-electricity"
+        [queryParams]="{ location: 'Spain', fromPeriod: 2020, toPeriod: 2023 }"
+        fragment="co2-chart"
+        class="button">
+        Open CO₂ emissions chart
+      </a>
+    </article>
+
+    <article class="card">
+      <h2>Ember electricity data by year</h2>
+
+      <p>
+        This chart shows yearly electricity generation data obtained from the external
+        Ember Energy API through the project backend proxy.
+      </p>
+
+      <ul>
+        <li>Source: Ember Energy API</li>
+        <li>Widget: Highcharts visualization</li>
+        <li>Metric: yearly electricity generation</li>
+        <li>Default example: Spain, 2020-2023</li>
+      </ul>
+
+      <a
+        routerLink="/integrations/renewable-electricity"
+        [queryParams]="{ location: 'Spain', fromPeriod: 2020, toPeriod: 2023 }"
+        fragment="ember-chart"
+        class="button">
+        Open Ember electricity chart
+      </a>
+    </article>
+
+    <article class="card">
+      <h2>CO₂ emissions vs electricity generation</h2>
+
+      <p>
+        This combined chart relates the local CO₂ emissions dataset with the external
+        Ember Energy dataset in a single visualization using two Y axes.
+      </p>
+
+      <ul>
+        <li>Source: local API + external API</li>
+        <li>Widget: Highcharts combined chart</li>
+        <li>Purpose: compare both datasets in one view</li>
+        <li>Default example: Spain, 2020-2023</li>
+      </ul>
+
+      <a
+        routerLink="/integrations/renewable-electricity"
+        [queryParams]="{ location: 'Spain', fromPeriod: 2020, toPeriod: 2023 }"
+        fragment="combined-chart"
+        class="button">
+        Open combined chart
+      </a>
+    </article>
+  </section>
+</main>

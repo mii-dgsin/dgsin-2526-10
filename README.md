@@ -1,30 +1,24 @@
 # DGSIN-2526-10
 
-Sistema de información en la nube para gestionar y analizar registros de emisiones de CO₂ por localización y año.
+Cloud information system for consulting, managing and visualizing CO₂ emission records by location and year.
 
-El proyecto se desarrolla para la asignatura **Desarrollo y Gestión de Sistemas de Información en la Nube**.
+The project has been developed for the subject **Desarrollo y Gestión de Sistemas de Información en la Nube**.
 
 ---
 
-## Descripción
+## Author
 
-La aplicación permite consultar, crear, editar y eliminar datos de emisiones de CO₂ asociados a una localización y a un periodo temporal.
+**María Jesús Cadenas Sánchez**
 
-La fuente principal de datos es:
+GitHub user:
 
 ```txt
-https://datosmacro.expansion.com/energia-y-medio-ambiente/emisiones-co2
+mjcadenas
 ```
-
-La fuente seleccionada contiene información organizada en tablas HTML, por lo que los datos no se consumen directamente desde una API pública propia de la fuente.
-
-Además, el backend integra la API externa de Ember Energy mediante un proxy propio. Esta integración permite complementar los registros locales de emisiones de CO₂ con datos externos de generación eléctrica anual.
-
-La aplicación también incluye visualizaciones con Highcharts para mostrar la evolución de los datos propios, los datos externos y una gráfica combinada entre ambas fuentes.
 
 ---
 
-## Repositorio
+## Repository
 
 ```txt
 https://github.com/mii-dgsin/dgsin-2526-10
@@ -32,63 +26,137 @@ https://github.com/mii-dgsin/dgsin-2526-10
 
 ---
 
-## URL desplegada
+## Deployed application
 
-La API está desplegada en Google App Engine:
+The complete application is deployed on Google App Engine:
 
 ```txt
 https://dgsin-2526-10-mjcadenas.ew.r.appspot.com
 ```
 
-Endpoints principales desplegados:
+The same App Engine deployment serves:
+
+- The Angular frontend.
+- The Express REST API.
+- The static Angular build from `backend/public`.
+- The backend proxy used for the external integration.
+
+The REST API is available under:
 
 ```txt
-GET https://dgsin-2526-10-mjcadenas.ew.r.appspot.com/
-GET https://dgsin-2526-10-mjcadenas.ew.r.appspot.com/api/v1/health
-GET https://dgsin-2526-10-mjcadenas.ew.r.appspot.com/api/v1/carbon-emission-records
-GET https://dgsin-2526-10-mjcadenas.ew.r.appspot.com/api/v1/carbon-emission-records/locations
-GET https://dgsin-2526-10-mjcadenas.ew.r.appspot.com/api/v1/integrations/supported-locations
-GET https://dgsin-2526-10-mjcadenas.ew.r.appspot.com/api/v1/integrations/renewable-electricity?location=Spain&fromPeriod=2020&toPeriod=2023
+https://dgsin-2526-10-mjcadenas.ew.r.appspot.com/api/v1
 ```
 
 ---
 
-## Tecnologías utilizadas
+## Project description
+
+The application manages a dataset of CO₂ emission records. Each record represents the emissions of a location during a specific year.
+
+The system allows the user to:
+
+- List CO₂ emission records.
+- Filter records by location.
+- Filter records by exact year.
+- Filter records by year range.
+- Create new records.
+- Edit existing records.
+- Delete one record.
+- Delete all records.
+- Load initial data when the collection is empty.
+- View operation status messages.
+- View API errors in a user-friendly way.
+- Access external data integrations.
+- View Highcharts visualizations.
+- Access project documentation and Postman documentation.
+
+---
+
+## Data source
+
+Main dataset:
+
+```txt
+https://datosmacro.expansion.com/energia-y-medio-ambiente/emisiones-co2
+```
+
+The source contains CO₂ emission data organized by location and year.
+
+The source is not used directly as a ready-made public API. The project stores the selected data in MongoDB Atlas and exposes it through its own REST API.
+
+Resource name:
+
+```txt
+carbon-emission-records
+```
+
+The resource name follows the required naming restrictions:
+
+- Only lowercase letters and hyphens.
+- No spaces.
+- No more than three words.
+
+---
+
+## External integration
+
+The project includes an external integration with the **Ember Energy API**.
+
+The integration combines:
+
+| Source | Type | Purpose |
+|---|---|---|
+| `carbon-emission-records` | Own REST API | Local CO₂ emission records stored in MongoDB Atlas |
+| Ember Energy API | External REST API | Yearly electricity generation data |
+
+The frontend does not call Ember directly. The request is made through the backend:
+
+```txt
+Angular frontend -> Express backend proxy -> Ember Energy API
+```
+
+This avoids exposing the external API key in the frontend and satisfies the proxy integration requirement.
+
+---
+
+## Technologies
+
+### Backend
 
 - Node.js
 - Express
 - MongoDB Atlas
 - Mongoose
+- CORS
 - dotenv
-- cors
-- nodemon
 - Google App Engine
-- Google Cloud CLI
+- Postman
+
+### Frontend
+
 - Angular
 - Angular Router
 - TypeScript
+- FormsModule
 - Font Awesome
-- Zone.js
 - Highcharts
-- Ember Energy API
-- Postman / Insomnia para pruebas de API
+- Custom favicon
+- Responsive CSS
 
 ---
 
-## Estructura del proyecto
+## Project structure
 
 ```txt
 dgsin-2526-10/
-├── .gitignore
 ├── README.md
 ├── backend/
-│   ├── .gcloudignore
 │   ├── app.example.yaml
 │   ├── data/
 │   │   └── carbonEmissionRecords.json
-│   ├── public/
-│   ├── package-lock.json
 │   ├── package.json
+│   ├── public/
+│   │   └── Angular production build
 │   └── src/
 │       ├── app.js
 │       ├── config/
@@ -103,53 +171,59 @@ dgsin-2526-10/
 │       ├── routes/
 │       │   ├── carbonEmissionRecord.routes.js
 │       │   └── integration.routes.js
-│       ├── scripts/
-│       │   └── loadCarbonEmissionRecords.js
 │       ├── services/
 │       │   └── emberEnergy.service.js
 │       └── validators/
 │           └── carbonEmissionRecord.validator.js
 ├── docs/
 │   ├── api.md
+│   ├── carbon-emission-records-docs.md
 │   ├── diary.md
 │   └── postman/
-│       └── DGSIN-2526-10.postman_collection.json
+│       ├── DGSIN-2526-10.postman_collection.json
 │       └── postman-run-results.png
 └── frontend/
     ├── angular.json
-    ├── package-lock.json
     ├── package.json
-    ├── public/
     ├── src/
+    │   ├── assets/
+    │   │   └── favicon.webp
+    │   ├── index.html
     │   └── app/
     │       ├── models/
     │       ├── pages/
-    │       │   ├── create-record-page/
-    │       │   ├── documentation-page/
-    │       │   ├── edit-record-page/
-    │       │   ├── integration-page/
-    │       │   └── records-page/
     │       └── services/
-    ├── tsconfig.app.json
-    ├── tsconfig.json
-    └── tsconfig.spec.json
+    └── tsconfig.json
 ```
 
 ---
 
-## Instalación del backend
+## Backend setup
+
+From the `backend` folder:
 
 ```bash
-git clone https://github.com/mii-dgsin/dgsin-2526-10.git
-cd dgsin-2526-10/backend
 npm install
+npm run dev
+```
+
+The local backend runs on:
+
+```txt
+http://localhost:8080
+```
+
+Health check:
+
+```txt
+http://localhost:8080/api/v1/health
 ```
 
 ---
 
-## Variables de entorno del backend
+## Backend environment variables
 
-Crear un archivo `.env` dentro de `backend/`:
+Create a local `.env` file inside `backend/`:
 
 ```env
 PORT=8080
@@ -157,21 +231,21 @@ MONGODB_URI=mongodb+srv://USER:PASSWORD@CLUSTER.mongodb.net/dgsin-2526-10?retryW
 EMBER_API_KEY=YOUR_EMBER_API_KEY
 ```
 
-El archivo `.env` no debe subirse al repositorio porque contiene credenciales privadas.
+The `.env` file must not be uploaded to GitHub.
 
 ---
 
-## Configuración de App Engine
+## App Engine configuration
 
-El archivo real `app.yaml` no se sube al repositorio porque puede contener credenciales reales de MongoDB Atlas y la API key de Ember.
+The real `app.yaml` file is not included in the repository because it may contain deployment-specific environment variables.
 
-Se incluye una plantilla:
+A safe template is provided:
 
 ```txt
 backend/app.example.yaml
 ```
 
-Ejemplo:
+Example:
 
 ```yaml
 runtime: nodejs24
@@ -185,7 +259,7 @@ env_variables:
   EMBER_API_KEY: "YOUR_EMBER_API_KEY"
 ```
 
-Para desplegar desde la carpeta `backend/`:
+Deploy command from the `backend` folder:
 
 ```bash
 gcloud app deploy
@@ -193,41 +267,16 @@ gcloud app deploy
 
 ---
 
-## Scripts del backend
+## Frontend setup
 
-Desde `backend/`:
-
-```bash
-npm run dev
-```
-
-Arranca el servidor en modo desarrollo.
+From the `frontend` folder:
 
 ```bash
-npm start
-```
-
-Arranca el servidor en modo normal.
-
-```bash
-npm run load:carbon
-```
-
-`npm run load:carbon` carga los datos de emisiones de CO₂ desde `backend/data/carbonEmissionRecords.json` en MongoDB Atlas.
-
----
-
-## Instalación del frontend
-
-Desde la raíz del proyecto:
-
-```bash
-cd frontend
 npm install
 ng serve
 ```
 
-La aplicación estará disponible en:
+The local frontend runs on:
 
 ```txt
 http://localhost:4200
@@ -235,200 +284,236 @@ http://localhost:4200
 
 ---
 
-## API propia: carbon-emission-records
+## Frontend production build
 
-### Endpoints principales
+From the `frontend` folder:
 
-| Método | Endpoint | Descripción |
+```bash
+ng build
+```
+
+The Angular build is copied into:
+
+```txt
+backend/public/
+```
+
+This allows Express to serve the Angular application and the REST API from the same App Engine deployment.
+
+---
+
+## REST API
+
+Base resource:
+
+```txt
+/api/v1/carbon-emission-records
+```
+
+### Main endpoints
+
+| Method | Endpoint | Description |
 |---|---|---|
-| GET | `/api/v1/health` | Comprueba que la API está funcionando |
-| GET | `/api/v1/carbon-emission-records` | Lista y filtra registros de emisiones |
-| GET | `/api/v1/carbon-emission-records/:id` | Obtiene un registro por ID |
-| POST | `/api/v1/carbon-emission-records` | Crea un registro |
-| PUT | `/api/v1/carbon-emission-records/:id` | Actualiza un registro |
-| DELETE | `/api/v1/carbon-emission-records/:id` | Elimina un registro |
-| GET | `/api/v1/carbon-emission-records/locations` | Devuelve localizaciones únicas del dataset local |
-| GET | `/api/v1/carbon-emission-records/loadInitialData` | Inicializa datos si la colección está vacía |
+| GET | `/api/v1/health` | Checks API status |
+| GET | `/api/v1/carbon-emission-records` | Lists and filters records |
+| POST | `/api/v1/carbon-emission-records` | Creates a new record |
+| DELETE | `/api/v1/carbon-emission-records` | Deletes all records |
+| GET | `/api/v1/carbon-emission-records/:id` | Gets one record |
+| PUT | `/api/v1/carbon-emission-records/:id` | Updates one record |
+| DELETE | `/api/v1/carbon-emission-records/:id` | Deletes one record |
+| GET | `/api/v1/carbon-emission-records/locations` | Returns available local locations |
+| GET | `/api/v1/carbon-emission-records/loadInitialData` | Loads initial data only if the collection is empty |
+| GET | `/api/v1/carbon-emission-records/docs` | Redirects to the public Postman documentation portal |
 
-### Parámetros de consulta soportados
+### Query parameters
 
-| Parámetro | Descripción |
+| Parameter | Description |
 |---|---|
-| `location` | Filtra por localización mediante búsqueda flexible |
-| `period` | Filtra por un año concreto |
-| `fromPeriod` | Filtra desde un año inicial |
-| `toPeriod` | Filtra hasta un año final |
-| `limit` | Define el número máximo de registros devueltos |
-| `offset` | Define desde qué posición comienzan los resultados |
+| `location` | Filters by location using flexible search |
+| `period` | Filters by exact year |
+| `fromPeriod` | Filters from a starting year |
+| `toPeriod` | Filters up to an ending year |
+| `limit` | Number of records per page |
+| `offset` | Number of records skipped |
 
-Ejemplo:
+Example:
 
 ```http
 GET /api/v1/carbon-emission-records?location=Spain&fromPeriod=2020&toPeriod=2023&limit=50&offset=0
 ```
 
-El filtro de localización usa búsqueda flexible. Por ejemplo, una búsqueda por `Spain` puede devolver registros cuya localización original sea `Spain and Andorra`.
-
 ---
 
-## Integraciones externas
+## API documentation
 
-### Ember Energy - Yearly electricity generation
+Project API documentation:
 
-El backend incluye una integración externa con la API de Ember Energy mediante un proxy propio.
-
-| Endpoint | Descripción |
-|---|---|
-| `GET /api/v1/integrations/supported-locations` | Obtiene localizaciones compatibles entre Ember Energy y el dataset local |
-| `GET /api/v1/integrations/renewable-electricity` | Devuelve datos integrados de emisiones locales y generación eléctrica externa |
-
-Ejemplo:
-
-```http
-GET /api/v1/integrations/renewable-electricity?location=Spain&fromPeriod=2020&toPeriod=2023
+```txt
+docs/api.md
 ```
 
-La llamada a Ember se realiza desde el backend para no exponer la API key en Angular.
+Specific resource documentation:
 
-La ruta `/api/v1/integrations/supported-locations` obtiene dinámicamente las entidades disponibles en Ember Energy y las cruza con las localizaciones existentes en la colección local `carbon-emission-records`.
+```txt
+docs/carbon-emission-records-docs.md
+```
 
-Para evitar falsos positivos, el cruce entre ambas fuentes se realiza mediante coincidencia exacta normalizada y alias controlados para casos en los que la fuente local agrupa varios territorios.
+Public Postman documentation portal:
 
-Ejemplo:
+```txt
+https://documenter.getpostman.com/view/15287747/2sBXwyF6od
+```
 
-| Ember entity | Local CO₂ dataset location |
-|---|---|
-| Spain | Spain and Andorra |
-| France | France and Monaco |
-| Italy | Italy, San Marino and the Holy See |
-| Switzerland | Switzerland and Liechtenstein |
+The API also provides a redirect route:
 
----
-
-## Modelo de datos
-
-| Campo | Tipo | Descripción |
-|---|---|---|
-| `location` | String | Localización original tal y como aparece en la fuente |
-| `period` | Number | Año del registro |
-| `totalEmissionsMt` | Number | Emisiones totales de CO₂ en megatoneladas |
-| `emissionsIntensity` | Number o null | Intensidad de emisiones |
-| `emissionsPerCapita` | Number | Emisiones de CO₂ por habitante |
-| `annualVariation` | Number o null | Variación anual de emisiones |
-
-El modelo incluye una restricción para evitar duplicados con la misma combinación de `location` y `period`.
-
-Los campos `emissionsIntensity` y `annualVariation` pueden ser `null` cuando la fuente no dispone de ese dato.
+```txt
+GET /api/v1/carbon-emission-records/docs
+```
 
 ---
 
-## Frontend
+## Postman tests
 
-El frontend se ha creado con Angular y utiliza Angular Router.
-
-La aplicación permite actualmente:
-
-- Consultar registros de emisiones de CO₂ desde la API desplegada en Google App Engine.
-- Mostrar los datos en una tabla.
-- Filtrar por localización, año concreto y rango de años.
-- Aplicar filtros automáticamente al escribir.
-- Paginar resultados mediante `limit` y `offset`.
-- Crear nuevos registros desde una vista separada.
-- Editar registros existentes desde una vista separada.
-- Eliminar registros desde la tabla.
-- Mostrar mensajes de error devueltos por la API.
-- Consultar la integración externa con Ember Energy desde una vista Angular.
-- Seleccionar dinámicamente las localizaciones compatibles entre Ember Energy y el dataset local.
-- Mostrar visualizaciones con Highcharts.
-- Visualizar datos propios de emisiones de CO₂ por año.
-- Visualizar datos externos de Ember Energy por año.
-- Visualizar una gráfica combinada entre emisiones de CO₂ y datos externos de generación eléctrica.
-- Consultar una página de documentación integrada en la propia aplicación.
-
-Rutas principales:
-
-| Ruta | Descripción |
-|---|---|
-| `/` | Listado, búsqueda, paginación y acciones |
-| `/records/new` | Creación de un nuevo registro |
-| `/records/:id/edit` | Edición de un registro existente |
-| `/integrations/renewable-electricity` | Vista de integración externa con Ember Energy y visualizaciones |
-| `/documentation` | Página de documentación del proyecto y enlaces relevantes |
-
----
-
-## Documentación
-
-El proyecto incluye documentación adicional en la carpeta `docs/`:
-
-| Archivo | Descripción |
-|---|---|
-| `docs/diary.md` | Diario de desarrollo del proyecto |
-| `docs/api.md` | Documentación formal de la API con ejemplos de endpoints, respuestas y códigos de estado |
-| `docs/postman/DGSIN-2526-10.postman_collection.json` | Colección Postman con pruebas de API |
-
-La aplicación Angular incluye además una página `/documentation` que resume el proyecto y enlaza a la documentación del repositorio.
-
----
-
-## Pruebas
-
-Se ha preparado una colección Postman compatible con producción App Engine:
+The Postman collection is located at:
 
 ```txt
 docs/postman/DGSIN-2526-10.postman_collection.json
 ```
 
-La colección prueba:
+The collection tests:
 
 - Health check.
-- Listado y filtros de registros.
-- Localizaciones disponibles.
-- Creación, duplicado, consulta, actualización y borrado de un registro de prueba.
-- Localizaciones soportadas por la integración.
-- Integración con Ember Energy.
-- Error de localización no soportada.
-- Error de ruta inexistente.
+- GET collection.
+- GET collection with filters.
+- POST collection.
+- POST duplicate record returning `409 Conflict`.
+- POST invalid body returning `400 Bad Request` or `422 Unprocessable Entity`.
+- GET one record.
+- PUT one record.
+- PUT with body `_id` different from URL id returning `400 Bad Request`.
+- DELETE one record.
+- DELETE collection.
+- GET deleted record returning `404 Not Found`.
+- Method not allowed returning `405 Method Not Allowed`.
+- Initial data loading.
+- Postman documentation redirect.
+- Integration endpoints.
 
-Las pruebas incluyen comprobaciones de códigos de estado y estructura básica de las respuestas.
-
-Como evidencia de ejecución, se conserva una captura del Runner de Postman con el resultado de las pruebas ejecutadas contra producción:
+The final execution evidence is stored in:
 
 ```txt
 docs/postman/postman-run-results.png
 ```
 
----
-
-## Despliegue
-
-La aplicación completa se ha desplegado en Google App Engine. El backend Express sirve tanto la API REST como la aplicación Angular generada para producción, y accede a los datos almacenados en MongoDB Atlas.
-
-Durante el despliegue se resolvieron incidencias relacionadas con facturación, permisos sobre el bucket de staging y acceso de red desde App Engine hacia MongoDB Atlas.
+No Insomnia evidence is included in the final delivery.
 
 ---
 
-## Estado actual
+## Frontend routes
 
-El backend está desplegado en Google App Engine y conectado a MongoDB Atlas.
-
-La API `carbon-emission-records` dispone de operaciones CRUD, filtros, paginación, validaciones, gestión de errores, endpoint de localizaciones, inicialización de datos e integración externa con Ember Energy mediante proxy propio.
-
-El frontend Angular consume la API desplegada y permite listar, filtrar, crear, editar y eliminar registros. También incluye una vista de integración externa con visualizaciones Highcharts y una página de documentación integrada.
-
----
-
-## Próximos pasos
-
-- Revisar visualmente la aplicación para preparar la grabación del vídeo.
-- Enlazar el vídeo explicativo en la aplicación si se genera antes de la entrega.
-- Realizar una revisión final de la documentación antes de entregar.
+| Route | Description |
+|---|---|
+| `/` | Main records page |
+| `/records/new` | Create record page |
+| `/records/:id/edit` | Edit record page |
+| `/integrations` | List of available integrations |
+| `/integrations/renewable-electricity` | Ember Energy integration view |
+| `/analytics` | List of analytical widgets and links to chart views |
+| `/documentation` | Project documentation page |
+| `/about` | Project information and video status |
 
 ---
 
-## Notas de seguridad
+## Frontend functionality
 
-No deben subirse al repositorio:
+The Angular frontend includes:
+
+- Tab-based header navigation.
+- Active route highlighting.
+- Records listing.
+- Location suggestions using existing dataset locations.
+- Exact year filter.
+- Year range filter.
+- Pagination with items-per-page selector.
+- Clear, reload and search actions.
+- Create record form.
+- Edit record form.
+- Delete one record.
+- Delete all records.
+- Load initial data button.
+- Dynamic operation messages.
+- User-friendly error and success messages.
+- Highcharts visualizations.
+- External integration through backend proxy.
+- Documentation page.
+- About page.
+
+---
+
+## Visualizations
+
+The `/integrations/renewable-electricity` view includes three Highcharts visualizations:
+
+| Chart | Data source | Description |
+|---|---|---|
+| CO₂ emissions by year | Local API | Shows total CO₂ emissions by year |
+| Ember electricity data by year | External Ember Energy API | Shows yearly electricity data obtained through the proxy |
+| CO₂ emissions vs electricity generation | Local API + external API | Combines both sources in one chart using two Y axes |
+
+The `/analytics` page links directly to these visualizations using default query parameters:
+
+```txt
+location=Spain
+fromPeriod=2020
+toPeriod=2023
+```
+
+---
+
+## About page and project video
+
+The `/about` route includes project information and the status of the project video.
+
+Current video status:
+
+```txt
+The project video link is pending.
+```
+
+The documentation does not state that the video has been delivered.
+
+---
+
+## Delivery files
+
+The final activity requires the following files:
+
+```txt
+backend.zip
+frontend.zip
+summary.pdf
+detailed.pdf
+```
+
+The Toggl reports are:
+
+```txt
+summary.pdf
+detailed.pdf
+```
+
+The ZIP files should be generated after the final commit:
+
+```bash
+git archive --format=zip --output=backend.zip --prefix=backend/ HEAD:backend
+git archive --format=zip --output=frontend.zip --prefix=frontend/ HEAD:frontend
+```
+
+---
+
+## Security notes
+
+The following files and folders must not be uploaded to GitHub:
 
 ```txt
 backend/.env
@@ -438,7 +523,7 @@ frontend/node_modules/
 frontend/.angular/
 ```
 
-Sí se mantiene en el repositorio la plantilla:
+Only the safe deployment template should be uploaded:
 
 ```txt
 backend/app.example.yaml
