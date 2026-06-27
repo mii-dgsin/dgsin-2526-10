@@ -139,7 +139,91 @@
       </p>
     </div>
   </section>
+<section class="advanced-filters">
+  <h2>Advanced filters</h2>
 
+  <div class="numeric-filter-grid">
+    <fieldset class="range-group">
+      <legend>Total emissions Mt</legend>
+
+      <input
+        type="number"
+        step="0.001"
+        [(ngModel)]="minTotalEmissionsMt"
+        (ngModelChange)="onFiltersChanged()"
+        placeholder="Min"
+      />
+
+      <input
+        type="number"
+        step="0.001"
+        [(ngModel)]="maxTotalEmissionsMt"
+        (ngModelChange)="onFiltersChanged()"
+        placeholder="Max"
+      />
+    </fieldset>
+
+    <fieldset class="range-group">
+      <legend>Intensity</legend>
+
+      <input
+        type="number"
+        step="0.01"
+        [(ngModel)]="minEmissionsIntensity"
+        (ngModelChange)="onFiltersChanged()"
+        placeholder="Min"
+      />
+
+      <input
+        type="number"
+        step="0.01"
+        [(ngModel)]="maxEmissionsIntensity"
+        (ngModelChange)="onFiltersChanged()"
+        placeholder="Max"
+      />
+    </fieldset>
+
+    <fieldset class="range-group">
+      <legend>Per capita</legend>
+
+      <input
+        type="number"
+        step="0.01"
+        [(ngModel)]="minEmissionsPerCapita"
+        (ngModelChange)="onFiltersChanged()"
+        placeholder="Min"
+      />
+
+      <input
+        type="number"
+        step="0.01"
+        [(ngModel)]="maxEmissionsPerCapita"
+        (ngModelChange)="onFiltersChanged()"
+        placeholder="Max"
+      />
+    </fieldset>
+
+    <fieldset class="range-group">
+      <legend>Annual variation</legend>
+
+      <input
+        type="number"
+        step="0.01"
+        [(ngModel)]="minAnnualVariation"
+        (ngModelChange)="onFiltersChanged()"
+        placeholder="Min"
+      />
+
+      <input
+        type="number"
+        step="0.01"
+        [(ngModel)]="maxAnnualVariation"
+        (ngModelChange)="onFiltersChanged()"
+        placeholder="Max"
+      />
+    </fieldset>
+  </div>
+</section>
   <section class="results-panel">
     <div class="results-summary">
       <div class="page-size-control">

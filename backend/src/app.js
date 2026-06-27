@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
+const swaggerUi = require("swagger-ui-express");
+const YAML = require("yamljs");
 require("dotenv").config();
 
 const connectDB = require("./config/db");
@@ -11,6 +13,8 @@ const notFound = require("./middlewares/notFound.middleware");
 const app = express();
 
 connectDB();
+
+const openApiDocument = YAML.load(path.join(__dirname, "../docs/openapi.yaml"));
 
 app.use(cors());
 app.use(express.json());
@@ -27,11 +31,14 @@ app.get("/api/v1", (req, res) => {
       carbonEmissionRecordLocations: "/api/v1/carbon-emission-records/locations",
       loadInitialData: "/api/v1/carbon-emission-records/loadInitialData",
       postmanDocumentation: "/api/v1/carbon-emission-records/docs",
+      openApiDocumentation: "/api/v1/openapi",
       supportedIntegrationLocations: "/api/v1/integrations/supported-locations",
       renewableElectricityIntegration: "/api/v1/integrations/renewable-electricity"
     }
   });
 });
+
+app.use("/api/v1/openapi", swaggerUi.serve, swaggerUi.setup(openApiDocument));
 
 app.get("/api/v1/health", (req, res) => {
   res.json({

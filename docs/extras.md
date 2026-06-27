@@ -1,5 +1,9 @@
 # Actividades extra
 
+Este documento describe las actividades extra implementadas individualmente en el proyecto.
+
+---
+
 ## Extra 1 - Paginación con limit y offset
 
 La API implementa paginación mediante:
@@ -15,13 +19,18 @@ Ejemplo:
 GET /api/v1/carbon-emission-records?limit=10&offset=0
 ```
 
-El frontend permite navegar con página anterior, página siguiente y selector de elementos por página.
-
-Acceso:
+El frontend ofrece controles de paginación en la página principal:
 
 ```txt
 /
 ```
+
+El usuario puede:
+
+- Seleccionar el número de registros por página.
+- Ir a la página siguiente.
+- Ir a la página anterior.
+- Ver el rango actual de registros mostrados.
 
 Código relacionado:
 
@@ -32,9 +41,15 @@ frontend/src/app/pages/records-page/
 
 ---
 
-## Extra 2 - Automatización de pruebas backend con Newman
+## Extra 2 - Automatización de pruebas de backend con Newman
 
-Se ha añadido Newman como dependencia de desarrollo del backend.
+Se ha añadido Newman para automatizar la ejecución de la colección Postman.
+
+Script:
+
+```txt
+backend/package.json
+```
 
 Comando:
 
@@ -43,7 +58,7 @@ cd backend
 npm run test:postman
 ```
 
-Este script ejecuta:
+El script ejecuta:
 
 ```txt
 docs/postman/DGSIN-2526-10.postman_collection.json
@@ -61,19 +76,31 @@ docs/postman/newman-run-results.png
 
 La API se ha descrito usando OpenAPI 3.0.3.
 
-Archivo:
+Archivo de documentación del repositorio:
 
 ```txt
 docs/openapi.yaml
+```
+
+Copia usada por el backend desplegado:
+
+```txt
+backend/docs/openapi.yaml
+```
+
+Además, la especificación se visualiza con Swagger UI en:
+
+```txt
+https://dgsin-2526-10-mjcadenas.ew.r.appspot.com/api/v1/openapi
 ```
 
 La especificación documenta:
 
 - Health check.
 - API `carbon-emission-records`.
-- Operaciones sobre colección.
-- Operaciones sobre recurso concreto.
-- `loadInitialData`.
-- Redirección a documentación.
+- Operaciones requeridas sobre colección y recurso concreto.
+- Ruta `loadInitialData`.
+- Redirección a documentación Postman.
+- Códigos de estado relevantes.
 - Endpoints de integración.
-- Esquemas JSON.
+- Esquemas JSON de petición y respuesta.

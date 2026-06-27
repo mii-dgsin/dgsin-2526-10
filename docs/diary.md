@@ -38,34 +38,11 @@ Incluye:
 - Carga de datos iniciales.
 - Integración externa con Ember Energy mediante proxy backend.
 - Visualizaciones con Highcharts.
+- Normalización de datos externos de Ember para agrupar valores por año.
 - Pruebas Postman.
 - Automatización de pruebas con Newman.
 - Especificación OpenAPI.
-
----
-
-## Fuente de datos
-
-Fuente principal:
-
-```txt
-https://datosmacro.expansion.com/energia-y-medio-ambiente/emisiones-co2
-```
-
-El dataset contiene registros de emisiones de CO₂ por localización y año.
-
-Ejemplo:
-
-```json
-{
-  "location": "Spain and Andorra",
-  "period": 2022,
-  "totalEmissionsMt": 235.471,
-  "emissionsIntensity": 0.11,
-  "emissionsPerCapita": 5.07,
-  "annualVariation": -0.84
-}
-```
+- Swagger UI para visualizar la documentación OpenAPI.
 
 ---
 
@@ -81,6 +58,8 @@ Recurso elegido:
 carbon-emission-records
 ```
 
+---
+
 ### Avance 2 - Estructura del repositorio
 
 Se creó la estructura:
@@ -90,6 +69,8 @@ backend/
 frontend/
 docs/
 ```
+
+---
 
 ### Avance 3 - Backend inicial
 
@@ -102,6 +83,8 @@ GET /
 GET /api/v1/health
 ```
 
+---
+
 ### Avance 4 - MongoDB Atlas
 
 Se configuró MongoDB Atlas como base de datos en la nube.
@@ -111,6 +94,8 @@ La conexión se separó en:
 ```txt
 backend/src/config/db.js
 ```
+
+---
 
 ### Avance 5 - Modelo de datos
 
@@ -126,6 +111,8 @@ Campos principales:
 - `annualVariation`
 
 Se añadió unicidad por `location` y `period`.
+
+---
 
 ### Avance 6 - API REST
 
@@ -147,6 +134,8 @@ Operaciones implementadas:
 - GET `loadInitialData`.
 - GET redirección a documentación.
 
+---
+
 ### Avance 7 - Carga de datos iniciales
 
 Se creó el dataset inicial:
@@ -163,6 +152,8 @@ GET /api/v1/carbon-emission-records/loadInitialData
 
 carga datos solo si la colección está vacía.
 
+---
+
 ### Avance 8 - Validaciones y errores
 
 La API controla:
@@ -173,6 +164,8 @@ La API controla:
 - Recursos no encontrados.
 - Métodos no permitidos.
 - PUT con `_id` del cuerpo distinto al id de la URL.
+
+---
 
 ### Avance 9 - Modularización
 
@@ -188,6 +181,8 @@ services/
 config/
 ```
 
+---
+
 ### Avance 10 - Despliegue en App Engine
 
 La aplicación se desplegó en:
@@ -196,9 +191,13 @@ La aplicación se desplegó en:
 https://dgsin-2526-10-mjcadenas.ew.r.appspot.com
 ```
 
+---
+
 ### Avance 11 - Frontend Angular
 
 Se creó el frontend Angular y se conectó con la API desplegada.
+
+---
 
 ### Avance 12 - Página principal de registros
 
@@ -212,6 +211,8 @@ Se implementó la página `Carbon Emission Records` con:
 - Carga inicial.
 - Navegación a crear y editar.
 
+---
+
 ### Avance 13 - Crear registro
 
 Se añadió la ruta:
@@ -220,7 +221,11 @@ Se añadió la ruta:
 /records/new
 ```
 
-El formulario incluye sugerencias de localización.
+El formulario incluye sugerencias de localización y permite introducir una localización nueva.
+
+Se corrigió el campo de localización para que use `newRecord.location` como valor del formulario y `locations` únicamente como lista de sugerencias.
+
+---
 
 ### Avance 14 - Editar registro
 
@@ -232,6 +237,8 @@ Se añadió la ruta:
 
 La edición se realiza en una vista separada del listado.
 
+---
+
 ### Avance 15 - Mensajes de operación
 
 Se añadieron mensajes específicos:
@@ -241,6 +248,8 @@ Se añadieron mensajes específicos:
 - Deleting all records...
 - Loading initial data...
 - Refreshing records...
+
+---
 
 ### Avance 16 - Integración externa con Ember Energy
 
@@ -252,6 +261,8 @@ Endpoint:
 /api/v1/integrations/renewable-electricity
 ```
 
+---
+
 ### Avance 17 - Localizaciones soportadas
 
 Se añadió:
@@ -261,6 +272,8 @@ GET /api/v1/integrations/supported-locations
 ```
 
 para listar localizaciones compatibles entre el dataset local y Ember Energy.
+
+---
 
 ### Avance 18 - Vista de integración
 
@@ -272,7 +285,17 @@ Se creó la ruta:
 
 Incluye selector de localización, rango de años, tablas y gráficos.
 
-### Avance 19 - Analytics
+---
+
+### Avance 19 - Normalización de datos externos para gráficos
+
+Se ajustó la preparación de datos de Ember Energy para agrupar los registros externos por año antes de representarlos.
+
+Esto evita que Highcharts muestre años repetidos cuando la API externa devuelve varias filas para el mismo año.
+
+---
+
+### Avance 20 - Analytics
 
 Se añadió:
 
@@ -282,7 +305,9 @@ Se añadió:
 
 como lista de visualizaciones disponibles.
 
-### Avance 20 - Integrations
+---
+
+### Avance 21 - Integrations
 
 Se añadió:
 
@@ -292,7 +317,9 @@ Se añadió:
 
 como índice de integraciones.
 
-### Avance 21 - About
+---
+
+### Avance 22 - About
 
 Se añadió:
 
@@ -302,7 +329,9 @@ Se añadió:
 
 con información del proyecto y zona para el vídeo.
 
-### Avance 22 - Documentation
+---
+
+### Avance 23 - Documentation
 
 Se añadió:
 
@@ -310,23 +339,29 @@ Se añadió:
 /documentation
 ```
 
-con enlaces a documentación, GitHub y Postman.
+con enlaces a GitHub, aplicación desplegada, Postman, Swagger UI y documentos del repositorio.
 
-### Avance 23 - Visualizaciones Highcharts
+---
+
+### Avance 24 - Visualizaciones Highcharts
 
 Se añadieron tres gráficos:
 
 - CO₂ emissions by year.
 - Ember electricity data by year.
-- CO₂ emissions vs electricity generation.
+- CO₂ emissions vs Ember electricity data.
 
-### Avance 24 - Pruebas Postman
+---
+
+### Avance 25 - Pruebas Postman
 
 Se creó una colección Postman para probar la API desplegada.
 
 Las pruebas cubren operaciones correctas, errores básicos, duplicados, métodos no permitidos y endpoints de integración.
 
-### Avance 25 - Mejoras de interfaz
+---
+
+### Avance 26 - Mejoras de interfaz
 
 Se mejoró:
 
@@ -339,7 +374,9 @@ Se mejoró:
 - Página de documentación.
 - Página About.
 
-### Avance 26 - Angular servido desde backend
+---
+
+### Avance 27 - Angular servido desde backend
 
 Se compiló Angular y se copió en:
 
@@ -349,7 +386,9 @@ backend/public/
 
 para servir frontend y API desde el mismo App Engine.
 
-### Avance 27 - Newman
+---
+
+### Avance 28 - Newman
 
 Se añadió Newman y el script:
 
@@ -363,7 +402,9 @@ Evidencia:
 docs/postman/newman-run-results.png
 ```
 
-### Avance 28 - OpenAPI
+---
+
+### Avance 29 - OpenAPI
 
 Se creó:
 
@@ -373,7 +414,25 @@ docs/openapi.yaml
 
 con la especificación OpenAPI 3.0.3.
 
-### Avance 29 - Ruta índice de API
+---
+
+### Avance 30 - Swagger UI
+
+Se añadió Swagger UI en el backend para visualizar la especificación OpenAPI de forma gráfica:
+
+```txt
+GET /api/v1/openapi
+```
+
+Para que funcione en App Engine, se incluyó una copia del archivo OpenAPI en:
+
+```txt
+backend/docs/openapi.yaml
+```
+
+---
+
+### Avance 31 - Ruta índice de API
 
 Se añadió la ruta:
 
@@ -390,10 +449,12 @@ para devolver un índice informativo de los endpoints principales.
 - Express para una API REST modular.
 - MongoDB Atlas como persistencia cloud.
 - Angular Router para vistas separadas.
-- Proxy backend para consumir Ember Energy.
+- Proxy backend para consumir Ember Energy sin exponer la clave externa en el frontend.
 - Uso de `null` en valores no disponibles.
 - Postman y Newman para pruebas.
 - OpenAPI como documentación extra.
+- Swagger UI para mostrar la especificación OpenAPI de forma visual.
+- Copia de `openapi.yaml` en `backend/docs` porque el despliegue de App Engine se realiza desde `backend`.
 
 ---
 

@@ -14,23 +14,29 @@
     class="record-form"
     (ngSubmit)="createRecord()"
   >
-    <div class="field">
-      <label for="location">Location</label>
-      <input
-        id="location"
-        type="text"
-        [(ngModel)]="locations"
-        list="createRecordLocations"
-        placeholder="Example: Spain and Andorra"
-      />
+  <div class="field">
+    <label for="location">Location</label>
+    <input
+      id="location"
+      name="location"
+      type="text"
+      [(ngModel)]="newRecord.location"
+      list="createRecordLocations"
+      placeholder="Example: Spain and Andorra"
+      required
+    />
 
-      <datalist id="createRecordLocations">
-        <option *ngFor="let locationOption of locations" [value]="locationOption"></option>
-      </datalist>
-      <p class="field-help">
-        You can select an existing location or type a new one.
-      </p>
-    </div>
+    <datalist id="createRecordLocations">
+      <option
+        *ngFor="let locationOption of locations"
+        [value]="locationOption"
+      ></option>
+    </datalist>
+
+    <p class="field-help">
+      You can select an existing location or type a new one.
+    </p>
+  </div>
 
     <div class="field">
       <label for="period">Year</label>

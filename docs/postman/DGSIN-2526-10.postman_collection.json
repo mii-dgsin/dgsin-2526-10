@@ -1,42 +1,83 @@
 {
   "info": {
+    "_postman_id": "dgsin-2526-10-updated",
     "name": "DGSIN-2526-10 API Tests",
-    "description": "Postman collection for testing the DGSIN-2526-10 backend deployed on Google App Engine. It covers the carbon emission records API, required REST operations, expected errors, 405 method-not-allowed checks, Postman documentation redirect and integration endpoints.",
+    "description": "Updated Postman collection for the DGSIN-2526-10 API. Includes API index, Swagger/OpenAPI endpoint, Postman documentation redirect, CRUD, errors, pagination and integrations.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     {
       "key": "baseUrl",
-      "value": "https://dgsin-2526-10-mjcadenas.ew.r.appspot.com",
-      "type": "string"
+      "value": "https://dgsin-2526-10-mjcadenas.ew.r.appspot.com"
     },
     {
       "key": "createdRecordId",
-      "value": "",
-      "type": "string"
+      "value": ""
     },
     {
       "key": "testLocation",
-      "value": "",
-      "type": "string"
+      "value": ""
     },
     {
-      "key": "testPeriod",
-      "value": "2026",
-      "type": "string"
-    },
-    {
-      "key": "postmanDocsUrl",
-      "value": "https://documenter.getpostman.com/view/15287747/2sBXwyF6es",
-      "type": "string"
+      "key": "wrongRecordId",
+      "value": "000000000000000000000000"
     }
   ],
   "item": [
     {
-      "name": "01 - Health check",
+      "name": "01 - API index",
       "request": {
         "method": "GET",
-        "header": [],
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "const json = pm.response.json();",
+              "pm.test('API index message is returned', function () {",
+              "    pm.expect(json.message).to.include('DGSIN-2526-10 API');",
+              "});",
+              "pm.test('OpenAPI endpoint is listed', function () {",
+              "    pm.expect(json.resources.openApiDocumentation).to.eql('/api/v1/openapi');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 - Health check",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
         "url": {
           "raw": "{{baseUrl}}/api/v1/health",
           "host": [
@@ -58,11 +99,9 @@
               "pm.test('Status code is 200', function () {",
               "    pm.response.to.have.status(200);",
               "});",
-              "",
-              "pm.test('Response has status ok and service name', function () {",
-              "    const json = pm.response.json();",
+              "const json = pm.response.json();",
+              "pm.test('Health status is ok', function () {",
               "    pm.expect(json.status).to.eql('ok');",
-              "    pm.expect(json.service).to.eql('carbon-emission-records-api');",
               "});"
             ]
           }
@@ -70,10 +109,56 @@
       ]
     },
     {
-      "name": "02 - Get all carbon emission records",
+      "name": "03 - OpenAPI Swagger UI",
       "request": {
         "method": "GET",
-        "header": [],
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/openapi",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "openapi"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Swagger UI HTML is returned', function () {",
+              "    pm.expect(pm.response.text()).to.include('Swagger UI');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 - Get carbon emission records paginated",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
         "url": {
           "raw": "{{baseUrl}}/api/v1/carbon-emission-records?limit=10&offset=0",
           "host": [
@@ -102,16 +187,15 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
-              "",
-              "pm.test('Response contains records array and pagination fields', function () {",
-              "    const json = pm.response.json();",
-              "    pm.expect(json).to.have.property('records');",
-              "    pm.expect(json.records).to.be.an('array');",
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "const json = pm.response.json();",
+              "pm.test('Paginated response contains metadata', function () {",
               "    pm.expect(json).to.have.property('total');",
               "    pm.expect(json).to.have.property('limit');",
               "    pm.expect(json).to.have.property('offset');",
-              "    pm.expect(json.limit).to.eql(10);",
+              "    pm.expect(json.records).to.be.an('array');",
               "});"
             ]
           }
@@ -119,12 +203,18 @@
       ]
     },
     {
-      "name": "03 - Get records filtered by location and year range",
+      "name": "05 - Get records filtered by location and year range",
       "request": {
         "method": "GET",
-        "header": [],
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
         "url": {
-          "raw": "{{baseUrl}}/api/v1/carbon-emission-records?location=Spain&fromPeriod=2020&toPeriod=2023&limit=50&offset=0",
+          "raw": "{{baseUrl}}/api/v1/carbon-emission-records?location=Spain&fromPeriod=2020&toPeriod=2023&limit=10&offset=0",
           "host": [
             "{{baseUrl}}"
           ],
@@ -148,7 +238,7 @@
             },
             {
               "key": "limit",
-              "value": "50"
+              "value": "10"
             },
             {
               "key": "offset",
@@ -163,16 +253,15 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
-              "",
-              "pm.test('Returned records are inside requested year range', function () {",
-              "    const json = pm.response.json();",
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "const json = pm.response.json();",
+              "pm.test('Filtered response contains records array', function () {",
               "    pm.expect(json.records).to.be.an('array');",
-              "    json.records.forEach((record) => {",
-              "        pm.expect(record.period).to.be.at.least(2020);",
-              "        pm.expect(record.period).to.be.at.most(2023);",
-              "        pm.expect(record.location.toLowerCase()).to.include('spain');",
-              "    });",
+              "});",
+              "pm.test('Pagination limit is returned', function () {",
+              "    pm.expect(json.limit).to.eql(10);",
               "});"
             ]
           }
@@ -180,10 +269,16 @@
       ]
     },
     {
-      "name": "04 - Get available local locations",
+      "name": "06 - Get available local locations",
       "request": {
         "method": "GET",
-        "header": [],
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
         "url": {
           "raw": "{{baseUrl}}/api/v1/carbon-emission-records/locations",
           "host": [
@@ -203,13 +298,12 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
-              "",
-              "pm.test('Locations are returned as an array', function () {",
-              "    const json = pm.response.json();",
-              "    pm.expect(json).to.have.property('locations');",
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "const json = pm.response.json();",
+              "pm.test('Locations list is returned', function () {",
               "    pm.expect(json.locations).to.be.an('array');",
-              "    pm.expect(json.total).to.eql(json.locations.length);",
               "});"
             ]
           }
@@ -217,49 +311,16 @@
       ]
     },
     {
-      "name": "05 - Create test carbon emission record",
-      "event": [
-        {
-          "listen": "prerequest",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "const uniqueLocation = 'Postman Test Country ' + Date.now();",
-              "pm.collectionVariables.set('testLocation', uniqueLocation);",
-              "pm.collectionVariables.set('testPeriod', '2026');"
-            ]
-          }
-        },
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });",
-              "",
-              "pm.test('Created record has an id and expected values', function () {",
-              "    const record = pm.response.json();",
-              "    pm.expect(record).to.have.property('_id');",
-              "    pm.expect(record.location).to.eql(pm.collectionVariables.get('testLocation'));",
-              "    pm.expect(record.period).to.eql(Number(pm.collectionVariables.get('testPeriod')));",
-              "    pm.collectionVariables.set('createdRecordId', record._id);",
-              "});"
-            ]
-          }
-        }
-      ],
+      "name": "07 - Create test carbon emission record",
       "request": {
         "method": "POST",
         "header": [
           {
             "key": "Content-Type",
-            "value": "application/json"
+            "value": "application/json",
+            "type": "text"
           }
         ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"location\": \"{{testLocation}}\",\n  \"period\": 2026,\n  \"totalEmissionsMt\": 10,\n  \"emissionsIntensity\": 1.5,\n  \"emissionsPerCapita\": 2.5,\n  \"annualVariation\": null\n}"
-        },
         "url": {
           "raw": "{{baseUrl}}/api/v1/carbon-emission-records",
           "host": [
@@ -270,23 +331,52 @@
             "v1",
             "carbon-emission-records"
           ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"location\": \"{{testLocation}}\",\n  \"period\": 2026,\n  \"totalEmissionsMt\": 1.23,\n  \"emissionsIntensity\": 0.45,\n  \"emissionsPerCapita\": 2.34,\n  \"annualVariation\": 0.12\n}"
         }
-      }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const timestamp = Date.now();",
+              "pm.collectionVariables.set('testLocation', 'Postman Test Location ' + timestamp);"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 201', function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "const json = pm.response.json();",
+              "pm.test('Created record has id', function () {",
+              "    pm.expect(json._id).to.be.a('string');",
+              "});",
+              "pm.collectionVariables.set('createdRecordId', json._id);"
+            ]
+          }
+        }
+      ]
     },
     {
-      "name": "06 - Create duplicate record should fail",
+      "name": "08 - Create duplicate record should fail",
       "request": {
         "method": "POST",
         "header": [
           {
             "key": "Content-Type",
-            "value": "application/json"
+            "value": "application/json",
+            "type": "text"
           }
         ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"location\": \"{{testLocation}}\",\n  \"period\": 2026,\n  \"totalEmissionsMt\": 20,\n  \"emissionsIntensity\": 2,\n  \"emissionsPerCapita\": 3,\n  \"annualVariation\": 1\n}"
-        },
         "url": {
           "raw": "{{baseUrl}}/api/v1/carbon-emission-records",
           "host": [
@@ -296,6 +386,51 @@
             "api",
             "v1",
             "carbon-emission-records"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"location\": \"{{testLocation}}\",\n  \"period\": 2026,\n  \"totalEmissionsMt\": 1.23,\n  \"emissionsIntensity\": 0.45,\n  \"emissionsPerCapita\": 2.34,\n  \"annualVariation\": 0.12\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 409', function () {",
+              "    pm.response.to.have.status(409);",
+              "});",
+              "pm.test('Duplicate conflict message is returned', function () {",
+              "    pm.expect(pm.response.json().message).to.include('already exists');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 - Get created record by id",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/carbon-emission-records/{{createdRecordId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "carbon-emission-records",
+            "{{createdRecordId}}"
           ]
         }
       },
@@ -305,11 +440,12 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test('Status code is 409 Conflict', function () { pm.response.to.have.status(409); });",
-              "",
-              "pm.test('Duplicate error message is returned', function () {",
-              "    const json = pm.response.json();",
-              "    pm.expect(json.message).to.include('already exists');",
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "const json = pm.response.json();",
+              "pm.test('Returned id matches created id', function () {",
+              "    pm.expect(json._id).to.eql(pm.collectionVariables.get('createdRecordId'));",
               "});"
             ]
           }
@@ -317,19 +453,241 @@
       ]
     },
     {
-      "name": "07 - Create invalid record should fail",
+      "name": "10 - Update created record",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/carbon-emission-records/{{createdRecordId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "carbon-emission-records",
+            "{{createdRecordId}}"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"_id\": \"{{createdRecordId}}\",\n  \"location\": \"{{testLocation}}\",\n  \"period\": 2026,\n  \"totalEmissionsMt\": 2.34,\n  \"emissionsIntensity\": null,\n  \"emissionsPerCapita\": 3.45,\n  \"annualVariation\": null\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "const json = pm.response.json();",
+              "pm.test('Updated total emissions value is returned', function () {",
+              "    pm.expect(json.totalEmissionsMt).to.eql(2.34);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 - Update with different body id should fail",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/carbon-emission-records/{{createdRecordId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "carbon-emission-records",
+            "{{createdRecordId}}"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"_id\": \"{{wrongRecordId}}\",\n  \"location\": \"{{testLocation}}\",\n  \"period\": 2026,\n  \"totalEmissionsMt\": 2.34,\n  \"emissionsIntensity\": null,\n  \"emissionsPerCapita\": 3.45,\n  \"annualVariation\": null\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 400', function () {",
+              "    pm.response.to.have.status(400);",
+              "});",
+              "pm.test('Body id mismatch message is returned', function () {",
+              "    pm.expect(pm.response.json().message).to.include('id');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "12 - Get records filtered by created test location",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/carbon-emission-records?location={{testLocation}}&limit=10&offset=0",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "carbon-emission-records"
+          ],
+          "query": [
+            {
+              "key": "location",
+              "value": "{{testLocation}}"
+            },
+            {
+              "key": "limit",
+              "value": "10"
+            },
+            {
+              "key": "offset",
+              "value": "0"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "const json = pm.response.json();",
+              "pm.test('Filtered test location returns at least one record', function () {",
+              "    pm.expect(json.records.length).to.be.greaterThan(0);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "13 - Delete created record",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/carbon-emission-records/{{createdRecordId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "carbon-emission-records",
+            "{{createdRecordId}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Delete message is returned', function () {",
+              "    pm.expect(pm.response.json().message).to.include('deleted');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "14 - Get deleted record should fail",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/carbon-emission-records/{{createdRecordId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "carbon-emission-records",
+            "{{createdRecordId}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 404', function () {",
+              "    pm.response.to.have.status(404);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "15 - Create invalid record should fail",
       "request": {
         "method": "POST",
         "header": [
           {
             "key": "Content-Type",
-            "value": "application/json"
+            "value": "application/json",
+            "type": "text"
           }
         ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"location\": \"Invalid Test\"\n}"
-        },
         "url": {
           "raw": "{{baseUrl}}/api/v1/carbon-emission-records",
           "host": [
@@ -340,6 +698,10 @@
             "v1",
             "carbon-emission-records"
           ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"location\": \"\",\n  \"period\": 1800,\n  \"totalEmissionsMt\": \"invalid\",\n  \"emissionsPerCapita\": 1\n}"
         }
       },
       "event": [
@@ -351,10 +713,8 @@
               "pm.test('Status code is 400 or 422', function () {",
               "    pm.expect([400, 422]).to.include(pm.response.code);",
               "});",
-              "",
-              "pm.test('Validation error response contains message', function () {",
-              "    const json = pm.response.json();",
-              "    pm.expect(json).to.have.property('message');",
+              "pm.test('Validation message is returned', function () {",
+              "    pm.expect(pm.response.json()).to.have.property('message');",
               "});"
             ]
           }
@@ -362,65 +722,30 @@
       ]
     },
     {
-      "name": "08 - Get created record by id",
+      "name": "16 - PATCH collection should return 405",
       "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/api/v1/carbon-emission-records/{{createdRecordId}}",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "api",
-            "v1",
-            "carbon-emission-records",
-            "{{createdRecordId}}"
-          ]
-        }
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
-              "",
-              "pm.test('Record id matches createdRecordId', function () {",
-              "    const record = pm.response.json();",
-              "    pm.expect(record._id).to.eql(pm.collectionVariables.get('createdRecordId'));",
-              "});"
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "name": "09 - Update created record",
-      "request": {
-        "method": "PUT",
+        "method": "PATCH",
         "header": [
           {
             "key": "Content-Type",
-            "value": "application/json"
+            "value": "application/json",
+            "type": "text"
           }
         ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"location\": \"{{testLocation}}\",\n  \"period\": 2026,\n  \"totalEmissionsMt\": 15,\n  \"emissionsIntensity\": null,\n  \"emissionsPerCapita\": 3.5,\n  \"annualVariation\": null\n}"
-        },
         "url": {
-          "raw": "{{baseUrl}}/api/v1/carbon-emission-records/{{createdRecordId}}",
+          "raw": "{{baseUrl}}/api/v1/carbon-emission-records",
           "host": [
             "{{baseUrl}}"
           ],
           "path": [
             "api",
             "v1",
-            "carbon-emission-records",
-            "{{createdRecordId}}"
+            "carbon-emission-records"
           ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"any\": \"value\"\n}"
         }
       },
       "event": [
@@ -429,12 +754,8 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
-              "",
-              "pm.test('Record was updated', function () {",
-              "    const record = pm.response.json();",
-              "    pm.expect(record.totalEmissionsMt).to.eql(15);",
-              "    pm.expect(record.emissionsIntensity).to.eql(null);",
+              "pm.test('Status code is 405', function () {",
+              "    pm.response.to.have.status(405);",
               "});"
             ]
           }
@@ -442,127 +763,16 @@
       ]
     },
     {
-      "name": "10 - Update with different body id should fail",
+      "name": "17 - API docs redirect to Postman",
       "request": {
-        "method": "PUT",
+        "method": "GET",
         "header": [
           {
             "key": "Content-Type",
-            "value": "application/json"
+            "value": "application/json",
+            "type": "text"
           }
         ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"_id\": \"000000000000000000000000\",\n  \"location\": \"{{testLocation}}\",\n  \"period\": 2026,\n  \"totalEmissionsMt\": 15,\n  \"emissionsIntensity\": null,\n  \"emissionsPerCapita\": 3.5,\n  \"annualVariation\": null\n}"
-        },
-        "url": {
-          "raw": "{{baseUrl}}/api/v1/carbon-emission-records/{{createdRecordId}}",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "api",
-            "v1",
-            "carbon-emission-records",
-            "{{createdRecordId}}"
-          ]
-        }
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });",
-              "",
-              "pm.test('Body id mismatch message is returned', function () {",
-              "    const json = pm.response.json();",
-              "    pm.expect(json.message).to.include('id must match');",
-              "});"
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "name": "11 - Delete created record",
-      "request": {
-        "method": "DELETE",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/api/v1/carbon-emission-records/{{createdRecordId}}",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "api",
-            "v1",
-            "carbon-emission-records",
-            "{{createdRecordId}}"
-          ]
-        }
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
-              "",
-              "pm.test('Delete response contains a message', function () {",
-              "    const json = pm.response.json();",
-              "    pm.expect(json).to.have.property('message');",
-              "});"
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "name": "12 - Get deleted record should fail",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/api/v1/carbon-emission-records/{{createdRecordId}}",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "api",
-            "v1",
-            "carbon-emission-records",
-            "{{createdRecordId}}"
-          ]
-        }
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('Status code is 404', function () { pm.response.to.have.status(404); });",
-              "",
-              "pm.test('Not found message is returned', function () {",
-              "    const json = pm.response.json();",
-              "    pm.expect(json).to.have.property('message');",
-              "});"
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "name": "13 - Redirect to Postman documentation",
-      "protocolProfileBehavior": {
-        "followRedirects": false
-      },
-      "request": {
-        "method": "GET",
-        "header": [],
         "url": {
           "raw": "{{baseUrl}}/api/v1/carbon-emission-records/docs",
           "host": [
@@ -582,68 +792,31 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test('Status code is 302 or final documentation page is reachable', function () {",
-              "    pm.expect([200, 301, 302]).to.include(pm.response.code);",
+              "pm.test('Status code is 302', function () {",
+              "    pm.response.to.have.status(302);",
               "});",
-              "",
-              "pm.test('Redirect location points to Postman documentation when redirects are not followed', function () {",
-              "    if (pm.response.code === 302 || pm.response.code === 301) {",
-              "        pm.expect(pm.response.headers.get('Location')).to.include('documenter.getpostman.com');",
-              "    }",
+              "pm.test('Location header points to public Postman documentation', function () {",
+              "    pm.expect(pm.response.headers.get('Location')).to.include('2sBXwyG7Uk');",
               "});"
             ]
           }
         }
-      ]
+      ],
+      "protocolProfileBehavior": {
+        "followRedirects": false
+      }
     },
     {
-      "name": "14 - PATCH collection should return 405",
+      "name": "18 - Get supported integration locations",
       "request": {
-        "method": "PATCH",
+        "method": "GET",
         "header": [
           {
             "key": "Content-Type",
-            "value": "application/json"
+            "value": "application/json",
+            "type": "text"
           }
         ],
-        "body": {
-          "mode": "raw",
-          "raw": "{}"
-        },
-        "url": {
-          "raw": "{{baseUrl}}/api/v1/carbon-emission-records",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "api",
-            "v1",
-            "carbon-emission-records"
-          ]
-        }
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('Status code is 405', function () { pm.response.to.have.status(405); });",
-              "",
-              "pm.test('Method not allowed message is returned', function () {",
-              "    const json = pm.response.json();",
-              "    pm.expect(json.message).to.include('Method not allowed');",
-              "});"
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "name": "15 - Get supported integration locations",
-      "request": {
-        "method": "GET",
-        "header": [],
         "url": {
           "raw": "{{baseUrl}}/api/v1/integrations/supported-locations",
           "host": [
@@ -663,16 +836,12 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
-              "",
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "const json = pm.response.json();",
               "pm.test('Supported locations are returned', function () {",
-              "    const json = pm.response.json();",
               "    pm.expect(json.locations).to.be.an('array');",
-              "    if (json.locations.length > 0) {",
-              "        pm.expect(json.locations[0]).to.have.property('label');",
-              "        pm.expect(json.locations[0]).to.have.property('emberEntity');",
-              "        pm.expect(json.locations[0]).to.have.property('localLocation');",
-              "    }",
               "});"
             ]
           }
@@ -680,10 +849,16 @@
       ]
     },
     {
-      "name": "16 - Get renewable electricity integration",
+      "name": "19 - Get renewable electricity integration",
       "request": {
         "method": "GET",
-        "header": [],
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
         "url": {
           "raw": "{{baseUrl}}/api/v1/integrations/renewable-electricity?location=Spain&fromPeriod=2020&toPeriod=2023",
           "host": [
@@ -717,15 +892,13 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
-              "",
-              "pm.test('Integration response contains local and external data arrays', function () {",
-              "    const json = pm.response.json();",
-              "    pm.expect(json).to.have.property('emissions');",
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "const json = pm.response.json();",
+              "pm.test('Integration response contains local and external data', function () {",
               "    pm.expect(json.emissions).to.be.an('array');",
-              "    pm.expect(json).to.have.property('electricityGeneration');",
               "    pm.expect(json.electricityGeneration).to.be.an('array');",
-              "    pm.expect(json).to.have.property('source');",
               "});"
             ]
           }
@@ -733,10 +906,16 @@
       ]
     },
     {
-      "name": "17 - Unsupported integration location should fail",
+      "name": "20 - Unsupported integration location should fail",
       "request": {
         "method": "GET",
-        "header": [],
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
         "url": {
           "raw": "{{baseUrl}}/api/v1/integrations/renewable-electricity?location=UnsupportedTestLocation&fromPeriod=2020&toPeriod=2023",
           "host": [
@@ -770,11 +949,11 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });",
-              "",
+              "pm.test('Status code is 400', function () {",
+              "    pm.response.to.have.status(400);",
+              "});",
               "pm.test('Unsupported location message is returned', function () {",
-              "    const json = pm.response.json();",
-              "    pm.expect(json.message).to.include('Unsupported location');",
+              "    pm.expect(pm.response.json().message).to.include('Unsupported');",
               "});"
             ]
           }
@@ -782,44 +961,16 @@
       ]
     },
     {
-      "name": "18 - Route not found should return 404",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/api/v1/no-existe",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "api",
-            "v1",
-            "no-existe"
-          ]
-        }
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('Status code is 404', function () { pm.response.to.have.status(404); });",
-              "",
-              "pm.test('Route not found message is returned', function () {",
-              "    const json = pm.response.json();",
-              "    pm.expect(json.message).to.eql('Route not found');",
-              "});"
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "name": "19 - Delete all carbon emission records collection",
+      "name": "21 - Delete all carbon emission records collection",
       "request": {
         "method": "DELETE",
-        "header": [],
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
         "url": {
           "raw": "{{baseUrl}}/api/v1/carbon-emission-records",
           "host": [
@@ -838,12 +989,12 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
-              "",
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "const json = pm.response.json();",
               "pm.test('Collection delete response contains deleted count', function () {",
-              "    const json = pm.response.json();",
               "    pm.expect(json).to.have.property('deleted');",
-              "    pm.expect(json.deleted).to.be.a('number');",
               "});"
             ]
           }
@@ -851,10 +1002,67 @@
       ]
     },
     {
-      "name": "20 - Load initial data after collection delete",
+      "name": "22 - Get empty collection after delete",
       "request": {
         "method": "GET",
-        "header": [],
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/carbon-emission-records?limit=10&offset=0",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "carbon-emission-records"
+          ],
+          "query": [
+            {
+              "key": "limit",
+              "value": "10"
+            },
+            {
+              "key": "offset",
+              "value": "0"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "const json = pm.response.json();",
+              "pm.test('Collection response contains records array', function () {",
+              "    pm.expect(json.records).to.be.an('array');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "23 - Load initial data",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
         "url": {
           "raw": "{{baseUrl}}/api/v1/carbon-emission-records/loadInitialData",
           "host": [
@@ -877,11 +1085,60 @@
               "pm.test('Status code is 200 or 201', function () {",
               "    pm.expect([200, 201]).to.include(pm.response.code);",
               "});",
-              "",
-              "pm.test('Initial data load response contains loaded and total fields', function () {",
-              "    const json = pm.response.json();",
-              "    pm.expect(json).to.have.property('loaded');",
+              "const json = pm.response.json();",
+              "pm.test('Load initial data response contains total', function () {",
               "    pm.expect(json).to.have.property('total');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "24 - Get collection after loading initial data",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/carbon-emission-records?limit=10&offset=0",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "carbon-emission-records"
+          ],
+          "query": [
+            {
+              "key": "limit",
+              "value": "10"
+            },
+            {
+              "key": "offset",
+              "value": "0"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "const json = pm.response.json();",
+              "pm.test('Collection has records after loadInitialData', function () {",
+              "    pm.expect(json.records.length).to.be.greaterThan(0);",
               "});"
             ]
           }

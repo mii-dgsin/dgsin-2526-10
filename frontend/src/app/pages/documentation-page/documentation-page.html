@@ -16,7 +16,7 @@
     </p>
 
     <p>
-      The main data source is a structured HTML dataset about CO₂ emissions. The project
+      The main data source is a structured dataset about CO₂ emissions. The project
       also integrates an external API from Ember Energy through a backend proxy, avoiding
       the exposure of the external API key in the frontend.
     </p>
@@ -89,6 +89,11 @@
           </tr>
 
           <tr>
+            <td><a routerLink="/integrations">/integrations</a></td>
+            <td>Available integrations index.</td>
+          </tr>
+
+          <tr>
             <td>
               <a routerLink="/integrations/renewable-electricity">
                 /integrations/renewable-electricity
@@ -98,8 +103,18 @@
           </tr>
 
           <tr>
+            <td><a routerLink="/analytics">/analytics</a></td>
+            <td>Analytical widgets and chart links.</td>
+          </tr>
+
+          <tr>
             <td><a routerLink="/documentation">/documentation</a></td>
             <td>Project documentation and useful links.</td>
+          </tr>
+
+          <tr>
+            <td><a routerLink="/about">/about</a></td>
+            <td>Project information and video link/status.</td>
           </tr>
         </tbody>
       </table>
@@ -122,8 +137,20 @@
         <tbody>
           <tr>
             <td>GET</td>
+            <td><code>/api/v1</code></td>
+            <td>Returns a JSON index with the main API resources.</td>
+          </tr>
+
+          <tr>
+            <td>GET</td>
             <td><code>/api/v1/health</code></td>
             <td>Checks API status.</td>
+          </tr>
+
+          <tr>
+            <td>GET</td>
+            <td><code>/api/v1/openapi</code></td>
+            <td>Shows the OpenAPI documentation using Swagger UI.</td>
           </tr>
 
           <tr>
@@ -136,6 +163,18 @@
             <td>POST</td>
             <td><code>/api/v1/carbon-emission-records</code></td>
             <td>Creates a new CO₂ emission record.</td>
+          </tr>
+
+          <tr>
+            <td>DELETE</td>
+            <td><code>/api/v1/carbon-emission-records</code></td>
+            <td>Deletes all CO₂ emission records.</td>
+          </tr>
+
+          <tr>
+            <td>GET</td>
+            <td><code>/api/v1/carbon-emission-records/:id</code></td>
+            <td>Gets an existing CO₂ emission record.</td>
           </tr>
 
           <tr>
@@ -154,6 +193,18 @@
             <td>GET</td>
             <td><code>/api/v1/carbon-emission-records/locations</code></td>
             <td>Returns available local dataset locations.</td>
+          </tr>
+
+          <tr>
+            <td>GET</td>
+            <td><code>/api/v1/carbon-emission-records/loadInitialData</code></td>
+            <td>Loads the initial dataset only if the collection is empty.</td>
+          </tr>
+
+          <tr>
+            <td>GET</td>
+            <td><code>/api/v1/carbon-emission-records/docs</code></td>
+            <td>Redirects to the public Postman documentation portal.</td>
           </tr>
 
           <tr>
@@ -181,7 +232,19 @@
       </a>
 
       <a [href]="appEngineUrl" target="_blank" rel="noopener noreferrer">
-        Deployed API
+        Deployed application
+      </a>
+
+      <a [href]="apiIndexUrl" target="_blank" rel="noopener noreferrer">
+        API index
+      </a>
+
+      <a [href]="postmanDocumentationUrl" target="_blank" rel="noopener noreferrer">
+        Postman public documentation
+      </a>
+
+      <a [href]="openApiDocumentationUrl" target="_blank" rel="noopener noreferrer">
+        OpenAPI documentation
       </a>
     </div>
   </section>

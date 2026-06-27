@@ -2,7 +2,7 @@ const initialCarbonEmissionRecords = require("../../data/carbonEmissionRecords.j
 const CarbonEmissionRecord = require("../models/carbonEmissionRecord.model");
 
 const POSTMAN_DOCUMENTATION_URL =
-  "https://documenter.getpostman.com/view/15287747/2sBXwyF6es";
+  "https://documenter.getpostman.com/view/15287747/2sBXwyG7Uk";
 
 const loadInitialCarbonEmissionRecords = async (req, res) => {
   try {
@@ -42,8 +42,22 @@ const redirectCarbonEmissionRecordDocs = (req, res) => {
 
 const getCarbonEmissionRecords = async (req, res) => {
   try {
-    const { location, period, fromPeriod, toPeriod, limit = 50, offset = 0 } =
-      req.query;
+    const {
+      location,
+      period,
+      fromPeriod,
+      toPeriod,
+      minTotalEmissionsMt,
+      maxTotalEmissionsMt,
+      minEmissionsIntensity,
+      maxEmissionsIntensity,
+      minEmissionsPerCapita,
+      maxEmissionsPerCapita,
+      minAnnualVariation,
+      maxAnnualVariation,
+      limit = 50,
+      offset = 0
+    } = req.query;
 
     const filter = {};
 
@@ -64,6 +78,53 @@ const getCarbonEmissionRecords = async (req, res) => {
 
       if (toPeriod) {
         filter.period.$lte = Number(toPeriod);
+      }
+      if (minTotalEmissionsMt || maxTotalEmissionsMt) {
+        filters.totalEmissionsMt = {};
+
+        if (minTotalEmissionsMt) {
+          filters.totalEmissionsMt.$gte = Number(minTotalEmissionsMt);
+        }
+
+        if (maxTotalEmissionsMt) {
+          filters.totalEmissionsMt.$lte = Number(maxTotalEmissionsMt);
+        }
+      }
+
+      if (minEmissionsIntensity || maxEmissionsIntensity) {
+        filters.emissionsIntensity = {};
+
+        if (minEmissionsIntensity) {
+          filters.emissionsIntensity.$gte = Number(minEmissionsIntensity);
+        }
+
+        if (maxEmissionsIntensity) {
+          filters.emissionsIntensity.$lte = Number(maxEmissionsIntensity);
+        }
+      }
+
+      if (minEmissionsPerCapita || maxEmissionsPerCapita) {
+        filters.emissionsPerCapita = {};
+
+        if (minEmissionsPerCapita) {
+          filters.emissionsPerCapita.$gte = Number(minEmissionsPerCapita);
+        }
+
+        if (maxEmissionsPerCapita) {
+          filters.emissionsPerCapita.$lte = Number(maxEmissionsPerCapita);
+        }
+      }
+
+      if (minAnnualVariation || maxAnnualVariation) {
+        filters.annualVariation = {};
+
+        if (minAnnualVariation) {
+          filters.annualVariation.$gte = Number(minAnnualVariation);
+        }
+
+        if (maxAnnualVariation) {
+          filters.annualVariation.$lte = Number(maxAnnualVariation);
+        }
       }
     }
 

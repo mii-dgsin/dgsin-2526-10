@@ -28,7 +28,17 @@ export class RecordsPage implements OnInit {
   period = '';
   fromPeriod = '';
   toPeriod = '';
+  minTotalEmissionsMt = '';
+  maxTotalEmissionsMt = '';
 
+  minEmissionsIntensity = '';
+  maxEmissionsIntensity = '';
+
+  minEmissionsPerCapita = '';
+  maxEmissionsPerCapita = '';
+
+  minAnnualVariation = '';
+  maxAnnualVariation = '';
   limit = 10;
   offset = 0;
 
@@ -143,15 +153,23 @@ export class RecordsPage implements OnInit {
 
     this.changeDetectorRef.detectChanges();
 
-    this.carbonEmissionService
-      .getRecords({
-        location: this.location,
-        period: this.period,
-        fromPeriod: this.period ? '' : this.fromPeriod,
-        toPeriod: this.period ? '' : this.toPeriod,
-        limit: this.limit.toString(),
-        offset: this.offset.toString()
-      })
+this.carbonEmissionService
+  .getRecords({
+    location: this.location,
+    period: this.period,
+    fromPeriod: this.fromPeriod,
+    toPeriod: this.toPeriod,
+    minTotalEmissionsMt: this.minTotalEmissionsMt,
+    maxTotalEmissionsMt: this.maxTotalEmissionsMt,
+    minEmissionsIntensity: this.minEmissionsIntensity,
+    maxEmissionsIntensity: this.maxEmissionsIntensity,
+    minEmissionsPerCapita: this.minEmissionsPerCapita,
+    maxEmissionsPerCapita: this.maxEmissionsPerCapita,
+    minAnnualVariation: this.minAnnualVariation,
+    maxAnnualVariation: this.maxAnnualVariation,
+    limit: this.limit.toString(),
+    offset: this.offset.toString()
+  })
       .subscribe({
         next: (response) => {
           this.records = response.records;
@@ -225,6 +243,17 @@ export class RecordsPage implements OnInit {
     this.period = '';
     this.fromPeriod = '';
     this.toPeriod = '';
+    this.minTotalEmissionsMt = '';
+this.maxTotalEmissionsMt = '';
+
+this.minEmissionsIntensity = '';
+this.maxEmissionsIntensity = '';
+
+this.minEmissionsPerCapita = '';
+this.maxEmissionsPerCapita = '';
+
+this.minAnnualVariation = '';
+this.maxAnnualVariation = '';
     this.errorMessage = '';
     this.successMessage = '';
     this.offset = 0;

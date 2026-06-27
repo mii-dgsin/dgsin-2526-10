@@ -11,27 +11,55 @@ import { RouterLink } from '@angular/router';
 export class DocumentationPage {
   readonly repositoryUrl = 'https://github.com/mii-dgsin/dgsin-2526-10';
   readonly appEngineUrl = 'https://dgsin-2526-10-mjcadenas.ew.r.appspot.com';
+  readonly apiIndexUrl = 'https://dgsin-2526-10-mjcadenas.ew.r.appspot.com/api/v1';
+  readonly postmanDocumentationUrl =
+    'https://documenter.getpostman.com/view/15287747/2sBXwyG7Uk';
+  readonly openApiDocumentationUrl =
+    'https://dgsin-2526-10-mjcadenas.ew.r.appspot.com/api/v1/openapi';
 
   readonly documentationLinks = [
     {
       label: 'README',
-      description: 'General project description, installation instructions and current status.',
-      url: 'https://github.com/mii-dgsin/dgsin-2526-10/blob/main/README.md'
+      url: 'https://github.com/mii-dgsin/dgsin-2526-10/blob/main/README.md',
+      description:
+        'General project description, setup instructions, deployment information and delivery notes.'
     },
     {
-      label: 'Project diary',
-      description: 'Development diary with the main project advances.',
-      url: 'https://github.com/mii-dgsin/dgsin-2526-10/blob/main/docs/diary.md'
+      label: 'Development diary',
+      url: 'https://github.com/mii-dgsin/dgsin-2526-10/blob/main/docs/diary.md',
+      description:
+        'Development progress, technical decisions and relevant changes made during the project.'
     },
     {
-      label: 'API documentation',
-      description: 'Detailed API documentation with endpoints, examples and status codes.',
-      url: 'https://github.com/mii-dgsin/dgsin-2526-10/blob/main/docs/api.md'
+      label: 'carbon-emission-records API documentation',
+      url:
+        'https://github.com/mii-dgsin/dgsin-2526-10/blob/main/docs/carbon-emission-records-docs.md',
+      description:
+        'Markdown documentation of the REST API resource, including operations, examples and status codes.'
     },
     {
-      label: 'Postman collection',
-      description: 'Collection of API tests covering CRUD, errors and integration endpoints.',
-      url: 'https://github.com/mii-dgsin/dgsin-2526-10/blob/main/docs/postman/DGSIN-2526-10.postman_collection.json'
+      label: 'OpenAPI specification',
+      url: 'https://github.com/mii-dgsin/dgsin-2526-10/blob/main/docs/openapi.yaml',
+      description:
+        'OpenAPI 3.0.3 specification of the REST API. It is also rendered visually with Swagger UI.'
+    },
+    {
+      label: 'Postman public documentation',
+      url: 'https://documenter.getpostman.com/view/15287747/2sBXwyG7Uk',
+      description:
+        'Public Postman documentation generated from the API test collection.'
+    },
+    {
+      label: 'Extra activities',
+      url: 'https://github.com/mii-dgsin/dgsin-2526-10/blob/main/docs/extras.md',
+      description:
+        'Description of the extra activities implemented in the project.'
+    },
+    {
+      label: 'Video script',
+      url: 'https://github.com/mii-dgsin/dgsin-2526-10/blob/main/docs/video-script.md',
+      description:
+        'Script used to record the project presentation video.'
     }
   ];
 }

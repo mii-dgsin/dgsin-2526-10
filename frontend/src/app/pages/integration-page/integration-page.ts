@@ -451,25 +451,25 @@ export class IntegrationPage implements OnInit, AfterViewInit {
     });
   }
 
-  private extractElectricityPoints(records: unknown[]): ChartPoint[] {
-    const points: ChartPoint[] = [];
+private extractElectricityPoints(records: unknown[]): ChartPoint[] {
+  const points: ChartPoint[] = [];
 
-    for (const item of records) {
-      const record = item as Record<string, unknown>;
+  for (const item of records) {
+    const record = item as Record<string, unknown>;
 
-      const year = this.extractYear(record);
-      const value = this.extractNumericValue(record);
+    const year = this.extractYear(record);
+    const value = this.extractNumericValue(record);
 
-      if (year !== null && value !== null) {
-        points.push({
-          year,
-          value
-        });
-      }
+    if (year !== null && value !== null) {
+      points.push({
+        year,
+        value
+      });
     }
-
-    return points.sort((a, b) => a.year - b.year);
   }
+
+  return points.sort((a, b) => a.year - b.year);
+}
 
   private extractYear(record: Record<string, unknown>): number | null {
     const possibleYearKeys = ['year', 'date', 'period'];

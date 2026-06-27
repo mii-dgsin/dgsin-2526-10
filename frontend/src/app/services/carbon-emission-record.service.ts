@@ -16,15 +16,22 @@ export class CarbonEmissionRecordService {
     'https://dgsin-2526-10-mjcadenas.ew.r.appspot.com/api/v1/carbon-emission-records';
 
   constructor(private readonly http: HttpClient) {}
-
-  getRecords(filters?: {
-    location?: string;
-    period?: string;
-    fromPeriod?: string;
-    toPeriod?: string;
-    limit?: string;
-    offset?: string;
-  }): Observable<CarbonEmissionRecordResponse> {
+getRecords(filters: {
+  location?: string;
+  period?: string;
+  fromPeriod?: string;
+  toPeriod?: string;
+  minTotalEmissionsMt?: string;
+  maxTotalEmissionsMt?: string;
+  minEmissionsIntensity?: string;
+  maxEmissionsIntensity?: string;
+  minEmissionsPerCapita?: string;
+  maxEmissionsPerCapita?: string;
+  minAnnualVariation?: string;
+  maxAnnualVariation?: string;
+  limit?: string;
+  offset?: string;
+}): Observable<CarbonEmissionRecordResponse> {
     let params = new HttpParams();
 
     if (filters?.location) {

@@ -1,6 +1,6 @@
 # Documentación de la API carbon-emission-records
 
-Ruta base:
+Ruta base del recurso:
 
 ```txt
 /api/v1/carbon-emission-records
@@ -18,9 +18,9 @@ Este documento describe las operaciones REST requeridas para el recurso `carbon-
 
 ## 1. Descripción del recurso
 
-El recurso almacena registros de emisiones de CO₂ por localización y año.
+El recurso `carbon-emission-records` almacena registros de emisiones de CO₂ por localización y año.
 
-Ejemplo:
+Ejemplo de recurso:
 
 ```json
 {
@@ -34,29 +34,33 @@ Ejemplo:
 }
 ```
 
-Campos:
+---
+
+## 2. Campos
 
 | Campo | Tipo | Obligatorio | Descripción |
 |---|---|---:|---|
 | `_id` | String | Sí | ObjectId de MongoDB |
-| `location` | String | Sí | Localización |
+| `location` | String | Sí | Localización del dataset |
 | `period` | Number | Sí | Año |
-| `totalEmissionsMt` | Number | Sí | Emisiones totales de CO₂ |
+| `totalEmissionsMt` | Number | Sí | Emisiones totales de CO₂ en megatoneladas |
 | `emissionsIntensity` | Number o null | No | Intensidad de emisiones |
-| `emissionsPerCapita` | Number | Sí | Emisiones per cápita |
+| `emissionsPerCapita` | Number | Sí | Emisiones de CO₂ per cápita |
 | `annualVariation` | Number o null | No | Variación anual |
 
 La combinación `location` + `period` debe ser única.
 
 ---
 
-## 2. POST sobre el conjunto
+## 3. POST sobre el conjunto de recursos
+
+Crea un nuevo registro.
 
 ```http
 POST /api/v1/carbon-emission-records
 ```
 
-Cuerpo:
+Cuerpo de petición:
 
 ```json
 {
@@ -87,7 +91,7 @@ Respuesta correcta:
 }
 ```
 
-Recurso duplicado:
+Si el recurso ya existe:
 
 ```http
 409 Conflict
@@ -99,7 +103,7 @@ Recurso duplicado:
 }
 ```
 
-JSON incorrecto:
+Si el JSON no contiene los campos esperados:
 
 ```http
 400 Bad Request
@@ -117,7 +121,9 @@ JSON incorrecto:
 
 ---
 
-## 3. GET sobre el conjunto
+## 4. GET sobre el conjunto de recursos
+
+Devuelve la colección de recursos.
 
 ```http
 GET /api/v1/carbon-emission-records
@@ -132,7 +138,7 @@ Parámetros opcionales:
 | `fromPeriod` | Año inicial |
 | `toPeriod` | Año final |
 | `limit` | Tamaño de página |
-| `offset` | Desplazamiento |
+| `offset` | Desplazamiento de paginación |
 
 Ejemplo:
 
@@ -167,7 +173,9 @@ Respuesta:
 
 ---
 
-## 4. DELETE sobre el conjunto
+## 5. DELETE sobre el conjunto de recursos
+
+Borra todos los registros.
 
 ```http
 DELETE /api/v1/carbon-emission-records
@@ -188,7 +196,9 @@ Respuesta:
 
 ---
 
-## 5. GET sobre un recurso concreto
+## 6. GET sobre un recurso concreto
+
+Obtiene un recurso por id.
 
 ```http
 GET /api/v1/carbon-emission-records/:id
@@ -212,7 +222,7 @@ Respuesta correcta:
 }
 ```
 
-Si no existe:
+Si el recurso no existe:
 
 ```http
 404 Not Found
@@ -226,13 +236,15 @@ Si no existe:
 
 ---
 
-## 6. PUT sobre un recurso concreto
+## 7. PUT sobre un recurso concreto
+
+Actualiza un recurso.
 
 ```http
 PUT /api/v1/carbon-emission-records/:id
 ```
 
-Cuerpo:
+Cuerpo de petición:
 
 ```json
 {
@@ -254,9 +266,15 @@ Respuesta:
 
 ---
 
-## 7. PUT incorrecto con conflicto de id
+## 8. PUT incorrecto con conflicto de identificador
 
-Si el `_id` del cuerpo no coincide con el id de la URL:
+Si el campo `_id` del cuerpo no coincide con el id indicado en la URL:
+
+```http
+PUT /api/v1/carbon-emission-records/68585f4f5c93c6ab1f2c1234
+```
+
+Cuerpo de petición:
 
 ```json
 {
@@ -282,7 +300,7 @@ Respuesta:
 }
 ```
 
-Si la actualización genera un duplicado:
+Si la actualización genera una combinación duplicada de `location` y `period`:
 
 ```http
 409 Conflict
@@ -296,7 +314,9 @@ Si la actualización genera un duplicado:
 
 ---
 
-## 8. DELETE sobre un recurso concreto
+## 9. DELETE sobre un recurso concreto
+
+Borra un recurso por id.
 
 ```http
 DELETE /api/v1/carbon-emission-records/:id
@@ -314,21 +334,29 @@ Respuesta:
 }
 ```
 
-Si no existe:
+Si el recurso no existe:
 
 ```http
 404 Not Found
 ```
 
+```json
+{
+  "message": "Carbon emission record not found"
+}
+```
+
 ---
 
-## 9. loadInitialData
+## 10. loadInitialData
+
+Carga los datos iniciales únicamente si la colección está vacía.
 
 ```http
 GET /api/v1/carbon-emission-records/loadInitialData
 ```
 
-Si carga datos:
+Si se cargan registros:
 
 ```http
 201 Created
@@ -343,7 +371,7 @@ Si carga datos:
 }
 ```
 
-Si ya hay datos:
+Si la colección ya tiene registros:
 
 ```http
 200 OK
@@ -360,7 +388,9 @@ Si ya hay datos:
 
 ---
 
-## 10. Redirección a documentación
+## 11. Redirección a documentación Postman
+
+Redirige al portal público de documentación de Postman.
 
 ```http
 GET /api/v1/carbon-emission-records/docs
@@ -375,12 +405,30 @@ Respuesta:
 Destino:
 
 ```txt
-https://documenter.getpostman.com/view/15287747/2sBXwyF6es
+https://documenter.getpostman.com/view/15287747/2sBXwyG7Uk
 ```
 
 ---
 
-## 11. Método no permitido
+## 12. Documentación OpenAPI visual
+
+El backend también expone una vista Swagger UI generada desde OpenAPI:
+
+```http
+GET /api/v1/openapi
+```
+
+URL desplegada:
+
+```txt
+https://dgsin-2526-10-mjcadenas.ew.r.appspot.com/api/v1/openapi
+```
+
+---
+
+## 13. Método no permitido
+
+Las rutas conocidas devuelven `405 Method Not Allowed` cuando se utiliza un método HTTP no soportado.
 
 Ejemplo:
 
@@ -404,15 +452,15 @@ Respuesta:
 
 ---
 
-## 12. Códigos de estado
+## 14. Códigos de estado
 
-| Código | Uso |
+| Código | Significado |
 |---:|---|
-| 200 | Operación correcta |
-| 201 | Recurso creado o datos iniciales cargados |
-| 302 | Redirección |
-| 400 | Petición incorrecta |
-| 404 | Recurso no encontrado |
-| 405 | Método no permitido |
-| 409 | Conflicto por duplicado |
-| 500 | Error de servidor |
+| `200 OK` | GET, PUT o DELETE correcto |
+| `201 Created` | Recurso creado o datos iniciales cargados |
+| `302 Found` | Redirección a documentación |
+| `400 Bad Request` | Error de validación o id incorrecto |
+| `404 Not Found` | Recurso no encontrado |
+| `405 Method Not Allowed` | Método no permitido |
+| `409 Conflict` | Recurso duplicado |
+| `500 Internal Server Error` | Error del servidor |

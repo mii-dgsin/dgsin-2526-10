@@ -49,7 +49,51 @@
   color: #666;
   font-size: 0.9rem;
 }
+.advanced-filters {
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: #fafafa;
+}
 
+.advanced-filters h2 {
+  margin: 0 0 12px 0;
+  font-size: 18px;
+}
+
+.numeric-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.range-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.range-group legend {
+  font-weight: bold;
+  padding: 0 4px;
+}
+
+.range-group input {
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+}
+
+@media (max-width: 900px) {
+  .numeric-filter-grid {
+    grid-template-columns: 1fr;
+  }
+}
 .year-help {
   padding: 6px 10px;
   border-radius: 999px;
