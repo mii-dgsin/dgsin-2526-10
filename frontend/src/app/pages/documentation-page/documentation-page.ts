@@ -56,10 +56,10 @@ export class DocumentationPage {
         'Description of the extra activities implemented in the project.'
     },
     {
-      label: 'Video script',
-      url: 'https://github.com/mii-dgsin/dgsin-2526-10/blob/main/docs/video-script.md',
+      label: 'Video',
+      url: 'https://www.kaltura.com/tiny/4nkkcwgr',
       description:
-        'Script used to record the project presentation video.'
+        'Description video of the project.'
     }
   ];
 }

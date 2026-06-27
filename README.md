@@ -160,7 +160,6 @@ dgsin-2526-10/
 │   ├── diary.md
 │   ├── extras.md
 │   ├── openapi.yaml
-│   ├── video-script.md
 │   └── postman/
 │       ├── DGSIN-2526-10.postman_collection.json
 │       ├── postman-run-results.png
