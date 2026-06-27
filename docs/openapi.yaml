@@ -1,0 +1,134 @@
+openapi: 3.0.3
+info:
+  title: API DGSIN-2526-10
+  version: 1.0.0
+  description: API REST para registros de emisiones de CO2 e integración con Ember Energy.
+servers:
+  - url: https://dgsin-2526-10-mjcadenas.ew.r.appspot.com
+    description: Producción en Google App Engine
+  - url: http://localhost:8080
+    description: Desarrollo local
+tags:
+  - name: Estado
+  - name: Registros de emisiones
+  - name: Integraciones
+paths:
+  /api/v1/health:
+    get:
+      tags: [Estado]
+      summary: Comprueba el estado de la API
+      responses:
+        "200":
+          description: API funcionando
+  /api/v1/carbon-emission-records:
+    get:
+      tags: [Registros de emisiones]
+      summary: Lista registros con filtros y paginación
+      parameters:
+        - { name: location, in: query, required: false, schema: { type: string } }
+        - { name: period, in: query, required: false, schema: { type: integer } }
+        - { name: fromPeriod, in: query, required: false, schema: { type: integer } }
+        - { name: toPeriod, in: query, required: false, schema: { type: integer } }
+        - { name: limit, in: query, required: false, schema: { type: integer } }
+        - { name: offset, in: query, required: false, schema: { type: integer } }
+      responses:
+        "200":
+          description: Lista paginada de registros
+    post:
+      tags: [Registros de emisiones]
+      summary: Crea un registro
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CarbonEmissionRecordInput"
+      responses:
+        "201": { description: Registro creado }
+        "400": { description: Error de validación }
+        "409": { description: Registro duplicado }
+    delete:
+      tags: [Registros de emisiones]
+      summary: Borra todos los registros
+      responses:
+        "200": { description: Registros borrados }
+  /api/v1/carbon-emission-records/loadInitialData:
+    get:
+      tags: [Registros de emisiones]
+      summary: Carga datos iniciales si la colección está vacía
+      responses:
+        "200": { description: La colección ya contiene datos }
+        "201": { description: Datos iniciales cargados }
+  /api/v1/carbon-emission-records/docs:
+    get:
+      tags: [Registros de emisiones]
+      summary: Redirige a la documentación pública de Postman
+      responses:
+        "302": { description: Redirección }
+  /api/v1/carbon-emission-records/locations:
+    get:
+      tags: [Registros de emisiones]
+      summary: Devuelve localizaciones disponibles
+      responses:
+        "200": { description: Localizaciones disponibles }
+  /api/v1/carbon-emission-records/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      tags: [Registros de emisiones]
+      summary: Obtiene un registro
+      responses:
+        "200": { description: Registro encontrado }
+        "404": { description: Registro no encontrado }
+    put:
+      tags: [Registros de emisiones]
+      summary: Actualiza un registro
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CarbonEmissionRecordInput"
+      responses:
+        "200": { description: Registro actualizado }
+        "400": { description: Error de validación o id incorrecto }
+        "404": { description: Registro no encontrado }
+        "409": { description: Registro duplicado }
+    delete:
+      tags: [Registros de emisiones]
+      summary: Borra un registro
+      responses:
+        "200": { description: Registro borrado }
+        "404": { description: Registro no encontrado }
+  /api/v1/integrations/supported-locations:
+    get:
+      tags: [Integraciones]
+      summary: Obtiene localizaciones compatibles con Ember
+      responses:
+        "200": { description: Localizaciones compatibles }
+  /api/v1/integrations/renewable-electricity:
+    get:
+      tags: [Integraciones]
+      summary: Obtiene datos integrados de CO2 y electricidad
+      parameters:
+        - { name: location, in: query, required: true, schema: { type: string } }
+        - { name: fromPeriod, in: query, required: true, schema: { type: integer } }
+        - { name: toPeriod, in: query, required: true, schema: { type: integer } }
+      responses:
+        "200": { description: Datos integrados }
+        "400": { description: Localización no soportada }
+components:
+  schemas:
+    CarbonEmissionRecordInput:
+      type: object
+      required: [location, period, totalEmissionsMt, emissionsPerCapita]
+      properties:
+        location: { type: string, example: "Spain and Andorra" }
+        period: { type: integer, example: 2026 }
+        totalEmissionsMt: { type: number, example: 2 }
+        emissionsIntensity: { type: number, nullable: true, example: 2 }
+        emissionsPerCapita: { type: number, example: 21 }
+        annualVariation: { type: number, nullable: true, example: 2 }

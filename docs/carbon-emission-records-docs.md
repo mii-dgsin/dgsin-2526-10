@@ -1,26 +1,26 @@
-# carbon-emission-records API documentation
+# Documentación de la API carbon-emission-records
 
-Resource base path:
+Ruta base:
 
 ```txt
 /api/v1/carbon-emission-records
 ```
 
-Deployed URL:
+URL desplegada:
 
 ```txt
 https://dgsin-2526-10-mjcadenas.ew.r.appspot.com/api/v1/carbon-emission-records
 ```
 
-This document describes the required REST operations for the `carbon-emission-records` resource.
+Este documento describe las operaciones REST requeridas para el recurso `carbon-emission-records`.
 
 ---
 
-## 1. Resource description
+## 1. Descripción del recurso
 
-The `carbon-emission-records` resource stores CO₂ emission records by location and year.
+El recurso almacena registros de emisiones de CO₂ por localización y año.
 
-Example record:
+Ejemplo:
 
 ```json
 {
@@ -34,33 +34,29 @@ Example record:
 }
 ```
 
----
+Campos:
 
-## 2. Fields
-
-| Field | Type | Required | Description |
+| Campo | Tipo | Obligatorio | Descripción |
 |---|---|---:|---|
-| `_id` | String | Yes | MongoDB ObjectId |
-| `location` | String | Yes | Dataset location |
-| `period` | Number | Yes | Year |
-| `totalEmissionsMt` | Number | Yes | Total CO₂ emissions in megatonnes |
-| `emissionsIntensity` | Number or null | No | Emissions intensity |
-| `emissionsPerCapita` | Number | Yes | CO₂ emissions per capita |
-| `annualVariation` | Number or null | No | Annual variation |
+| `_id` | String | Sí | ObjectId de MongoDB |
+| `location` | String | Sí | Localización |
+| `period` | Number | Sí | Año |
+| `totalEmissionsMt` | Number | Sí | Emisiones totales de CO₂ |
+| `emissionsIntensity` | Number o null | No | Intensidad de emisiones |
+| `emissionsPerCapita` | Number | Sí | Emisiones per cápita |
+| `annualVariation` | Number o null | No | Variación anual |
 
-The pair `location` + `period` must be unique.
+La combinación `location` + `period` debe ser única.
 
 ---
 
-## 3. POST collection
-
-Creates a new resource.
+## 2. POST sobre el conjunto
 
 ```http
 POST /api/v1/carbon-emission-records
 ```
 
-Request body:
+Cuerpo:
 
 ```json
 {
@@ -73,7 +69,7 @@ Request body:
 }
 ```
 
-Response:
+Respuesta correcta:
 
 ```http
 201 Created
@@ -91,7 +87,7 @@ Response:
 }
 ```
 
-If the resource already exists:
+Recurso duplicado:
 
 ```http
 409 Conflict
@@ -103,7 +99,7 @@ If the resource already exists:
 }
 ```
 
-If the JSON body does not contain the expected fields:
+JSON incorrecto:
 
 ```http
 400 Bad Request
@@ -121,32 +117,30 @@ If the JSON body does not contain the expected fields:
 
 ---
 
-## 4. GET collection
-
-Returns the collection.
+## 3. GET sobre el conjunto
 
 ```http
 GET /api/v1/carbon-emission-records
 ```
 
-Optional query parameters:
+Parámetros opcionales:
 
-| Parameter | Description |
+| Parámetro | Descripción |
 |---|---|
-| `location` | Flexible location search |
-| `period` | Exact year |
-| `fromPeriod` | Start year |
-| `toPeriod` | End year |
-| `limit` | Page size |
-| `offset` | Pagination offset |
+| `location` | Búsqueda flexible por localización |
+| `period` | Año exacto |
+| `fromPeriod` | Año inicial |
+| `toPeriod` | Año final |
+| `limit` | Tamaño de página |
+| `offset` | Desplazamiento |
 
-Example:
+Ejemplo:
 
 ```http
-GET /api/v1/carbon-emission-records?location=Spain&fromPeriod=2020&toPeriod=2023&limit=50&offset=0
+GET /api/v1/carbon-emission-records?location=Spain&fromPeriod=2020&toPeriod=2023&limit=10&offset=0
 ```
 
-Response:
+Respuesta:
 
 ```http
 200 OK
@@ -155,7 +149,7 @@ Response:
 ```json
 {
   "total": 4,
-  "limit": 50,
+  "limit": 10,
   "offset": 0,
   "records": [
     {
@@ -173,15 +167,13 @@ Response:
 
 ---
 
-## 5. DELETE collection
-
-Deletes all resources.
+## 4. DELETE sobre el conjunto
 
 ```http
 DELETE /api/v1/carbon-emission-records
 ```
 
-Response:
+Respuesta:
 
 ```http
 200 OK
@@ -196,21 +188,13 @@ Response:
 
 ---
 
-## 6. GET one resource
-
-Gets one resource by id.
+## 5. GET sobre un recurso concreto
 
 ```http
 GET /api/v1/carbon-emission-records/:id
 ```
 
-Example:
-
-```http
-GET /api/v1/carbon-emission-records/68585f4f5c93c6ab1f2c1234
-```
-
-Response:
+Respuesta correcta:
 
 ```http
 200 OK
@@ -228,7 +212,7 @@ Response:
 }
 ```
 
-If the resource does not exist:
+Si no existe:
 
 ```http
 404 Not Found
@@ -242,15 +226,13 @@ If the resource does not exist:
 
 ---
 
-## 7. PUT one resource
-
-Updates one resource.
+## 6. PUT sobre un recurso concreto
 
 ```http
 PUT /api/v1/carbon-emission-records/:id
 ```
 
-Request body:
+Cuerpo:
 
 ```json
 {
@@ -264,35 +246,17 @@ Request body:
 }
 ```
 
-Response:
+Respuesta:
 
 ```http
 200 OK
 ```
 
-```json
-{
-  "_id": "68585f4f5c93c6ab1f2c1234",
-  "location": "Spain and Andorra",
-  "period": 2026,
-  "totalEmissionsMt": 3,
-  "emissionsIntensity": null,
-  "emissionsPerCapita": 22,
-  "annualVariation": null
-}
-```
-
 ---
 
-## 8. Incorrect PUT with id conflict
+## 7. PUT incorrecto con conflicto de id
 
-If the body `_id` does not match the id in the URL:
-
-```http
-PUT /api/v1/carbon-emission-records/68585f4f5c93c6ab1f2c1234
-```
-
-Request body:
+Si el `_id` del cuerpo no coincide con el id de la URL:
 
 ```json
 {
@@ -306,7 +270,7 @@ Request body:
 }
 ```
 
-Response:
+Respuesta:
 
 ```http
 400 Bad Request
@@ -318,7 +282,7 @@ Response:
 }
 ```
 
-If the update creates a duplicate `location` and `period`:
+Si la actualización genera un duplicado:
 
 ```http
 409 Conflict
@@ -332,15 +296,13 @@ If the update creates a duplicate `location` and `period`:
 
 ---
 
-## 9. DELETE one resource
-
-Deletes one resource by id.
+## 8. DELETE sobre un recurso concreto
 
 ```http
 DELETE /api/v1/carbon-emission-records/:id
 ```
 
-Response:
+Respuesta:
 
 ```http
 200 OK
@@ -352,29 +314,21 @@ Response:
 }
 ```
 
-If the resource does not exist:
+Si no existe:
 
 ```http
 404 Not Found
 ```
 
-```json
-{
-  "message": "Carbon emission record not found"
-}
-```
-
 ---
 
-## 10. loadInitialData
-
-Loads the initial data only if the collection is empty.
+## 9. loadInitialData
 
 ```http
 GET /api/v1/carbon-emission-records/loadInitialData
 ```
 
-If records are loaded:
+Si carga datos:
 
 ```http
 201 Created
@@ -389,7 +343,7 @@ If records are loaded:
 }
 ```
 
-If the collection already contains records:
+Si ya hay datos:
 
 ```http
 200 OK
@@ -406,39 +360,35 @@ If the collection already contains records:
 
 ---
 
-## 11. Documentation redirect
-
-Redirects to the public Postman documentation portal.
+## 10. Redirección a documentación
 
 ```http
 GET /api/v1/carbon-emission-records/docs
 ```
 
-Response:
+Respuesta:
 
 ```http
 302 Found
 ```
 
-Redirect URL:
+Destino:
 
 ```txt
-https://documenter.getpostman.com/view/15287747/2sBXwyF6od
+https://documenter.getpostman.com/view/15287747/2sBXwyF6es
 ```
 
 ---
 
-## 12. Method not allowed
+## 11. Método no permitido
 
-Known routes return `405 Method Not Allowed` when an unsupported method is used.
-
-Example:
+Ejemplo:
 
 ```http
 PATCH /api/v1/carbon-emission-records
 ```
 
-Response:
+Respuesta:
 
 ```http
 405 Method Not Allowed
@@ -454,15 +404,15 @@ Response:
 
 ---
 
-## 13. Status codes
+## 12. Códigos de estado
 
-| Status code | Meaning |
+| Código | Uso |
 |---:|---|
-| `200 OK` | Successful GET, PUT or DELETE |
-| `201 Created` | Resource created or initial data loaded |
-| `302 Found` | Documentation redirect |
-| `400 Bad Request` | Validation error or wrong body id |
-| `404 Not Found` | Resource not found |
-| `405 Method Not Allowed` | Unsupported method |
-| `409 Conflict` | Duplicate resource |
-| `500 Internal Server Error` | Server error |
+| 200 | Operación correcta |
+| 201 | Recurso creado o datos iniciales cargados |
+| 302 | Redirección |
+| 400 | Petición incorrecta |
+| 404 | Recurso no encontrado |
+| 405 | Método no permitido |
+| 409 | Conflicto por duplicado |
+| 500 | Error de servidor |

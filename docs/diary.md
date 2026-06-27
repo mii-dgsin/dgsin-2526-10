@@ -1,22 +1,22 @@
-# DGSIN-2526-10 Diary
+# Diario del proyecto DGSIN-2526-10
 
-## Team member
+## Datos generales
 
-María Jesús Cadenas Sánchez
+Autora: **María Jesús Cadenas Sánchez**
 
-GitHub user:
+Usuario GitHub:
 
 ```txt
 mjcadenas
 ```
 
-Repository:
+Repositorio:
 
 ```txt
 https://github.com/mii-dgsin/dgsin-2526-10
 ```
 
-Deployment:
+Despliegue:
 
 ```txt
 https://dgsin-2526-10-mjcadenas.ew.r.appspot.com
@@ -24,42 +24,37 @@ https://dgsin-2526-10-mjcadenas.ew.r.appspot.com
 
 ---
 
-# Project description
+## Descripción
 
-The project is a cloud information system for managing and visualizing CO₂ emission records by location and year.
+El proyecto es un sistema de información en la nube para gestionar y visualizar registros de emisiones de CO₂ por localización y año.
 
-The system provides:
+Incluye:
 
-- A REST API deployed on Google App Engine.
-- Persistence using MongoDB Atlas.
-- An Angular frontend.
-- CRUD operations for the selected data source.
-- Integration with an external REST API.
-- Highcharts visualizations.
-- Postman tests and public Postman documentation.
-- Project documentation.
-
-The main resource is:
-
-```txt
-carbon-emission-records
-```
-
-The external integration uses Ember Energy yearly electricity data.
+- API REST con Node.js y Express.
+- Persistencia en MongoDB Atlas.
+- Frontend Angular.
+- CRUD completo.
+- Paginación con `limit` y `offset`.
+- Carga de datos iniciales.
+- Integración externa con Ember Energy mediante proxy backend.
+- Visualizaciones con Highcharts.
+- Pruebas Postman.
+- Automatización de pruebas con Newman.
+- Especificación OpenAPI.
 
 ---
 
-# Data source
+## Fuente de datos
 
-Main source:
+Fuente principal:
 
 ```txt
 https://datosmacro.expansion.com/energia-y-medio-ambiente/emisiones-co2
 ```
 
-The dataset contains CO₂ emission records by location and year.
+El dataset contiene registros de emisiones de CO₂ por localización y año.
 
-Example record:
+Ejemplo:
 
 ```json
 {
@@ -74,23 +69,21 @@ Example record:
 
 ---
 
-# Development progress
+## Avances de desarrollo
 
-## Progress 1 - Project definition
+### Avance 1 - Definición del proyecto
 
-The project objective was defined: creating a cloud information system to manage CO₂ emission records by location and year.
+Se definió el objetivo del proyecto: crear una aplicación cloud para consultar, gestionar y visualizar emisiones de CO₂.
 
-The selected resource was named:
+Recurso elegido:
 
 ```txt
 carbon-emission-records
 ```
 
----
+### Avance 2 - Estructura del repositorio
 
-## Progress 2 - Repository structure
-
-The GitHub repository was created and organized with separate folders:
+Se creó la estructura:
 
 ```txt
 backend/
@@ -98,44 +91,32 @@ frontend/
 docs/
 ```
 
-This separation makes it easier to develop the Express backend, Angular frontend and documentation independently.
+### Avance 3 - Backend inicial
 
----
+Se creó el backend con Node.js y Express.
 
-## Progress 3 - Initial backend
-
-A Node.js and Express backend was created.
-
-Initial endpoints were added:
+Endpoints iniciales:
 
 ```txt
 GET /
 GET /api/v1/health
 ```
 
-The health endpoint was used to verify that the backend was running correctly.
+### Avance 4 - MongoDB Atlas
 
----
+Se configuró MongoDB Atlas como base de datos en la nube.
 
-## Progress 4 - MongoDB Atlas connection
-
-MongoDB Atlas was configured as the cloud database.
-
-The backend connection logic was separated into:
+La conexión se separó en:
 
 ```txt
 backend/src/config/db.js
 ```
 
-The MongoDB connection string is provided through environment variables.
+### Avance 5 - Modelo de datos
 
----
+Se creó el modelo `CarbonEmissionRecord` con Mongoose.
 
-## Progress 5 - Data model
-
-The `CarbonEmissionRecord` model was created using Mongoose.
-
-The model includes:
+Campos principales:
 
 - `location`
 - `period`
@@ -144,77 +125,58 @@ The model includes:
 - `emissionsPerCapita`
 - `annualVariation`
 
-A uniqueness rule was added to avoid duplicated records with the same `location` and `period`.
+Se añadió unicidad por `location` y `period`.
 
----
+### Avance 6 - API REST
 
-## Progress 6 - REST API implementation
-
-The main REST resource was implemented:
+Se implementó el recurso:
 
 ```txt
 /api/v1/carbon-emission-records
 ```
 
-Implemented operations:
+Operaciones implementadas:
 
-- POST collection.
-- GET collection.
-- DELETE collection.
-- GET one resource.
-- PUT one resource.
-- DELETE one resource.
-- GET locations.
-- GET loadInitialData.
-- GET docs redirect.
+- POST colección.
+- GET colección.
+- DELETE colección.
+- GET recurso concreto.
+- PUT recurso concreto.
+- DELETE recurso concreto.
+- GET localizaciones.
+- GET `loadInitialData`.
+- GET redirección a documentación.
 
----
+### Avance 7 - Carga de datos iniciales
 
-## Progress 7 - Initial data loading
-
-An initial JSON dataset was created:
+Se creó el dataset inicial:
 
 ```txt
 backend/data/carbonEmissionRecords.json
 ```
 
-The route:
+La ruta:
 
 ```txt
 GET /api/v1/carbon-emission-records/loadInitialData
 ```
 
-loads the data only if the MongoDB collection is empty.
+carga datos solo si la colección está vacía.
 
----
+### Avance 8 - Validaciones y errores
 
-## Progress 8 - Validation and error handling
+La API controla:
 
-Validation was added for the resource fields.
+- Campos obligatorios.
+- Valores inválidos.
+- Registros duplicados.
+- Recursos no encontrados.
+- Métodos no permitidos.
+- PUT con `_id` del cuerpo distinto al id de la URL.
 
-The API now handles:
+### Avance 9 - Modularización
 
-- Missing required fields.
-- Invalid year values.
-- Duplicate records.
-- Resource not found.
-- Method not allowed.
-- Wrong `_id` in PUT body.
-
-Relevant HTTP status codes are returned, including:
-
-```txt
-400
-404
-405
-409
-```
-
----
-
-## Progress 9 - Backend modularization
-
-The backend was modularized into:
+El backend se separó en:
 
 ```txt
 controllers/
@@ -226,345 +188,220 @@ services/
 config/
 ```
 
-The main `app.js` file imports the separated route files.
+### Avance 10 - Despliegue en App Engine
 
----
-
-## Progress 10 - App Engine deployment
-
-The backend was deployed on Google App Engine.
-
-The application is available at:
+La aplicación se desplegó en:
 
 ```txt
 https://dgsin-2526-10-mjcadenas.ew.r.appspot.com
 ```
 
-The backend connects to MongoDB Atlas from App Engine.
+### Avance 11 - Frontend Angular
 
----
+Se creó el frontend Angular y se conectó con la API desplegada.
 
-## Progress 11 - Angular frontend creation
+### Avance 12 - Página principal de registros
 
-An Angular frontend was created in the `frontend/` folder.
+Se implementó la página `Carbon Emission Records` con:
 
-The frontend consumes the backend API deployed on App Engine.
+- Listado.
+- Filtros.
+- Paginación.
+- Borrado individual.
+- Borrado total.
+- Carga inicial.
+- Navegación a crear y editar.
 
----
+### Avance 13 - Crear registro
 
-## Progress 12 - Records page
-
-The main records page was implemented.
-
-It supports:
-
-- Listing records.
-- Location search.
-- Exact year filter.
-- Year range filter.
-- Pagination.
-- Items-per-page selector.
-- Status messages.
-- Delete one record.
-- Delete all records.
-- Load initial data.
-- Navigation to create and edit views.
-
-The filters were later reorganized to improve clarity and reduce visual noise.
-
----
-
-## Progress 13 - Create record page
-
-A separate Angular route was added for creating records:
+Se añadió la ruta:
 
 ```txt
 /records/new
 ```
 
-The form includes suggestions for existing locations using the local locations endpoint.
+El formulario incluye sugerencias de localización.
 
-The user can select an existing location or type a new one.
+### Avance 14 - Editar registro
 
----
-
-## Progress 14 - Edit record page
-
-A separate Angular route was added for editing records:
+Se añadió la ruta:
 
 ```txt
 /records/:id/edit
 ```
 
-The edit form loads the selected record and allows updating it.
+La edición se realiza en una vista separada del listado.
 
-The location field also includes suggestions using existing local locations.
+### Avance 15 - Mensajes de operación
 
----
-
-## Progress 15 - Operation messages
-
-The frontend was improved to show operation-specific messages.
-
-Examples:
+Se añadieron mensajes específicos:
 
 - Loading records...
 - Deleting record...
 - Deleting all records...
 - Loading initial data...
-- Refreshing records after deleting record...
-- Refreshing records after loading initial data...
+- Refreshing records...
 
-This improves user feedback during API operations.
+### Avance 16 - Integración externa con Ember Energy
 
----
+Se implementó integración externa mediante proxy backend.
 
-## Progress 16 - External integration with Ember Energy
-
-An external integration with Ember Energy was implemented.
-
-The backend acts as a proxy to the external API:
+Endpoint:
 
 ```txt
 /api/v1/integrations/renewable-electricity
 ```
 
-The frontend does not expose the Ember API key.
+### Avance 17 - Localizaciones soportadas
 
----
-
-## Progress 17 - Supported integration locations
-
-The backend provides:
+Se añadió:
 
 ```txt
 GET /api/v1/integrations/supported-locations
 ```
 
-This endpoint returns compatible locations between the local CO₂ dataset and Ember Energy.
+para listar localizaciones compatibles entre el dataset local y Ember Energy.
 
-Controlled aliases are used for cases where the local dataset groups territories.
+### Avance 18 - Vista de integración
 
-Example:
-
-| Ember entity | Local dataset location |
-|---|---|
-| Spain | Spain and Andorra |
-| France | France and Monaco |
-| Italy | Italy, San Marino and the Holy See |
-
----
-
-## Progress 18 - Integration view
-
-The Angular route:
+Se creó la ruta:
 
 ```txt
 /integrations/renewable-electricity
 ```
 
-was created.
+Incluye selector de localización, rango de años, tablas y gráficos.
 
-It allows selecting a compatible location and a year range.
+### Avance 19 - Analytics
 
-The view displays:
-
-- Integration summary.
-- Local CO₂ records.
-- External Ember records.
-- Highcharts visualizations.
-
----
-
-## Progress 19 - Analytics view
-
-The route:
+Se añadió:
 
 ```txt
 /analytics
 ```
 
-was added as a list of analytical widgets.
+como lista de visualizaciones disponibles.
 
-It links to the charts in the integration view using default parameters:
+### Avance 20 - Integrations
 
-```txt
-location=Spain
-fromPeriod=2020
-toPeriod=2023
-```
-
-The integration page reads the query parameters, loads the data automatically and scrolls to the selected chart.
-
----
-
-## Progress 20 - Integrations index
-
-The route:
+Se añadió:
 
 ```txt
 /integrations
 ```
 
-was added.
+como índice de integraciones.
 
-It acts as an index of available integrations and links to:
+### Avance 21 - About
 
-```txt
-/integrations/renewable-electricity
-```
-
----
-
-## Progress 21 - About page
-
-The route:
+Se añadió:
 
 ```txt
 /about
 ```
 
-was added.
+con información del proyecto y zona para el vídeo.
 
-It includes project information and the current status of the project video.
+### Avance 22 - Documentation
 
-The current video message is:
-
-```txt
-The project video link is pending.
-```
-
----
-
-## Progress 22 - Documentation page
-
-The route:
+Se añadió:
 
 ```txt
 /documentation
 ```
 
-was created to provide access to project documentation, GitHub, API documentation and Postman documentation.
+con enlaces a documentación, GitHub y Postman.
 
----
+### Avance 23 - Visualizaciones Highcharts
 
-## Progress 23 - Highcharts visualizations
+Se añadieron tres gráficos:
 
-Three Highcharts visualizations were added:
+- CO₂ emissions by year.
+- Ember electricity data by year.
+- CO₂ emissions vs electricity generation.
 
-| Chart | Description |
-|---|---|
-| CO₂ emissions by year | Uses local records from the own API |
-| Ember electricity data by year | Uses external Ember data through the proxy |
-| CO₂ emissions vs electricity generation | Combines local and external data in one chart |
+### Avance 24 - Pruebas Postman
 
----
+Se creó una colección Postman para probar la API desplegada.
 
-## Progress 24 - Postman tests
+Las pruebas cubren operaciones correctas, errores básicos, duplicados, métodos no permitidos y endpoints de integración.
 
-A Postman collection was created to test the deployed API.
+### Avance 25 - Mejoras de interfaz
 
-The collection verifies:
+Se mejoró:
 
-- REST operations.
-- Expected status codes.
-- Duplicate conflict.
-- Wrong PUT body id.
-- Invalid JSON body.
-- Not found errors.
-- Method not allowed errors.
-- Delete collection.
-- Load initial data.
-- Documentation redirect.
-- Integration endpoints.
+- Cabecera con pestañas.
+- Ruta activa.
+- Filtros.
+- Paginación.
+- Favicon.
+- Mensajes de operación.
+- Página de documentación.
+- Página About.
 
-The collection is stored at:
+### Avance 26 - Angular servido desde backend
 
-```txt
-docs/postman/DGSIN-2526-10.postman_collection.json
-```
-
-The final execution evidence is stored at:
-
-```txt
-docs/postman/postman-run-results.png
-```
-
-The public Postman documentation portal is:
-
-```txt
-https://documenter.getpostman.com/view/15287747/2sBXwyF6od
-```
-
----
-
-## Progress 25 - Frontend design improvements
-
-Several UI improvements were added:
-
-- Tab-style header navigation.
-- Active route highlighting.
-- More compact records filters.
-- Year range grouped visually.
-- Pagination and items-per-page grouped together.
-- Custom favicon.
-- Better operation messages.
-- More readable documentation and about pages.
-
----
-
-## Progress 26 - Angular build served by backend
-
-The Angular production build was generated and copied into:
+Se compiló Angular y se copió en:
 
 ```txt
 backend/public/
 ```
 
-This allows the Express backend to serve the Angular frontend and the REST API from the same App Engine deployment.
+para servir frontend y API desde el mismo App Engine.
 
----
+### Avance 27 - Newman
 
-# Technical decisions
-
-## Node.js and Express
-
-Express was selected to implement the REST API because it allows a clear separation between routes, controllers, validators and services.
-
-## MongoDB Atlas
-
-MongoDB Atlas was selected as the cloud persistence layer.
-
-## Angular Router
-
-Angular Router was used to provide separated views:
+Se añadió Newman y el script:
 
 ```txt
-/
-/records/new
-/records/:id/edit
-/integrations
-/integrations/renewable-electricity
-/analytics
-/documentation
-/about
+npm run test:postman
 ```
 
-## Backend proxy
+Evidencia:
 
-The Ember Energy API is consumed through the backend. This avoids exposing the API key in the Angular frontend.
+```txt
+docs/postman/newman-run-results.png
+```
 
-## Null values
+### Avance 28 - OpenAPI
 
-Some original source fields may not be available. The project uses `null` instead of replacing missing values with `0`.
+Se creó:
+
+```txt
+docs/openapi.yaml
+```
+
+con la especificación OpenAPI 3.0.3.
+
+### Avance 29 - Ruta índice de API
+
+Se añadió la ruta:
+
+```txt
+GET /api/v1
+```
+
+para devolver un índice informativo de los endpoints principales.
 
 ---
 
-# Time tracking
+## Decisiones técnicas
 
-Time was tracked using Toggl.
+- Express para una API REST modular.
+- MongoDB Atlas como persistencia cloud.
+- Angular Router para vistas separadas.
+- Proxy backend para consumir Ember Energy.
+- Uso de `null` en valores no disponibles.
+- Postman y Newman para pruebas.
+- OpenAPI como documentación extra.
 
-Final delivery includes:
+---
+
+## Registro de tiempo
+
+El tiempo se ha registrado con Toggl.
+
+La entrega incluye:
 
 ```txt
 summary.pdf
@@ -573,13 +410,8 @@ detailed.pdf
 
 ---
 
-# Current pending item
+## Estado del vídeo
 
-The project video has not been published.
+El vídeo se añadirá al final.
 
-The application shows:
-
-```txt
-The project video link is pending.
-```
-
+La página `/about` debe actualizarse con el enlace final cuando esté publicado.

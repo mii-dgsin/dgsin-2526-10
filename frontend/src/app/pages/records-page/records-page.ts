@@ -29,7 +29,7 @@ export class RecordsPage implements OnInit {
   fromPeriod = '';
   toPeriod = '';
 
-  limit = 50;
+  limit = 10;
   offset = 0;
 
   private filterTimeout?: ReturnType<typeof setTimeout>;
